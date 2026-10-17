@@ -1,0 +1,74 @@
+{
+  "name": "blox-bridge",
+  "productName": "Blox Bridge",
+  "version": "0.1.0",
+  "description": "Connect any local model (Ollama, LM Studio, llama.cpp, Jan) to Roblox Studio over MCP.",
+  "main": "src/main/main.js",
+  "type": "module",
+  "author": "Blox Bridge",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check src/main/*.js && node --check src/renderer/app.js && node --test test/*.test.js",
+    "dist": "electron-builder --publish never",
+    "dist:win": "electron-builder --win --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:linux": "electron-builder --linux --publish never"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "electron": "^44.9.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "app.bloxbridge.desktop",
+    "productName": "Blox Bridge",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "plugin",
+        "to": "plugin"
+      }
+    ],
+    "icon": "build/icon.png",
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "artifactName": "Blox-Bridge-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Blox-Bridge-Portable-${version}.${ext}"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.developer-tools",
+      "artifactName": "Blox-Bridge-${version}-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Development",
+      "artifactName": "Blox-Bridge-${version}.${ext}"
+    }
+  }
+}
