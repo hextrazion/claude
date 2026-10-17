@@ -14,7 +14,14 @@ Get the installer for your OS from the **Releases** page, or from the latest **A
 | macOS | `Blox-Bridge-x.y.z-arm64.dmg` (Apple Silicon) / `-x64.dmg` (Intel) |
 | Linux | `Blox-Bridge-x.y.z.AppImage` (Studio itself doesn't run on Linux, but you can use the MCP endpoint remotely) |
 
-The builds are not code-signed yet. On Windows click **More info → Run anyway**. On macOS right-click the app → **Open** the first time.
+The builds are not code-signed yet, so your OS warns the first time:
+
+- **Windows:** click **More info → Run anyway**.
+- **macOS** ("Blox Bridge" Not Opened): click **Done**, open **System Settings → Privacy & Security**, scroll down and click **Open Anyway** next to Blox Bridge, then confirm. Or run this once in Terminal after dragging the app to Applications:
+
+  ```bash
+  xattr -dr com.apple.quarantine "/Applications/Blox Bridge.app"
+  ```
 
 ## Setup (2 minutes)
 
