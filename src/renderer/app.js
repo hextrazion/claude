@@ -597,19 +597,34 @@ function renderStudioTab() {
 
 function renderStudioSteps() {
   const st = S.studio;
-  const canInstall = !!st.plugin?.folder;
+  const pl = st.plugin || {};
+  const canInstall = !!pl.folder;
+  const mod = S.info?.platform === 'darwin' ? '⌘' : 'Ctrl+';
   return `
   <ol class="studio-steps">
-    <li>${st.plugin?.installed ? 'Plugin installed ✓' : 'Install the Blox Bridge plugin into Studio.'}</li>
-    <li>Open (or restart) Roblox Studio and open your place.</li>
-    <li>Studio asks if Blox Bridge may connect to 127.0.0.1. Click <b>Allow</b>.</li>
-    <li>That's it. It connects by itself. The <b>Plugins › Blox Bridge › Connect</b> button turns it on/off.</li>
+    <li>${pl.installed ? `Plugin installed ✓${pl.installedVersion ? ` <span class="kbd">v${esc(pl.installedVersion)}</span>` : ''}` : 'Install the Blox Bridge plugin into Studio.'}</li>
+    <li><b>Restart Roblox Studio</b> after installing or updating, then open your place.</li>
+    <li>If Studio asks whether Blox Bridge may connect to 127.0.0.1, click <b>Allow</b>.</li>
+    <li>It connects by itself. The <b>Plugins › Blox Bridge › Connect</b> button turns it on and off.</li>
   </ol>
+  ${st.connected && st.pluginVersion && pl.latestVersion && !pl.outdated && st.pluginVersion !== pl.latestVersion ? `<div class="status-box">${icon('alert', 18)}<div>Studio is still running the old plugin (v${esc(st.pluginVersion)}). Restart Studio to load v${esc(pl.latestVersion)}.</div></div>` : ''}
+  ${pl.outdated ? `<div class="status-box">${icon('alert', 18)}<div>Your Studio plugin is out of date (v${esc(pl.installedVersion)}, newest v${esc(pl.latestVersion)}). Click <b>Update plugin</b>, then restart Studio.</div></div>` : ''}
   <div class="row">
-    ${canInstall ? `<button class="btn ${st.plugin?.installed ? '' : 'primary'}" data-action="install-plugin">${icon('download', 15)}${st.plugin?.installed ? 'Update plugin' : 'Install plugin'}</button>
+    ${canInstall ? `<button class="btn ${pl.installed && !pl.outdated ? '' : 'primary'}" data-action="install-plugin">${icon('download', 15)}${pl.installed ? 'Update plugin' : 'Install plugin'}</button>
     <button class="btn ghost" data-action="open-plugins-folder">${icon('folder', 15)}Open plugins folder</button>` : ''}
     <button class="btn ghost" data-action="save-plugin">${icon('download', 15)}Save plugin file…</button>
-  </div>`;
+  </div>
+  ${!st.connected && !st.error ? `
+  <details class="trouble">
+    <summary>${icon('chevron', 12)}Studio is open but not connecting?</summary>
+    <ul>
+      <li><b>Restart Studio completely</b> (${mod}Q, then reopen it). Studio only loads new plugins when it starts.</li>
+      <li>In Studio open <b>View › Output</b>. Lines starting with <span class="mono">[Blox Bridge]</span> say exactly what's wrong. No lines at all means the plugin didn't load: click <b>Open plugins folder</b> and check <span class="mono">BloxBridge.lua</span> is there.</li>
+      <li>Check the <b>Plugins</b> tab has a <b>Blox Bridge › Connect</b> button and that it's highlighted (on).</li>
+      <li>If you clicked Deny when Studio asked about 127.0.0.1: <b>Plugins › Manage Plugins</b>, find Blox Bridge, and allow its HTTP access.</li>
+      <li>Keep this app open. Studio connects to it, not the other way round.</li>
+    </ul>
+  </details>` : ''}`;
 }
 
 function renderToolsTab() {
@@ -1200,7 +1215,7 @@ api.on('mcp:status', async (s) => {
   setInterval(async () => {
     // Pick up plugin installs done outside the app.
     const st = await api.invoke('studio:status');
-    if (st.plugin?.installed !== S.studio.plugin?.installed) {
+    if (JSON.stringify(st.plugin) !== JSON.stringify(S.studio.plugin)) {
       S.studio = { ...S.studio, ...st };
       render();
     }

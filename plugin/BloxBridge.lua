@@ -21,6 +21,7 @@ if RunService:IsRunning() then
 end
 
 local PORT = 44755
+local VERSION = "0.2.0"
 local BASE = "http://127.0.0.1:" .. PORT
 local SETTING = "BloxBridgeAutoConnect"
 
@@ -513,15 +514,19 @@ local function request(method, path, body)
 			["Content-Type"] = "application/json",
 			["X-Blox-Bridge"] = "1",
 			["X-Blox-Place"] = HttpService:UrlEncode(game.Name),
+			["X-Blox-Plugin"] = VERSION,
 		},
 		Body = body and HttpService:JSONEncode(body) or nil,
 	})
 end
 
+local lastReason = nil
+
 local function setConnected(value)
 	if connected ~= value then
 		connected = value
 		if value then
+			lastReason = nil
 			print("[Blox Bridge] Connected to the app on port " .. PORT)
 		else
 			print("[Blox Bridge] Waiting for the Blox Bridge app…")
@@ -546,6 +551,29 @@ local function execute(cmd)
 	return { id = cmd.id, ok = false, error = tostring(result) }
 end
 
+-- Explain a failed request once per distinct reason, so the Output window says what to fix.
+local function explainFailure(ok, res)
+	local reason
+	if ok then
+		reason = "HTTP " .. tostring(res.StatusCode) .. " from the app"
+	else
+		local msg = tostring(res)
+		if msg:find("ConnectFail") or msg:find("refused") or msg:find("HttpError") then
+			reason = "Can't reach the Blox Bridge app on 127.0.0.1:" .. PORT .. ". Is the app open?"
+		elseif msg:lower():find("not enabled") or msg:lower():find("permission") or msg:lower():find("denied") then
+			reason = "Studio blocked the connection. Open Plugins > Manage Plugins, find Blox Bridge and allow 127.0.0.1, then click Connect again. ("
+				.. msg
+				.. ")"
+		else
+			reason = msg
+		end
+	end
+	if reason ~= lastReason then
+		lastReason = reason
+		warn("[Blox Bridge] " .. reason)
+	end
+end
+
 local function loop(gen)
 	while enabled and gen == generation do
 		local ok, res = pcall(request, "GET", "/poll")
@@ -554,6 +582,7 @@ local function loop(gen)
 		end
 		if not ok or not res.Success then
 			setConnected(false)
+			explainFailure(ok, res)
 			task.wait(3)
 		elseif res.StatusCode == 200 then
 			setConnected(true)
@@ -572,6 +601,7 @@ local function start()
 	generation += 1
 	button:SetActive(enabled)
 	if enabled then
+		print("[Blox Bridge] v" .. VERSION .. " connecting to the Blox Bridge app on 127.0.0.1:" .. PORT .. "…")
 		task.spawn(loop, generation)
 	else
 		setConnected(false)

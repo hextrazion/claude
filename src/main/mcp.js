@@ -12,7 +12,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
-const CLIENT_INFO = { name: 'blox-bridge', version: '0.1.0' };
+const CLIENT_INFO = { name: 'blox-bridge', version: '0.2.0' };
 
 export class McpHub extends EventEmitter {
   constructor() {

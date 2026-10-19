@@ -22,9 +22,30 @@ function pluginSource(port) {
   return src.replace('local PORT = 44755', `local PORT = ${Number(port) || 44755}`);
 }
 
+function versionOf(src) {
+  return src?.match(/local VERSION = "([^"]+)"/)?.[1] || null;
+}
+
+export function bundledVersion() {
+  try {
+    return versionOf(pluginSource(44755));
+  } catch {
+    return null;
+  }
+}
+
 export function pluginStatus() {
   const folder = pluginsFolder();
-  return { folder, installed: !!folder && fs.existsSync(path.join(folder, PLUGIN_FILE)) };
+  const file = folder ? path.join(folder, PLUGIN_FILE) : null;
+  let installed = false;
+  let installedVersion = null;
+  try {
+    const src = fs.readFileSync(file, 'utf8');
+    installed = true;
+    installedVersion = versionOf(src) || '0.1.0';
+  } catch {}
+  const latest = bundledVersion();
+  return { folder, file, installed, installedVersion, latestVersion: latest, outdated: installed && !!latest && installedVersion !== latest };
 }
 
 export function installPlugin(port) {

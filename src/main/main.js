@@ -134,8 +134,15 @@ function registerIpc() {
 
   h('studio:status', () => ({ ...bridge.status(), plugin: pluginStatus() }));
   h('studio:installPlugin', () => {
-    const file = installPlugin(store.getSettings().bridgePort);
-    return { file, plugin: pluginStatus() };
+    try {
+      const file = installPlugin(store.getSettings().bridgePort);
+      return { file, plugin: pluginStatus() };
+    } catch (e) {
+      if (process.platform === 'darwin' && (e.code === 'EPERM' || e.code === 'EACCES')) {
+        throw new Error('macOS blocked access to your Documents folder. Allow Blox Bridge in System Settings › Privacy & Security › Files and Folders, or use "Save plugin file…".');
+      }
+      throw e;
+    }
   });
   h('studio:openPluginsFolder', async () => {
     const folder = pluginsFolder();

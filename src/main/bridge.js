@@ -64,7 +64,14 @@ export class StudioBridge extends EventEmitter {
   }
 
   status() {
-    return { connected: this.connected, place: this.place, port: this.port, error: this.error };
+    return {
+      connected: this.connected,
+      place: this.place,
+      port: this.port,
+      error: this.error,
+      pluginVersion: this.pluginVersion || null,
+      everSeen: !!this.everSeen,
+    };
   }
 
   emitStatus(force = false) {
@@ -122,6 +129,8 @@ export class StudioBridge extends EventEmitter {
 
     const place = req.headers['x-blox-place'];
     if (place) this.place = safeDecode(place);
+    this.pluginVersion = req.headers['x-blox-plugin'] || '0.1.0';
+    this.everSeen = true;
     this.lastSeen = Date.now();
 
     if (req.method === 'GET' && url.pathname === '/hello') {

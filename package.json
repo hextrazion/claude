@@ -1,7 +1,7 @@
 {
   "name": "blox-bridge",
   "productName": "Blox Bridge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Connect any local model (Ollama, LM Studio, llama.cpp, Jan) to Roblox Studio over MCP.",
   "main": "src/main/main.js",
   "type": "module",
@@ -61,7 +61,13 @@
         "zip"
       ],
       "category": "public.app-category.developer-tools",
-      "artifactName": "Blox-Bridge-${version}-${arch}.${ext}"
+      "artifactName": "Blox-Bridge-${version}-${arch}.${ext}",
+      "identity": "-",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "extendInfo": {
+        "NSDocumentsFolderUsageDescription": "Blox Bridge installs its Roblox Studio plugin into Documents/Roblox/Plugins."
+      }
     },
     "linux": {
       "target": [
