@@ -1,0 +1,24 @@
+[project]
+name = "clipper"
+version = "0.1.0"
+description = "Find the funniest moments in Twitch/YouTube videos and compile a Top-N video, judged by a local LLM."
+requires-python = ">=3.9"
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+download = ["yt-dlp"]
+transcribe = ["faster-whisper"]
+all = ["yt-dlp", "faster-whisper"]
+
+[project.scripts]
+clipper = "clipper.cli:main"
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["clipper"]
+
+[tool.setuptools.package-data]
+clipper = ["web/*"]
