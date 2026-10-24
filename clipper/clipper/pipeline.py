@@ -18,8 +18,10 @@ class Settings:
     pre: float = 5.0          # setup seconds before the audio peak
     post: float = 4.0         # reaction seconds after the peak
     per_source_candidates: int = 0   # 0 -> 3 * count
+    max_clip: float = 25.0           # longest clip we will cut
+    whole_clip_max: float = 90.0     # sources this short are already clips (e.g. Twitch clips): use them whole
     weights: Dict[str, float] = field(default_factory=lambda: {
-        "audio": 0.30, "laughter": 0.15, "chat": 0.25, "ai": 0.30})
+        "audio": 0.30, "laughter": 0.15, "chat": 0.25, "ai": 0.30, "views": 0.35})
 
 
 def _combine(sig: Dict[str, float], weights: Dict[str, float]) -> float:
@@ -53,6 +55,7 @@ def analyze(sources: List[dict], cfg: Optional[Settings] = None, llm: Optional[L
 
     pool: List[Clip] = []
     source_info: List[dict] = []
+    view_counts: Dict[int, int] = {}   # id(clip) -> views, for pre-made clips
     for src in sources:
         path = src["path"]
         duration, has_audio = media.probe(path)
@@ -68,21 +71,41 @@ def analyze(sources: List[dict], cfg: Optional[Settings] = None, llm: Optional[L
             times = signals.load_chat_times(src["chat"])
             chat_z = signals.chat_z_series(times, duration)
             log(f"  chat: {len(times)} messages")
-        moments = signals.audio_moments(db, chat_z)
-        log(f"  {len(moments)} loud moments found")
-
         cands: List[Clip] = []
-        for m in moments:
-            sig = {"audio": m.audio, "laughter": m.laughter}
-            if m.chat is not None:
-                sig["chat"] = m.chat
-            start = max(0.0, m.t - cfg.pre - cfg.lead_in)
-            end = min(duration, m.t + cfg.post + cfg.lead_out)
-            cands.append(Clip(source=path, start=start, end=end, score=_combine(sig, cfg.weights),
-                              signals=sig, credit=src.get("credit", ""),
-                              permission=src.get("permission", "unknown")))
-        cands.sort(key=lambda c: -c.score)
-        cands = cands[:per_source]
+        if duration <= cfg.whole_clip_max and len(db) >= 2:
+            # already a clip: use it whole (or its loudest stretch); loudness range replaces the z-score
+            import numpy as np
+            peak = int(np.argmax(db))
+            sig = {"audio": signals.unit(float(db[peak] - np.median(db)), 4.0, 20.0),
+                   "laughter": signals.sustain_score(db, peak, float(np.median(db)),
+                                                     max(float(np.median(np.abs(db - np.median(db))) * 1.4826),
+                                                         signals.MIN_SPREAD_DB))}
+            if duration <= cfg.max_clip:
+                start, end = 0.0, duration
+            else:
+                start = min(max(0.0, peak * signals.HOP - cfg.max_clip * 0.6), duration - cfg.max_clip)
+                end = start + cfg.max_clip
+            c = Clip(source=path, start=start, end=end, score=_combine(sig, cfg.weights), signals=sig,
+                     title=src.get("title", ""), credit=src.get("credit", ""),
+                     permission=src.get("permission", "unknown"))
+            cands.append(c)
+            views = int(src.get("views") or 0)
+            if views:
+                view_counts[id(c)] = views
+        else:
+            moments = signals.audio_moments(db, chat_z)
+            log(f"  {len(moments)} loud moments found")
+            for m in moments:
+                sig = {"audio": m.audio, "laughter": m.laughter}
+                if m.chat is not None:
+                    sig["chat"] = m.chat
+                start = max(0.0, m.t - cfg.pre - cfg.lead_in)
+                end = min(duration, m.t + cfg.post + cfg.lead_out, start + cfg.max_clip)
+                cands.append(Clip(source=path, start=start, end=end, score=_combine(sig, cfg.weights),
+                                  signals=sig, title=src.get("title", ""), credit=src.get("credit", ""),
+                                  permission=src.get("permission", "unknown")))
+            cands.sort(key=lambda c: -c.score)
+            cands = cands[:per_source]
 
         if llm and transcriber:
             for n, c in enumerate(cands, 1):
@@ -97,10 +120,19 @@ def analyze(sources: List[dict], cfg: Optional[Settings] = None, llm: Optional[L
                     llm = None
                     break
                 c.signals["ai"] = j.score
-                c.reason, c.title = j.reason, j.title
+                c.reason, c.title = j.reason, c.title or j.title
                 c.score = _combine(c.signals, cfg.weights)
                 log(f"  [{n}/{len(cands)}] {_stamp(c.start)} ai={j.score:.0f} {j.title}")
         pool.extend(cands)
+
+    if len(view_counts) >= 2:   # rank pre-made clips against each other by view count (0-100 percentile)
+        ranked = sorted(view_counts.values())
+        by_id = {id(c): c for c in pool}
+        for cid, v in view_counts.items():
+            c = by_id.get(cid)
+            if c is not None:
+                c.signals["views"] = 100.0 * ranked.index(v) / (len(ranked) - 1)
+                c.score = _combine(c.signals, cfg.weights)
 
     pool.sort(key=lambda c: -c.score)
     picked: List[Clip] = []
@@ -122,3 +154,13 @@ def analyze(sources: List[dict], cfg: Optional[Settings] = None, llm: Optional[L
                 video_titles=[f"Top {n} FUNNIEST Moments ({best})" if best else f"Top {n} Funniest Moments",
                               f"Top {n} Moments You Can't Unsee"],
                 sources=source_info, settings=asdict(cfg))
+
+
+def add_captions(plan: Plan, transcriber: Transcriber, log: Callable[[str], None] = print) -> None:
+    """Transcribe the chosen clips only and store word-grouped captions (source time) on each clip."""
+    from .captions import group_words
+    for n, c in enumerate(plan.clips, 1):
+        words = transcriber.words(media.load_audio_slice(c.source, c.start, c.end))
+        c.captions = [{"start": c.start + w["start"], "end": c.start + w["end"], "text": w["text"]}
+                      for w in group_words(words)]
+        log(f"  captions {n}/{len(plan.clips)}: {len(c.captions)} lines")

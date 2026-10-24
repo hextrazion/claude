@@ -15,7 +15,7 @@ h1{font-size:16px;margin:0}
 .grow{flex:1}
 .muted{color:var(--muted)}
 .small{font-size:12px}
-main{display:grid;grid-template-columns:320px minmax(0,1fr) 360px;gap:24px;padding:24px;align-items:start}
+main{display:grid;grid-template-columns:380px minmax(0,1fr) 360px;gap:24px;padding:24px;align-items:start}
 @media(max-width:1100px){main{grid-template-columns:1fr}}
 .col{display:flex;flex-direction:column;gap:16px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
@@ -58,6 +58,21 @@ video{width:100%;background:#0A0B0E;border-radius:8px;aspect-ratio:16/9;display:
 img.thumbout{width:100%;border-radius:8px;margin-top:10px}
 label.chk{display:flex;gap:8px;align-items:center;margin:6px 0}
 .empty{padding:32px;text-align:center;color:var(--muted)}
+.chat{padding:0;display:flex;flex-direction:column;max-height:calc(100vh - 110px);position:sticky;top:76px}
+.chat .head{display:flex;align-items:center;gap:8px;padding:14px 16px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green)}.dot.off{background:var(--muted)}
+.msgs{overflow:auto;padding:4px 16px 12px;display:flex;flex-direction:column;gap:12px;min-height:200px}
+.bub{max-width:300px;padding:10px 12px;border-radius:12px;background:var(--surface2);font-size:13px;white-space:pre-wrap;word-break:break-word}
+.bub.user{align-self:flex-end;background:var(--accent);color:#fff}
+.jobcard{background:var(--surface2);border:1px solid var(--accent);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.jobcard b{font-size:14px}
+.jobcard .chips{margin:0}.jobcard .chip{background:var(--border);color:var(--text)}.jobcard .chip.m{color:var(--muted)}
+.log{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.log .last{color:var(--green)}.log .bad{color:var(--red)}
+.send{display:flex;gap:8px;padding:12px 16px 16px}
+.send input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;min-width:0}
+.send input:focus{outline:none;border-color:var(--accent)}
+.exp select{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 8px}
 </style>
 </head>
 <body>
@@ -69,6 +84,12 @@ label.chk{display:flex;gap:8px;align-items:center;margin:6px 0}
 </header>
 <main>
   <div class="col">
+    <div class="card chat">
+      <div class="head"><span class="dot" id="dot"></span><b>Assistant</b><span class="grow"></span><span class="small muted" id="model"></span></div>
+      <div class="msgs" id="msgs" aria-live="polite"></div>
+      <form class="send" id="sendform"><input id="msg" placeholder="Ask for clips, or change the edit…" autocomplete="off" aria-label="Message">
+        <button class="btn primary" id="sendbtn">Send</button></form>
+    </div>
     <div class="card"><h2>Sources</h2><div id="sources"></div></div>
     <div class="card"><h2>Analysis settings</h2><div id="settings"></div>
       <p class="small muted" style="margin:8px 0 0">Set when you run <code>clipper analyze</code>. Re-run it to change them.</p></div>
@@ -88,7 +109,10 @@ label.chk{display:flex;gap:8px;align-items:center;margin:6px 0}
       <div class="small muted" id="pvlabel" style="margin-top:8px">Click “Preview” on a clip.</div></div>
     <div class="card ideas"><h2>Title ideas</h2><div id="ideas"></div></div>
     <div class="card"><h2>Export</h2>
-      <label class="chk"><input type="checkbox" id="overlay" checked> Countdown, title &amp; credit overlays</label>
+      <div class="row exp" style="margin-bottom:6px"><select id="aspect" aria-label="Format"><option value="16:9">16:9 widescreen</option><option value="9:16">9:16 vertical</option><option value="1:1">1:1 square</option></select>
+        <select id="style" aria-label="Style"><option value="countdown">Countdown</option><option value="compilation">Compilation</option></select></div>
+      <label class="chk"><input type="checkbox" id="captions"> Burned-in captions</label>
+      <label class="chk"><input type="checkbox" id="overlay" checked> Title &amp; credit overlays</label>
       <label class="chk"><input type="checkbox" id="intro" checked> Intro title card</label>
       <div class="row" style="margin:8px 0"><input id="outname" value="top5.mp4" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px" aria-label="Output file"></div>
       <button class="btn primary" id="render" style="width:100%">Render video</button>
@@ -102,6 +126,7 @@ label.chk{display:flex;gap:8px;align-items:center;margin:6px 0}
 
 <script>
 let plan = null, saveTimer = null;
+const api = (u, o = {}) => fetch(u, {...o, headers: {'X-Clipper': '1', ...(o.headers || {})}});
 const $ = id => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => {
   const e = Object.assign(document.createElement(tag), props);
@@ -115,14 +140,18 @@ const base = p => p.split(/[\\/]/).pop();
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),1800); }
 
 async function load(){
-  plan = await (await fetch('/api/plan')).json();
+  plan = await (await api('/api/plan')).json();
   draw();
+  const st = plan.settings || {};
+  if (st.aspect) $('aspect').value = st.aspect;
+  if (st.style) $('style').value = st.style;
+  $('captions').checked = !!st.captions; $('overlay').checked = st.overlay !== false; $('intro').checked = st.intro !== false;
 }
 function queueSave(){
   $('saved').textContent = 'saving…';
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
-    const r = await fetch('/api/plan', {method:'PUT', body: JSON.stringify(plan)});
+    const r = await api('/api/plan', {method:'PUT', body: JSON.stringify(plan)});
     $('saved').textContent = r.ok ? 'saved' : 'save failed';
   }, 400);
 }
@@ -142,7 +171,7 @@ function draw(){
   const n = plan.clips.length;
   $('sub').textContent = n ? `Video order: #${n} → #1 · ${n} clips · ${fmt(plan.clips.reduce((a,c)=>a+c.end-c.start,0))} of footage` : '';
   const box = $('clips'); box.replaceChildren();
-  if (!n) box.append(el('div',{className:'card empty',textContent:'No clips in this plan.'}));
+  if (!n) box.append(el('div',{className:'card empty',textContent:'No clips yet. Tell the assistant who to find clips from.'}));
   plan.clips.forEach((c, i) => box.append(clipCard(c, i, n)));
 
   const ideas = $('ideas'); ideas.replaceChildren();
@@ -186,19 +215,19 @@ async function preview(i){
   v.onloadeddata = () => { $('pvlabel').textContent = `#${plan.clips.length - i} · ${c.title}`; v.play().catch(()=>{}); };
   v.onerror = () => { $('pvlabel').textContent = 'Could not cut a preview (is ffmpeg installed?)'; };
 }
-async function flush(){ if (saveTimer){ clearTimeout(saveTimer); saveTimer=null; await fetch('/api/plan',{method:'PUT',body:JSON.stringify(plan)}); $('saved').textContent='saved'; } }
+async function flush(){ if (saveTimer){ clearTimeout(saveTimer); saveTimer=null; await api('/api/plan',{method:'PUT',body:JSON.stringify(plan)}); $('saved').textContent='saved'; } }
 
 $('ptitle').oninput = e => { plan.title = e.target.value; queueSave(); };
 
 $('render').onclick = async () => {
   await flush();
   $('rerr').textContent = ''; $('result').replaceChildren();
-  const r = await fetch('/api/render',{method:'POST',body:JSON.stringify({output:$('outname').value,overlay:$('overlay').checked,intro:$('intro').checked})});
+  const r = await api('/api/render',{method:'POST',body:JSON.stringify({output:$('outname').value,overlay:$('overlay').checked,intro:$('intro').checked,captions:$('captions').checked,aspect:$('aspect').value,style:$('style').value})});
   if (!r.ok) { $('rerr').textContent = (await r.json()).error; return; }
   $('render').disabled = true; poll();
 };
 async function poll(){
-  const s = await (await fetch('/api/state')).json();
+  const s = await (await api('/api/state')).json();
   $('bar').style.width = s.total ? (100*s.step/s.total)+'%' : '5%';
   $('rmsg').textContent = s.status === 'running' ? `${s.step}/${s.total} · ${s.message}` : '';
   if (s.status === 'running') return setTimeout(poll, 700);
@@ -210,7 +239,79 @@ async function poll(){
       el('img',{className:'thumbout',src:'/thumbnail?t='+Date.now(),alt:'Thumbnail'}));
   }
 }
-load();
+
+// ---------------- assistant chat ----------------
+const chat = {history: [], spec: null, dismissed: false, log: [], n: 0, status: 'idle', error: '', pending: false};
+const GREETING = "Hi! Tell me who to find funny clips from and how you want the video, e.g. “find funny clips from xQc and make a top 5 vertical video with captions”. You can also paste links.";
+function specChips(sp){
+  const kind = sp.style === 'countdown' ? `Top ${sp.count} countdown` : `${sp.count}-clip compilation`;
+  const fmt = {'16:9':'16:9 widescreen','9:16':'9:16 vertical','1:1':'1:1 square'}[sp.aspect] || sp.aspect;
+  const main = [fmt, sp.captions && 'captions', sp.overlay && 'overlays', sp.intro && 'intro card'].filter(Boolean);
+  const src = sp.urls.length ? `${sp.urls.length} link${sp.urls.length>1?'s':''}` : `${sp.platform === 'auto' ? 'auto' : sp.platform} · ${sp.period}`;
+  return {kind, who: sp.urls.length ? 'your links' : '“' + sp.query + '”', main, minor: [src, `≤ ${sp.max_clip_seconds} s per clip`]};
+}
+function jobCard(){
+  const c = specChips(chat.spec), running = chat.status === 'running';
+  const mk = (arr, cls) => el('div', {className: 'chips'}, ...arr.map(t => el('span', {className: 'chip ' + (cls || ''), textContent: t})));
+  return el('div', {className: 'jobcard'}, el('b', {textContent: `${c.kind} · ${c.who}`}), mk(c.main), mk(c.minor, 'm'),
+    el('div', {className: 'row'},
+      el('button', {className: 'btn primary', textContent: running ? 'Working…' : 'Start', disabled: running, onclick: startJob}),
+      running ? null : el('button', {className: 'btn', textContent: 'Dismiss', onclick: () => { chat.dismissed = true; drawChat(); }})));
+}
+function logBox(){
+  const lines = chat.log.slice(-7), box = el('div', {className: 'log'});
+  lines.forEach((l, i) => box.append(el('div', {textContent: l, className: i === lines.length - 1 ? (chat.status === 'error' ? 'bad' : 'last') : ''})));
+  return box;
+}
+function drawChat(){
+  const box = $('msgs'); box.replaceChildren(el('div', {className: 'bub', textContent: GREETING}));
+  for (const m of chat.history) box.append(el('div', {className: 'bub ' + (m.role === 'user' ? 'user' : ''), textContent: m.content}));
+  if (chat.pending) box.append(el('div', {className: 'bub muted', textContent: 'Thinking…'}));
+  if (chat.spec && !chat.dismissed) box.append(jobCard());
+  if (chat.log.length) box.append(logBox());
+  if (chat.status === 'done') box.append(el('div', {className: 'bub', textContent: 'Your video is ready: preview it under Export, or tweak clips and render again.'}));
+  box.scrollTop = box.scrollHeight;
+}
+async function loadChat(){
+  const c = await (await api('/api/chat')).json();
+  chat.history = c.history; chat.spec = c.spec;
+  $('model').textContent = c.llm ? (c.model || 'local model') : 'keyword mode';
+  $('dot').classList.toggle('off', !c.llm);
+  const j = await (await api('/api/job?since=0')).json();
+  chat.log = j.log; chat.n = j.n; chat.status = j.status; chat.error = j.error;
+  drawChat();
+  if (j.status === 'running') pollJob();
+}
+$('sendform').onsubmit = async e => {
+  e.preventDefault();
+  const text = $('msg').value.trim(); if (!text || chat.pending) return;
+  $('msg').value = ''; chat.history.push({role: 'user', content: text}); chat.pending = true; drawChat();
+  try {
+    const r = await api('/api/chat', {method: 'POST', body: JSON.stringify({message: text})});
+    const d = await r.json();
+    chat.history.push({role: 'assistant', content: r.ok ? d.reply : (d.error || 'Something went wrong.')});
+    if (r.ok) { chat.spec = d.spec; chat.dismissed = false; }
+  } catch (err) { chat.history.push({role: 'assistant', content: 'Could not reach the app server.'}); }
+  chat.pending = false; drawChat();
+};
+async function startJob(){
+  chat.log = []; chat.n = 0; chat.status = 'running'; chat.error = ''; drawChat();
+  const r = await api('/api/job', {method: 'POST', body: JSON.stringify({})});
+  if (!r.ok) { chat.status = 'error'; chat.log = [(await r.json()).error]; drawChat(); return; }
+  pollJob();
+}
+async function pollJob(){
+  const j = await (await api('/api/job?since=' + chat.n)).json();
+  chat.log.push(...j.log); chat.n = j.n; chat.status = j.status; drawChat();
+  if (j.status === 'running') return setTimeout(pollJob, 800);
+  if (j.status === 'done') {
+    await load();
+    const res = $('result'); res.replaceChildren(el('video', {src: '/video', controls: true, style: 'margin-top:10px'}),
+      el('img', {className: 'thumbout', src: '/thumbnail?t=' + Date.now(), alt: 'Thumbnail'}));
+    $('rmsg').textContent = 'Done: ' + j.output;
+  }
+}
+load(); loadChat();
 </script>
 </body>
 </html>

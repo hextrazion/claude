@@ -18,6 +18,7 @@ class Clip:
     transcript: str = ""
     credit: str = ""                 # e.g. "Twitch: StreamerName"
     permission: str = "unknown"      # unknown | granted | own
+    captions: List[dict] = field(default_factory=list)   # [{start, end, text}] in SOURCE time
 
     @property
     def duration(self) -> float:

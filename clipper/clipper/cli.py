@@ -94,10 +94,17 @@ def main(argv=None) -> None:
     run.add_argument("--plan", default="plan.json", help="where to save the plan")
     run.add_argument("--no-overlay", action="store_true")
 
-    u = sub.add_parser("ui", help="open the review screen for a plan.json")
-    u.add_argument("plan")
-    u.add_argument("--port", type=int, default=8765)
-    u.add_argument("--no-browser", action="store_true")
+    for name, hlp in (("chat", "open the app: chat with the assistant, review clips, render"),
+                      ("ui", "same as chat; opens an existing plan.json")):
+        u = sub.add_parser(name, help=hlp)
+        u.add_argument("plan", nargs="?", default="plan.json")
+        u.add_argument("--workdir", default=".", help="where downloads and finished videos go")
+        u.add_argument("--port", type=int, default=8765)
+        u.add_argument("--no-browser", action="store_true")
+        u.add_argument("--llm-url", default="http://localhost:11434/v1")
+        u.add_argument("--llm-model", default="")
+        u.add_argument("--no-llm", action="store_true", help="chat uses simple keyword parsing, no local model")
+        u.add_argument("--whisper", default="small")
 
     args = ap.parse_args(argv)
     try:
@@ -113,9 +120,11 @@ def main(argv=None) -> None:
             plan.save(args.plan)
             _print_plan(plan)
             _render(plan, args.out, not args.no_overlay)
-        elif args.cmd == "ui":
-            from .server import serve
-            serve(args.plan, args.port, open_browser=not args.no_browser)
+        elif args.cmd in ("chat", "ui"):
+            from .server import ServerConfig, serve
+            serve(args.plan, args.port, open_browser=not args.no_browser,
+                  config=ServerConfig(workdir=args.workdir, llm_url=args.llm_url, llm_model=args.llm_model,
+                                      use_llm=not args.no_llm, whisper=args.whisper))
     except (MediaError, LLMError) as e:
         sys.exit(f"error: {e}")
     except KeyboardInterrupt:

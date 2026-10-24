@@ -38,3 +38,17 @@ def load_audio(path: str) -> np.ndarray:
     raw = _run(["ffmpeg", "-v", "error", "-i", path, "-vn", "-ac", "1", "-ar", str(SAMPLE_RATE),
                 "-f", "s16le", "-"]).stdout
     return np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
+
+
+def probe_size(path: str) -> Tuple[int, int]:
+    """Return (width, height) of the first video stream."""
+    out = _run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
+                "-of", "json", path]).stdout
+    st = (json.loads(out).get("streams") or [{}])[0]
+    return int(st.get("width") or 0), int(st.get("height") or 0)
+
+
+def load_audio_slice(path: str, start: float, end: float) -> np.ndarray:
+    raw = _run(["ffmpeg", "-v", "error", "-ss", f"{start:.3f}", "-t", f"{max(0.0, end - start):.3f}", "-i", path,
+                "-vn", "-ac", "1", "-ar", str(SAMPLE_RATE), "-f", "s16le", "-"]).stdout
+    return np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0

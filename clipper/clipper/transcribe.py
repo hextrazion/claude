@@ -29,3 +29,10 @@ class Transcriber:
             return ""
         segments, _ = self._load().transcribe(samples, vad_filter=True, beam_size=1)
         return " ".join(s.text.strip() for s in segments).strip()
+
+    def words(self, samples: np.ndarray):
+        """[(start, end, word)] in seconds relative to the start of `samples`."""
+        if len(samples) < 16000:
+            return []
+        segments, _ = self._load().transcribe(samples, vad_filter=True, beam_size=1, word_timestamps=True)
+        return [(w.start, w.end, w.word.strip()) for seg in segments for w in (seg.words or []) if w.word.strip()]

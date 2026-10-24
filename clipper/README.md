@@ -15,20 +15,42 @@ cd clipper
 pip install -e ".[all]"      # numpy + yt-dlp (downloads) + faster-whisper (speech-to-text)
 ```
 
-## Use
+## Use: just chat
 
 ```bash
-# 1. find the best moments -> plan.json (add --chat for a chat log, see below)
-python -m clipper analyze "https://www.twitch.tv/videos/123456789" stream2.mp4 --count 5
-
-# 2. review/edit in the browser: preview clips, retitle, trim, reorder, remove, render
-python -m clipper ui plan.json
-
-# or skip the review and render straight away
-python -m clipper run "https://youtu.be/XXXXXXXXXXX" --out top5.mp4
+python -m clipper chat          # opens http://127.0.0.1:8765
 ```
 
-Output: `top5.mp4`, `top5.jpg` (thumbnail from the #1 clip) and a few title ideas.
+Type what you want, the way you'd text a person:
+
+> *I need you to find funny clips from xQc and compile them into a top 5 vertical video with captions*
+
+The assistant (your local model) turns that into a **job card**: who to search, how many clips, countdown or
+plain compilation, 16:9 / 9:16 / 1:1, captions, overlays, intro. Check it, press **Start**, and watch the log:
+find sources -> download -> pick the funniest moments -> edit -> render. Then review the clips on the same page
+(preview, retitle, trim, reorder, remove, switch format) and render again. Follow-ups work too:
+*"make it square"*, *"no intro"*, *"7 clips instead"*. You can also paste links.
+
+If the local model is off or confused, simple keyword parsing still understands the common phrasings.
+
+**Where clips come from**
+
+| Source | How | Needs |
+|---|---|---|
+| Twitch top clips (best) | the official API, ranked by views, within a time window | free key: set `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` (create an app at dev.twitch.tv/console) |
+| YouTube search | yt-dlp search for "<name> funny moments" | nothing |
+| Your own links/files | paste URLs in the chat, or use the CLI below | nothing |
+
+**Formats:** Top-N countdown (#N badges, #1 last) or plain compilation; 16:9, 9:16 (blurred-background fill, text kept
+clear of the TikTok/Shorts buttons) or 1:1; optional burned-in captions; title + credit overlays; intro card.
+
+### Command line (no chat)
+
+```bash
+python -m clipper analyze "https://www.twitch.tv/videos/123456789" stream2.mp4 --count 5   # -> plan.json
+python -m clipper ui plan.json                                                             # review + render
+python -m clipper run "https://youtu.be/XXXXXXXXXXX" --out top5.mp4                        # all in one
+```
 
 ### Local model
 
@@ -60,11 +82,18 @@ Compiling other people's clips can be a copyright or monetization problem even w
 keeps a `credit` (shown on screen) and a `permission` (`unknown` / `granted` / `own`) so you can track which
 creators you have cleared. Get the creator's OK before posting.
 
+## Security notes
+
+The app server listens on `127.0.0.1` only, rejects requests whose `Host` isn't localhost, and requires a custom
+header on every write, so other websites open in your browser can't start jobs. Output files are always written
+inside `--workdir`.
+
 ## Tests
 
 ```bash
 python -m unittest discover -s tests -t .
 ```
 
-Tests build a synthetic video with loud bursts at known times, and cover detection, the LLM client (against a
-fake local server), rendering, and the review server.
+Tests build a synthetic video with loud bursts at known times, and cover detection, the chat parser and LLM client
+(against a fake local server), source discovery (mocked Twitch/YouTube), all render formats, and the app server.
+Live Twitch/YouTube access, Whisper and a real local model are not exercised by the test suite.

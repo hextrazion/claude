@@ -59,6 +59,15 @@ class LocalLLM:
             self.model = names[0]
         return self.model
 
+    def chat(self, messages: List[dict], temperature: float = 0.2) -> str:
+        """Plain chat completion; returns the assistant text."""
+        resp = self._request("/chat/completions", {"model": self.resolve_model(), "temperature": temperature,
+                                                   "stream": False, "messages": messages})
+        try:
+            return resp["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError) as e:
+            raise LLMError(f"unexpected response shape: {str(resp)[:200]}") from e
+
     def judge(self, transcript: str, context: str = "") -> Judgement:
         model = self.resolve_model()
         user = f"Clip transcript:\n\"\"\"\n{transcript.strip()[:2500] or '(no speech detected)'}\n\"\"\""
