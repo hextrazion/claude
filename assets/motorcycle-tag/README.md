@@ -2,6 +2,8 @@
 
 A stylized low-poly motorcycle built for Roblox. Each wheel is its own mesh centred on its axle, so it can spin on its own, and the front wheel turns with the fork for steering.
 
+The second bike, a skinnable dirt bike, is in [`dirtbike/`](dirtbike). Both bikes share the same rig script.
+
 ![Hero view](previews/hero.png)
 
 | Steering at 30° | Wheels are separate objects |
@@ -65,11 +67,13 @@ MotorcycleRig.Rig(bike)            -- once, while the bike stands upright
 MotorcycleRig.SetThrottle(bike, 1) -- -1 .. 1, drives the rear wheel
 MotorcycleRig.SetSteer(bike, -0.5) -- -1 (left) .. 1 (right), servo on the raked steering axis
 MotorcycleRig.SetPaint(bike, Color3.fromRGB(40, 140, 255))
+MotorcycleRig.SetHighlight(bike, Color3.fromRGB(255, 0, 0)) -- outline the player who is "it"; nil clears
 ```
 
 `Rig` does the following:
 
-- Welds the body to `Frame` and the steering parts to `Fork`.
+- Welds the steering parts to `Fork` and every other part except the wheels to `Frame`.
+- Reads the fork angle from the model name (24° here, 27° for the dirt bike), a `SteeringRake` attribute, or `Rig(bike, { rake = degrees })`.
 - Adds three `HingeConstraint`s, all placed on wheel centres so the rig works at any scale: a servo `SteerHinge` from Frame to Fork, a free `FrontWheelHinge` from Fork to FrontWheel, and a motorised `RearWheelHinge` from Swingarm to RearWheel.
 - Adds a `KeepUpright` AlignOrientation and sets the materials (Metal, Neon lights, Glass windscreen).
 - Leaves only the wheels with `CanCollide` on. Every part keeps `CanTouch` on, so `Touched` still fires for tagging.

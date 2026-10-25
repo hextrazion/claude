@@ -1,34 +1,42 @@
 -- MotorcycleRig (ModuleScript)
--- Turns the imported MotorcycleTag_Bike model into a physics rig:
---   * body parts welded to Frame (Frame becomes the PrimaryPart)
+-- Turns an imported Motorcycle Tag bike (street bike or dirt bike) into a physics rig:
+--   * every body part welded to Frame (Frame becomes the PrimaryPart)
 --   * steering parts welded to Fork, Fork hinged to Frame on the raked steering axis (servo)
 --   * FrontWheel hinged to Fork (free spin), RearWheel hinged to Swingarm (motor drive)
 --   * an AlignOrientation that keeps the bike upright while leaving yaw free
 --
 -- Usage (server):
 --   local MotorcycleRig = require(game.ServerStorage.MotorcycleRig)
---   local bike = game.ServerStorage.MotorcycleTag_Bike:Clone()
+--   local bike = game.ServerStorage.MotorcycleTag_DirtBike:Clone()
 --   bike.Parent = workspace
 --   MotorcycleRig.Rig(bike)            -- once, while the bike stands upright
 --   MotorcycleRig.SetSteer(bike, 0.5)  -- -1 full left .. 1 full right
 --   MotorcycleRig.SetThrottle(bike, 1) -- -1 reverse .. 1 full forward
---   MotorcycleRig.SetPaint(bike, Color3.fromRGB(40, 140, 255))  -- e.g. tint whoever is "it"
+--   MotorcycleRig.SetSkin(bike, "rbxassetid://123")             -- swap the whole skin texture
+--   MotorcycleRig.SetHighlight(bike, Color3.fromRGB(255, 0, 0)) -- outline whoever is "it"; nil clears
 --
 -- All joints sit on the wheel centres, so the rig works at any import scale.
 
 local MotorcycleRig = {}
 
-MotorcycleRig.RAKE = math.rad(24)   -- fork angle baked into the model
-MotorcycleRig.STEER_LOCK = 30       -- degrees; the model is clearance-checked up to this
+MotorcycleRig.STEER_LOCK = 30       -- degrees; the models are clearance-checked up to this
 MotorcycleRig.WHEEL_SPEED = 60      -- rear wheel rad/s at full throttle
 MotorcycleRig.DRIVE_TORQUE = 20000
-MotorcycleRig.PAINT = Color3.fromRGB(242, 73, 46)
 
-local BODY_PARTS = { "Bodywork", "Seat", "Engine", "Exhaust", "Swingarm", "TailLight" }
-local STEER_PARTS = { "Handlebars", "FrontFender", "HeadlightCowl", "Headlight", "Windscreen" }
+-- Fork angle (degrees from vertical) baked into each model. A model can also carry a
+-- "SteeringRake" attribute, or Rig can be given { rake = degrees }.
+MotorcycleRig.RAKE_BY_MODEL = {
+	MotorcycleTag_Bike = 24,
+	MotorcycleTag_DirtBike = 27,
+}
+
+-- Parts that turn with the handlebars (whichever of them a model has). Everything else
+-- except the wheels is welded to Frame.
+local STEER_PARTS = { "Handlebars", "FrontFender", "HeadlightCowl", "Headlight", "Windscreen", "FrontPlate" }
+-- The street bike's single-colour paint parts, recoloured by SetPaint.
 local PAINT_PARTS = { "Bodywork", "FrontFender", "HeadlightCowl" }
 
--- Parts listed with a colour lose the palette texture and use Color + Material instead.
+-- Parts listed with a colour lose the texture and use Color + Material instead.
 local LOOK = {
 	Frame = { Enum.Material.Metal },
 	Fork = { Enum.Material.Metal },
@@ -48,8 +56,8 @@ local function getPart(model, name)
 	return part
 end
 
-local function useFlatColor(part, color)
-	-- Clearing the palette texture lets Color show; imported textures may also arrive as a SurfaceAppearance.
+local function clearTexture(part)
+	-- Imported textures may arrive as TextureID or as a SurfaceAppearance.
 	pcall(function()
 		part.TextureID = ""
 	end)
@@ -57,7 +65,6 @@ local function useFlatColor(part, color)
 	if appearance then
 		appearance:Destroy()
 	end
-	part.Color = color
 end
 
 local function weld(part0, part1)
@@ -86,19 +93,35 @@ local function hinge(name, part0, part1, worldCFrame)
 	return h
 end
 
-function MotorcycleRig.Rig(model)
+local function rakeFor(model, options)
+	local rake = (options and options.rake) or model:GetAttribute("SteeringRake") or MotorcycleRig.RAKE_BY_MODEL[model.Name]
+	if not rake then
+		warn(("MotorcycleRig: no rake known for %s, assuming 24 degrees"):format(model.Name))
+		rake = 24
+	end
+	return math.rad(rake)
+end
+
+-- options (optional): { rake = degrees }
+function MotorcycleRig.Rig(model, options)
 	local frame = getPart(model, "Frame")
 	local fork = getPart(model, "Fork")
 	local swingarm = getPart(model, "Swingarm")
 	local frontWheel = getPart(model, "FrontWheel")
 	local rearWheel = getPart(model, "RearWheel")
+	local rake = rakeFor(model, options)
 
 	-- Derive the bike's axes from the wheels, so any import orientation or heading works.
 	local flat = (frontWheel.Position - rearWheel.Position) * Vector3.new(1, 0, 1)
 	local forward = flat.Unit
 	local up = Vector3.yAxis
 	local right = forward:Cross(up)
-	local steerAxis = (up * math.cos(MotorcycleRig.RAKE) - forward * math.sin(MotorcycleRig.RAKE)).Unit
+	local steerAxis = (up * math.cos(rake) - forward * math.sin(rake)).Unit
+
+	local steering = {}
+	for _, name in ipairs(STEER_PARTS) do
+		steering[name] = true
+	end
 
 	model.PrimaryPart = frame
 	for _, part in ipairs(model:GetDescendants()) do
@@ -107,14 +130,12 @@ function MotorcycleRig.Rig(model)
 			-- Only the wheels touch the world; everything else still fires Touched for tagging.
 			part.CanCollide = part == frontWheel or part == rearWheel
 			part.CanTouch = true
+			if steering[part.Name] then
+				weld(fork, part)
+			elseif part ~= frame and part ~= fork and part ~= frontWheel and part ~= rearWheel then
+				weld(frame, part)
+			end
 		end
-	end
-
-	for _, name in ipairs(BODY_PARTS) do
-		weld(frame, getPart(model, name))
-	end
-	for _, name in ipairs(STEER_PARTS) do
-		weld(fork, getPart(model, name))
 	end
 
 	-- The steering axis passes through the front axle, so the joint sits on the wheel centre.
@@ -144,16 +165,18 @@ function MotorcycleRig.Rig(model)
 	upright.Parent = frame
 
 	for name, look in pairs(LOOK) do
-		local part = getPart(model, name)
-		part.Material = look[1]
-		if look[2] then
-			useFlatColor(part, look[2])
-		end
-		if look[3] then
-			part.Transparency = look[3]
+		local part = model:FindFirstChild(name, true)
+		if part and part:IsA("BasePart") then
+			part.Material = look[1]
+			if look[2] then
+				clearTexture(part)
+				part.Color = look[2]
+			end
+			if look[3] then
+				part.Transparency = look[3]
+			end
 		end
 	end
-	MotorcycleRig.SetPaint(model, MotorcycleRig.PAINT)
 	return model
 end
 
@@ -171,10 +194,46 @@ function MotorcycleRig.SetThrottle(model, amount)
 	drive.AngularVelocity = -math.clamp(amount, -1, 1) * MotorcycleRig.WHEEL_SPEED
 end
 
+-- Applies one skin texture to every textured part. Lights and glass keep their flat look.
+function MotorcycleRig.SetSkin(model, textureId)
+	for _, part in ipairs(model:GetDescendants()) do
+		local look = LOOK[part.Name]
+		if part:IsA("MeshPart") and not (look and look[2]) then
+			local appearance = part:FindFirstChildOfClass("SurfaceAppearance")
+			if appearance then
+				appearance:Destroy()
+			end
+			part.TextureID = textureId
+		end
+	end
+end
+
+-- Outlines the whole bike (e.g. the player who is "it"); pass nil to remove.
+function MotorcycleRig.SetHighlight(model, color)
+	local highlight = model:FindFirstChild("TagHighlight")
+	if not color then
+		if highlight then
+			highlight:Destroy()
+		end
+		return
+	end
+	if not highlight then
+		highlight = Instance.new("Highlight")
+		highlight.Name = "TagHighlight"
+		highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+		highlight.Parent = model
+	end
+	highlight.OutlineColor = color
+	highlight.FillColor = color
+	highlight.FillTransparency = 0.75
+end
+
+-- Street bike only: recolours its single-colour paint parts.
 function MotorcycleRig.SetPaint(model, color)
 	for _, name in ipairs(PAINT_PARTS) do
 		local part = getPart(model, name)
-		useFlatColor(part, color)
+		clearTexture(part)
+		part.Color = color
 		part.Material = Enum.Material.SmoothPlastic
 	end
 end

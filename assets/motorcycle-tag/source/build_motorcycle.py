@@ -588,18 +588,19 @@ def nearest(a, b):
         return np.concatenate(out)
 
 
-def check(parts):
-    """Sweep the steering through the lock and spin the wheels; print the tightest gaps."""
+def check(parts, axis=D, front=FRONT_AXLE, rear=REAR_AXLE, lock_rad=STEER_LOCK, spin_period=72):
+    """Sweep the steering through the lock and spin the wheels; print the tightest gaps.
+    spin_period: rotational symmetry of the wheels in degrees."""
     S = {p.name: surface_samples(*p.world()[:2]) for p in parts}
     group = {p.name: p.group for p in parts}
     steer = [n for n in S if group[n] == "Steer"] + ["FrontWheel"]
     body = [n for n in S if group[n] == "Body"] + ["RearWheel"]
-    lock = round(math.degrees(STEER_LOCK))
+    lock = round(math.degrees(lock_rad))
     gaps = {}
     for s_name in steer:
         for ang in range(-lock, lock + 1, 3):
-            R = rotation(D, math.radians(ang))
-            pts = (S[s_name] - FRONT_AXLE) @ R.T + FRONT_AXLE
+            R = rotation(axis, math.radians(ang))
+            pts = (S[s_name] - front) @ R.T + front
             for b_name in body:
                 d = nearest(pts, S[b_name]).min()
                 if d < gaps.get((s_name, b_name), (np.inf,))[0]:
@@ -607,12 +608,11 @@ def check(parts):
     print(f"Steering sweep +/-{lock} deg, tightest steering-part/body gaps:")
     for (a, b), (d, ang) in sorted(gaps.items(), key=lambda kv: kv[1][0])[:6]:
         print(f"  {a:14s} vs {b:12s} {d:.3f} studs (at {ang:+d} deg)")
-    print("Spinning wheels vs the parts around them (5 spokes -> 72 deg symmetry):")
-    for wname, center, others in (("FrontWheel", FRONT_AXLE, ["Fork", "FrontFender", "HeadlightCowl"]),
-                                  ("RearWheel", REAR_AXLE, ["Swingarm", "Frame", "Bodywork", "Exhaust", "Seat"])):
-        for o in others:
-            lo = min(nearest((S[wname] - center) @ rotation(X, math.radians(a)).T + center, S[o]).min()
-                     for a in range(0, 72, 6))
+    print("Spinning wheels vs the parts around them (tightest 4 each):")
+    for wname, center, others in (("FrontWheel", front, steer[:-1]), ("RearWheel", rear, body[:-1])):
+        spin = {o: min(nearest((S[wname] - center) @ rotation(X, math.radians(a)).T + center, S[o]).min()
+                       for a in range(0, spin_period, 6)) for o in others}
+        for o, lo in sorted(spin.items(), key=lambda kv: kv[1])[:4]:
             print(f"  {wname:14s} vs {o:12s} {lo:.3f} studs")
 
 
