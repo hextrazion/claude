@@ -19,7 +19,7 @@ from collections import defaultdict
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from build_motorcycle import loft, unit
+from build_motorcycle import X, Y, Z, beam, lathe, loft, unit
 
 TEX = 1024
 
@@ -126,6 +126,20 @@ def front_chart(name, label, min_dot=0.5):
     return Chart(name, label, lambda n, c: -n[2] > min_dot, lambda p: (-p[0], p[1]), "up")
 
 
+def fender_chart(name, label, axle, radius, min_dot=0.6):
+    """A fender arcing around an axle, unrolled: across the bike to the right, front at the top."""
+    axle = np.asarray(axle, float)
+
+    def pred(n, c):
+        radial = np.array([0.0, c[1] - axle[1], c[2] - axle[2]])
+        return n @ radial > min_dot * np.linalg.norm(radial)
+
+    def proj(p):
+        return p[0], -math.atan2(p[2] - axle[2], p[1] - axle[1]) * radius
+
+    return Chart(name, label, pred, proj, "up")
+
+
 # ---------------------------------------------------------------- parts
 class SkinPart:
     def __init__(self, atlas, name, pivot=(0, 0, 0), group="Body"):
@@ -189,6 +203,27 @@ def side_panel(part, profile, xs, block, chart_r, chart_l):
     for sx, chart in ((1, chart_r), (-1, chart_l)):
         part.add(loft([[np.array([sx * x, c[1] + (y - c[1]) * s, c[0] + (z - c[0]) * s]) for z, y in profile]
                        for x, s in xs]), block, [chart])
+
+
+def spoked_wheel(part, center, R, hw, spokes, spoke_w, disc_x=()):
+    """Road wheel. Blocks: TIRE, WHITEWALL (lower sidewalls), RIM, HUB, SPOKES, BRAKE."""
+    prof = [  # closed (x, r) loop: tire outside, rim inside
+        (-0.85 * hw, 0.73 * R), (-0.975 * hw, 0.80 * R), (-1.0 * hw, 0.87 * R), (-0.90 * hw, 0.94 * R),
+        (-0.62 * hw, 0.985 * R), (-0.22 * hw, R), (0.22 * hw, R), (0.62 * hw, 0.985 * R),
+        (0.90 * hw, 0.94 * R), (1.0 * hw, 0.87 * R), (0.975 * hw, 0.80 * R), (0.85 * hw, 0.73 * R),
+        (0.80 * hw, 0.71 * R), (0.70 * hw, 0.635 * R), (-0.70 * hw, 0.635 * R), (-0.80 * hw, 0.71 * R),
+    ]
+    part.add(lathe(center, prof, 32, [1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1] + [2] * 5), ["TIRE", "WHITEWALL", "RIM"])
+    hub_hw = 0.86 * hw
+    part.add(lathe(center, [(-hub_hw, 0.0), (-hub_hw, 0.15), (-0.75 * hub_hw, 0.24), (0.75 * hub_hw, 0.24),
+                            (hub_hw, 0.15), (hub_hw, 0.0)], 18), "HUB")
+    for s in range(spokes):
+        th = 2 * math.pi * s / spokes
+        radial = math.cos(th) * Y + math.sin(th) * Z
+        part.add(beam(center + 0.18 * radial, center + 0.66 * R * radial, spoke_w, min(0.30 * hw, 0.16), spoke_w * 0.8,
+                      min(0.26 * hw, 0.14), c=0.02, up=X), "SPOKES")
+    for x0, x1 in disc_x:
+        part.add(lathe(center, [(x0, 0.30), (x0, 0.60), (x1, 0.60), (x1, 0.30)], 24), "BRAKE")
 
 
 # ---------------------------------------------------------------- images

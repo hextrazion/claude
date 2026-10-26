@@ -1,5 +1,6 @@
 -- MotorcycleRig (ModuleScript)
--- Turns an imported Motorcycle Tag bike (street bike, dirt bike or superbike) into a physics rig:
+-- Turns an imported Motorcycle Tag bike (street bike, dirt bike, superbike, chopper or scooter)
+-- into a physics rig:
 --   * every body part welded to Frame (Frame becomes the PrimaryPart)
 --   * steering parts welded to Fork, Fork hinged to Frame on the raked steering axis (servo)
 --   * FrontWheel hinged to Fork (free spin), RearWheel hinged to Swingarm (motor drive)
@@ -29,6 +30,8 @@ MotorcycleRig.RAKE_BY_MODEL = {
 	MotorcycleTag_Bike = 24,
 	MotorcycleTag_DirtBike = 27,
 	MotorcycleTag_SuperBike = 23,
+	MotorcycleTag_Chopper = 34,
+	MotorcycleTag_Scooter = 26,
 }
 
 -- Parts that turn with the handlebars (whichever of them a model has). Everything else
