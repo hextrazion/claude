@@ -21,24 +21,20 @@ Run:  python3 build_dirtbike.py          build everything
       python3 build_dirtbike.py --check  also sweep the steering and report clearances
 Needs numpy and Pillow.
 """
-import json
 import math
 import os
-import struct
 import sys
-from collections import defaultdict
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "source"))
 import build_motorcycle as kit  # noqa: E402  (shared primitives from the street bike)
 from build_motorcycle import X, Y, beam, catmull, cbox, cylinder, lathe, loft, ring, rotation, superellipse, tube, unit  # noqa: E402
+from skinkit import Atlas, Chart, SkinPart, build, side_chart, side_panel, top_chart  # noqa: E402
 
 OUT_DIR = os.path.abspath(os.path.join(HERE, ".."))
 NAME = "MotorcycleTag_DirtBike"
-TEX = 1024
 
 # ---------------------------------------------------------------- layout
 RAKE = math.radians(27.0)
@@ -64,7 +60,7 @@ def steer_coords(p):
     return q @ X, q @ D, q @ FWD
 
 
-# ---------------------------------------------------------------- texture blocks (solid colours)
+# ---------------------------------------------------------------- texture: solid blocks, then paintable panels
 BLOCKS = [  # name, Blaze colour
     ("TIRE", (34, 34, 37)), ("RIM", (30, 30, 34)), ("HUB", (190, 196, 204)), ("SPOKES", (200, 205, 212)),
     ("BRAKE", (150, 156, 164)), ("FORK_UPPER", (238, 176, 52)), ("FORK_LOWER", (205, 212, 220)),
@@ -75,128 +71,26 @@ BLOCKS = [  # name, Blaze colour
     ("SEAT_SIDE", (28, 28, 31)), ("PLASTIC", (245, 245, 245)), ("TANK", (245, 245, 245)), ("SKID", (52, 55, 60)),
     ("PEGS", (150, 156, 164)),
 ]
-BLOCK = {name: i for i, (name, _) in enumerate(BLOCKS)}
-BLOCK_PX = 64
-BLOCK_ROWS = 2
-PANEL_H = TEX - BLOCK_ROWS * BLOCK_PX
+ATLAS = Atlas(BLOCKS)
 
-
-def block_rect(i):
-    per_row = TEX // BLOCK_PX
-    return (i % per_row) * BLOCK_PX, PANEL_H + (i // per_row) * BLOCK_PX, BLOCK_PX, BLOCK_PX
-
-
-def block_uv(i):
-    x, y, w, h = block_rect(i)
-    return (x + w / 2) / TEX, (y + h / 2) / TEX
-
-
-# ---------------------------------------------------------------- texture panels (projected charts)
-class Chart:
-    """A paintable panel. proj maps a 3D point to (right, up) as seen by someone looking at that surface."""
-
-    def __init__(self, name, label, pred, proj, front):
-        self.name, self.label, self.pred, self.proj, self.front = name, label, pred, proj, front
-        self.points = []
-        self.tris = []      # (3, 2) projected triangles, for the template wireframe
-        self.rect = None
-
-    def bounds(self):
-        p = np.array(self.points)
-        return p.min(0), p.max(0)
-
-    def to_px(self, sx, sy):
-        (mn, mx), (x, y, w, h), s = self.bounds(), self.rect, self.scale
-        return x + (sx - mn[0]) * s, y + (mx[1] - sy) * s
-
-    def frac_to_px(self, ff, fy):
-        """ff: 0 = rear/bottom edge .. 1 = edge nearest the bike's front (or top for top-down panels)."""
-        mn, mx = self.bounds()
-        fx = ff if self.front in ("right", "up") else 1 - ff
-        return self.to_px(mn[0] + fx * (mx[0] - mn[0]), mn[1] + fy * (mx[1] - mn[1]))
-
-
-def side_chart(name, label, sign, min_dot=0.4):
-    # Viewed from the right (+X) the bike's front (-Z) is on the viewer's right; from the left, on the left.
-    return Chart(name, label, lambda n: n[0] * sign > min_dot, lambda p: (-sign * p[2], p[1]),
-                 "right" if sign > 0 else "left")
-
-
-def top_chart(name, label, min_dot=0.4):
-    # Viewed from above with the front at the top of the image.
-    return Chart(name, label, lambda n: n[1] > min_dot, lambda p: (p[0], -p[2]), "up")
-
-
-CHARTS = {
-    "SHROUD_R": side_chart("SHROUD_R", "Shroud right", 1),
-    "SHROUD_L": side_chart("SHROUD_L", "Shroud left", -1),
-    "SIDEPLATE_R": side_chart("SIDEPLATE_R", "Number plate right", 1),
-    "SIDEPLATE_L": side_chart("SIDEPLATE_L", "Number plate left", -1),
-    "FRONT_PLATE": Chart("FRONT_PLATE", "Front number plate", lambda n: n @ FWD > 0.4,
-                         lambda p: (-steer_coords(p)[0], steer_coords(p)[1]), "up"),
-    "FRONT_FENDER": Chart("FRONT_FENDER", "Front fender (top)", lambda n: n @ D > 0.35,
-                          lambda p: (steer_coords(p)[0], steer_coords(p)[2]), "up"),
-    "REAR_FENDER": top_chart("REAR_FENDER", "Rear fender (top)"),
-    "SEAT": top_chart("SEAT", "Seat (top)", 0.5),
-    "SWINGARM_R": side_chart("SWINGARM_R", "Swingarm right", 1, 0.6),
-    "SWINGARM_L": side_chart("SWINGARM_L", "Swingarm left", -1, 0.6),
-}
+ATLAS.add(
+    side_chart("SHROUD_R", "Shroud right", 1),
+    side_chart("SHROUD_L", "Shroud left", -1),
+    side_chart("SIDEPLATE_R", "Number plate right", 1),
+    side_chart("SIDEPLATE_L", "Number plate left", -1),
+    Chart("FRONT_PLATE", "Front number plate", lambda n, c: n @ FWD > 0.4,
+          lambda p: (-steer_coords(p)[0], steer_coords(p)[1]), "up"),
+    Chart("FRONT_FENDER", "Front fender (top)", lambda n, c: n @ D > 0.35,
+          lambda p: (steer_coords(p)[0], steer_coords(p)[2]), "up"),
+    top_chart("REAR_FENDER", "Rear fender (top)"),
+    top_chart("SEAT", "Seat (top)", 0.5),
+    side_chart("SWINGARM_R", "Swingarm right", 1, 0.6),
+    side_chart("SWINGARM_L", "Swingarm left", -1, 0.6),
+)
+CHARTS = ATLAS.charts
 
 
 # ---------------------------------------------------------------- parts
-class SkinPart:
-    def __init__(self, name, pivot=(0, 0, 0), group="Body"):
-        self.name, self.group = name, group
-        self.pivot = np.asarray(pivot, float)
-        self.verts, self.faces, self.kinds, self.raw = [], [], [], []
-        self.count = 0
-
-    def add(self, prim, block, charts=()):
-        """block: block name, or a list of names indexed by a lathe's per-face colours."""
-        verts, faces = np.asarray(prim[0], float), np.asarray(prim[1], int)
-        if isinstance(block, str):
-            fblocks = np.full(len(faces), BLOCK[block])
-        else:
-            fblocks = np.array([BLOCK[block[k]] for k in prim[2]])
-        c = verts.mean(0)
-        a, b, d = verts[faces[:, 0]] - c, verts[faces[:, 1]] - c, verts[faces[:, 2]] - c
-        if np.einsum("ij,ij->i", a, np.cross(b, d)).sum() < 0:
-            faces = faces[:, [0, 2, 1]]
-        P = verts[faces]
-        fn = np.cross(P[:, 1] - P[:, 0], P[:, 2] - P[:, 0])
-        area = np.linalg.norm(fn, axis=1)
-        keep = area > 1e-9
-        faces, P, fn, fblocks = faces[keep], P[keep], fn[keep] / area[keep, None], fblocks[keep]
-        for f in range(len(faces)):
-            for ch in charts:
-                if ch.pred(fn[f]):
-                    tri = np.array([ch.proj(p) for p in P[f]])
-                    ch.points.extend(tri)
-                    ch.tris.append(tri)
-                    self.kinds.append(ch)
-                    self.raw.append(tri)
-                    break
-            else:
-                self.kinds.append(int(fblocks[f]))
-                self.raw.append(None)
-        self.verts.append(verts)
-        self.faces.append(faces + self.count)
-        self.count += len(verts)
-        return self
-
-    def world(self):
-        return np.concatenate(self.verts), np.concatenate(self.faces)
-
-    def corner_uvs(self):
-        out = np.zeros((len(self.kinds), 3, 2))
-        for f, (kind, raw) in enumerate(zip(self.kinds, self.raw)):
-            if isinstance(kind, Chart):
-                out[f] = [np.array(kind.to_px(*p)) / TEX for p in raw]
-            else:
-                out[f] = block_uv(kind)
-        return out
-
-
 def knobby_wheel(part, center, R, hw, spokes=12, disc=False):
     base = R - 0.08
     prof = [  # closed (x, r) loop: tire carcass outside, rim inside
@@ -231,19 +125,11 @@ def knobby_wheel(part, center, R, hw, spokes=12, disc=False):
         part.add(lathe(center, [(0.88 * hw, 0.16), (0.88 * hw, 0.44), (0.97 * hw, 0.44), (0.97 * hw, 0.16)], 20), "BRAKE")
 
 
-def side_panel(part, profile, xs, block, chart_r, chart_l):
-    """Prism from a convex side-view profile [(z, y)], with sections [(x, scale)] going outward."""
-    c = np.mean(profile, axis=0)
-    for sx, chart in ((1, chart_r), (-1, chart_l)):
-        part.add(loft([[np.array([sx * x, c[1] + (y - c[1]) * s, c[0] + (z - c[0]) * s]) for z, y in profile]
-                       for x, s in xs]), block, [chart])
-
-
 def build_parts():
     parts = []
 
     def part(name, pivot=(0, 0, 0), group="Body"):
-        p = SkinPart(name, pivot, group)
+        p = SkinPart(ATLAS, name, pivot, group)
         parts.append(p)
         return p
 
@@ -360,87 +246,7 @@ def build_parts():
     return parts
 
 
-# ---------------------------------------------------------------- atlas packing
-def pack(charts, pad=14, label=22):
-    """Skyline-pack the panels into the top zone at the largest uniform texel density that fits.
-    Each panel keeps `label` pixels above it for its name on the template."""
-    items = sorted(charts, key=lambda c: -(c.bounds()[1][1] - c.bounds()[0][1]))
-
-    def place(scale):
-        sky = np.full(TEX, pad + label, float)   # lowest free y per pixel column
-        rects = {}
-        for c in items:
-            mn, mx = c.bounds()
-            w, h = (mx - mn) * scale
-            span = int(math.ceil(w)) + pad
-            best = None
-            for x in range(pad, TEX - span + 1, 4):
-                y = sky[x:x + span].max()
-                if best is None or y < best[1]:
-                    best = (x, y)
-            if best is None or best[1] + h + pad > PANEL_H:
-                return None
-            x, y = best
-            rects[c.name] = (x, y, w, h)
-            sky[x:x + span] = y + h + pad + label
-        return rects
-
-    lo, hi = 10.0, 1000.0
-    for _ in range(30):
-        mid = (lo + hi) / 2
-        lo, hi = (mid, hi) if place(mid) else (lo, mid)
-    rects = place(lo)
-    for c in charts:
-        c.rect, c.scale = rects[c.name], lo
-    return lo
-
-
-# ---------------------------------------------------------------- images
-def font(size, bold=True):
-    for path in ("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-                 "/Library/Fonts/Arial Bold.ttf", "C:/Windows/Fonts/arialbd.ttf"):
-        if os.path.exists(path):
-            return ImageFont.truetype(path, size)
-    return ImageFont.load_default(size)
-
-
-def text_color(rgb):
-    return (20, 20, 22) if sum(rgb) > 380 else (245, 245, 245)
-
-
-def draw_wire(draw, chart, color, width=1):
-    for tri in chart.tris:
-        pts = [chart.to_px(*p) for p in tri]
-        draw.line(pts + [pts[0]], fill=color, width=width)
-
-
-def write_template(charts, path_template, path_overlay):
-    img = Image.new("RGB", (TEX, TEX), (43, 45, 49))
-    ov = Image.new("RGBA", (TEX, TEX), (0, 0, 0, 0))
-    d, do = ImageDraw.Draw(img), ImageDraw.Draw(ov)
-    for c in charts.values():
-        x, y, w, h = c.rect
-        d.rectangle([x - 6, y - 6, x + w + 6, y + h + 6], fill=(70, 74, 80))
-        for tri in c.tris:
-            d.polygon([c.to_px(*p) for p in tri], fill=(232, 234, 238))
-        draw_wire(d, c, (175, 180, 188))
-        draw_wire(do, c, (255, 255, 255, 140))
-        do.rectangle([x - 6, y - 6, x + w + 6, y + h + 6], outline=(255, 210, 0, 200), width=2)
-        arrow = {"right": "FRONT \u2192", "left": "\u2190 FRONT", "up": "\u2191 FRONT"}[c.front]
-        if c.name == "FRONT_PLATE":
-            arrow = "\u2191 UP"
-        d.text((x, y - 4), c.label, fill=(255, 210, 0), font=font(15), anchor="lb")
-        d.text((x + w / 2, y + h / 2), arrow, fill=(110, 116, 126), font=font(14), anchor="mm")
-    for i, (name, rgb) in enumerate(BLOCKS):
-        x, y, w, h = block_rect(i)
-        d.rectangle([x, y, x + w - 1, y + h - 1], fill=rgb, outline=(20, 20, 22))
-        do.rectangle([x, y, x + w - 1, y + h - 1], outline=(255, 210, 0, 160))
-        label = name.replace("_", "\n", 1)
-        d.multiline_text((x + w / 2, y + h / 2), label, fill=text_color(rgb), font=font(9), anchor="mm", align="center")
-    img.save(path_template)
-    ov.save(path_overlay)
-
-
+# ---------------------------------------------------------------- skins
 SKINS = {
     "blaze": dict(primary=(255, 92, 20), secondary=(250, 250, 250), accent=(24, 24, 28), plate=(250, 250, 250),
                   number="07", number_color=(24, 24, 28), seat=(26, 26, 30), seat_rib=(60, 60, 66), swingarm=(186, 192, 200),
@@ -464,186 +270,40 @@ SKINS = {
 }
 
 
-def paint_skin(charts, skin, path):
-    img = Image.new("RGB", (TEX, TEX), skin["primary"])
-    d = ImageDraw.Draw(img)
-
-    def fill(c, color, grow=10):
-        x, y, w, h = c.rect
-        d.rectangle([x - grow, y - grow, x + w + grow, y + h + grow], fill=color)
-
-    def poly(c, pts, color):
-        d.polygon([c.frac_to_px(ff, fy) for ff, fy in pts], fill=color)
-
-    def number(c, size_frac=0.62, cy=0.5):
-        x, y, w, h = c.rect
-        f = font(max(8, int(h * size_frac)))
-        cx, py = c.frac_to_px(0.5, cy)
-        d.text((cx, py), skin["number"], fill=skin["number_color"], font=f, anchor="mm")
-
+def paint_skin(pt, skin):
     for side in ("SHROUD_R", "SHROUD_L"):  # base colour with a swoosh rising toward the front
-        c = charts[side]
-        fill(c, skin["primary"])
-        poly(c, [(0.0, 0.05), (0.55, 0.30), (1.0, 0.85), (1.0, 1.05), (0.45, 0.55), (0.0, 0.32)], skin["secondary"])
-        poly(c, [(0.0, 0.36), (0.45, 0.59), (1.0, 1.08), (1.0, 1.2), (0.42, 0.68), (0.0, 0.46)], skin["accent"])
+        c = CHARTS[side]
+        pt.fill(c, skin["primary"])
+        pt.poly(c, [(0.0, 0.05), (0.55, 0.30), (1.0, 0.85), (1.0, 1.05), (0.45, 0.55), (0.0, 0.32)], skin["secondary"])
+        pt.poly(c, [(0.0, 0.36), (0.45, 0.59), (1.0, 1.08), (1.0, 1.2), (0.42, 0.68), (0.0, 0.46)], skin["accent"])
     for side in ("SIDEPLATE_R", "SIDEPLATE_L"):
-        c = charts[side]
-        fill(c, skin["plate"])
-        poly(c, [(0.0, 0.0), (1.0, 0.0), (1.0, 0.12), (0.0, 0.12)], skin["primary"])
-        number(c, 0.58, 0.56)
-    c = charts["FRONT_PLATE"]
-    fill(c, skin["plate"])
-    poly(c, [(0.0, 0.0), (1.0, 0.0), (1.0, 0.36), (0.0, 0.36)], skin["primary"])  # headlight sits here
-    number(c, 0.40, 0.70)
+        c = CHARTS[side]
+        pt.fill(c, skin["plate"])
+        pt.poly(c, [(0.0, 0.0), (1.0, 0.0), (1.0, 0.12), (0.0, 0.12)], skin["primary"])
+        pt.number(c, skin["number"], skin["number_color"], 0.58, 0.56)
+    c = CHARTS["FRONT_PLATE"]
+    pt.fill(c, skin["plate"])
+    pt.poly(c, [(0.0, 0.0), (1.0, 0.0), (1.0, 0.36), (0.0, 0.36)], skin["primary"])  # headlight sits here
+    pt.number(c, skin["number"], skin["number_color"], 0.40, 0.70)
     for name in ("FRONT_FENDER", "REAR_FENDER"):
-        c = charts[name]
-        fill(c, skin["primary"])
-        for lo, hi, col in ((0.38, 0.62, skin["secondary"]), (0.45, 0.55, skin["accent"])):
-            x0, _ = c.frac_to_px(lo, 0)
-            x1, _ = c.frac_to_px(hi, 0)
-            x, y, w, h = c.rect
-            d.rectangle([min(x0, x1), y - 10, max(x0, x1), y + h + 10], fill=col)
-    c = charts["SEAT"]
-    fill(c, skin["seat"])
-    x, y, w, h = c.rect
-    for k in range(1, 12):  # gripper ribs
-        yy = y + h * k / 12
-        d.line([(x + w * 0.12, yy), (x + w * 0.88, yy)], fill=skin["seat_rib"], width=3)
+        c = CHARTS[name]
+        pt.fill(c, skin["primary"])
+        pt.bands(c, [(0.38, 0.62, skin["secondary"]), (0.45, 0.55, skin["accent"])])
+    c = CHARTS["SEAT"]
+    pt.fill(c, skin["seat"])
+    pt.ribs(c, skin["seat_rib"])  # gripper ribs
     for side in ("SWINGARM_R", "SWINGARM_L"):
-        c = charts[side]
-        fill(c, skin["swingarm"])
-        poly(c, [(0.55, 0.25), (0.9, 0.25), (0.9, 0.75), (0.55, 0.75)], skin["accent"])
-    for i, (name, rgb) in enumerate(BLOCKS):
-        x, y, w, h = block_rect(i)
-        d.rectangle([x, y, x + w - 1, y + h - 1], fill=skin["blocks"].get(name, rgb))
-    img.save(path)
-
-
-# ---------------------------------------------------------------- normals + export
-def bake(part, smooth_deg=40.0):
-    V, F = part.world()
-    UV = part.corner_uvs()
-    P = V[F]
-    fn = np.cross(P[:, 1] - P[:, 0], P[:, 2] - P[:, 0])
-    fu = fn / np.linalg.norm(fn, axis=1, keepdims=True)
-    key = {}
-    gid = np.array([key.setdefault(tuple(k), len(key)) for k in np.round(V * 1e4).astype(np.int64)])
-    G = gid[F]
-    by_group = defaultdict(list)
-    for f in range(len(F)):
-        for c in range(3):
-            by_group[G[f, c]].append(f)
-    by_group = {g: np.array(fs) for g, fs in by_group.items()}
-    cos_t = math.cos(math.radians(smooth_deg))
-    out, pos, nor, uv, idx = {}, [], [], [], []
-    for f in range(len(F)):
-        for c in range(3):
-            fs = by_group[G[f, c]]
-            n = unit(fn[fs[fu[fs] @ fu[f] > cos_t]].sum(0))
-            k = (G[f, c], *np.round(n * 1e3).astype(int), *np.round(UV[f, c] * 1e5).astype(int))
-            if k not in out:
-                out[k] = len(pos)
-                pos.append(V[F[f, c]] - part.pivot)
-                nor.append(n)
-                uv.append(UV[f, c])
-            idx.append(out[k])
-    return (np.array(pos, np.float32), np.array(nor, np.float32), np.array(uv, np.float32), np.array(idx, np.uint32))
-
-
-def write_glb(path, parts, baked, png):
-    blob, views, accessors = bytearray(), [], []
-
-    def view(data, target=None):
-        while len(blob) % 4:
-            blob.append(0)
-        views.append({"buffer": 0, "byteOffset": len(blob), "byteLength": len(data), **({"target": target} if target else {})})
-        blob.extend(data)
-        return len(views) - 1
-
-    def accessor(arr, kind, ctype, target, minmax=False):
-        a = {"bufferView": view(arr.tobytes(), target), "componentType": ctype, "count": len(arr), "type": kind}
-        if minmax:
-            a["min"], a["max"] = arr.min(0).astype(float).tolist(), arr.max(0).astype(float).tolist()
-        accessors.append(a)
-        return len(accessors) - 1
-
-    meshes, nodes = [], []
-    for p, (pos, nor, uv, idx) in zip(parts, baked):
-        small = idx.max() < 65535
-        prim = {"attributes": {"POSITION": accessor(pos, "VEC3", 5126, 34962, True),
-                               "NORMAL": accessor(nor, "VEC3", 5126, 34962),
-                               "TEXCOORD_0": accessor(uv, "VEC2", 5126, 34962)},
-                "indices": accessor(idx.astype(np.uint16 if small else np.uint32), "SCALAR", 5123 if small else 5125, 34963),
-                "material": 0}
-        meshes.append({"name": p.name, "primitives": [prim]})
-        nodes.append({"name": p.name, "mesh": len(meshes) - 1, "translation": p.pivot.tolist(), "extras": {"group": p.group}})
-    image_view = view(png)
-    nodes.append({"name": NAME, "children": list(range(len(parts))),
-                  "extras": {"units": "studs", "forward": "-Z", "up": "+Y", "steeringRakeDeg": math.degrees(RAKE),
-                             "steeringAxis": "through FrontWheel centre, tilted back by steeringRakeDeg"}})
-    gltf = {
-        "asset": {"version": "2.0", "generator": "Motorcycle Tag build_dirtbike.py"},
-        "scene": 0, "scenes": [{"name": NAME, "nodes": [len(nodes) - 1]}], "nodes": nodes, "meshes": meshes,
-        "materials": [{"name": "DirtBikeSkin", "pbrMetallicRoughness": {"baseColorTexture": {"index": 0}, "metallicFactor": 0.0,
-                                                                         "roughnessFactor": 0.6}}],
-        "textures": [{"source": 0, "sampler": 0}],
-        "samplers": [{"magFilter": 9729, "minFilter": 9987, "wrapS": 33071, "wrapT": 33071}],
-        "images": [{"name": "skin", "bufferView": image_view, "mimeType": "image/png"}],
-        "accessors": accessors, "bufferViews": views, "buffers": [{"byteLength": len(blob)}],
-    }
-    js = json.dumps(gltf, separators=(",", ":")).encode()
-    js += b" " * ((4 - len(js) % 4) % 4)
-    while len(blob) % 4:
-        blob.append(0)
-    with open(path, "wb") as fh:
-        fh.write(struct.pack("<III", 0x46546C67, 2, 12 + 8 + len(js) + 8 + len(blob)))
-        fh.write(struct.pack("<I4s", len(js), b"JSON") + js)
-        fh.write(struct.pack("<I4s", len(blob), b"BIN\x00") + bytes(blob))
-
-
-def write_obj(path, parts, baked, texture):
-    mtl = os.path.splitext(os.path.basename(path))[0] + ".mtl"
-    lines = [f"# {NAME} - units: studs, +Y up, front faces -Z", f"mtllib {mtl}"]
-    base = 1
-    for p, (pos, nor, uv, idx) in zip(parts, baked):
-        lines.append(f"o {p.name}")
-        lines += [f"v {a:.5f} {b:.5f} {c:.5f}" for a, b, c in pos + p.pivot]
-        lines += [f"vt {a:.5f} {1 - b:.5f}" for a, b in uv]
-        lines += [f"vn {a:.4f} {b:.4f} {c:.4f}" for a, b, c in nor]
-        lines += ["usemtl DirtBikeSkin", "s off"]
-        lines += ["f " + " ".join(f"{i}/{i}/{i}" for i in t) for t in idx.reshape(-1, 3) + base]
-        base += len(pos)
-    with open(path, "w") as fh:
-        fh.write("\n".join(lines) + "\n")
-    with open(os.path.join(os.path.dirname(path), mtl), "w") as fh:
-        fh.write(f"newmtl DirtBikeSkin\nKa 0 0 0\nKd 1 1 1\nKs 0.1 0.1 0.1\nNs 30\nd 1\nillum 2\nmap_Kd {texture}\n")
+        c = CHARTS[side]
+        pt.fill(c, skin["swingarm"])
+        pt.poly(c, [(0.55, 0.25), (0.9, 0.25), (0.9, 0.75), (0.55, 0.75)], skin["accent"])
+    pt.blocks(skin["blocks"])
 
 
 # ---------------------------------------------------------------- main
 def main():
     parts = build_parts()
-    density = pack(list(CHARTS.values()))
-    baked = [bake(p) for p in parts]
-    os.makedirs(os.path.join(OUT_DIR, "skins"), exist_ok=True)
-    for name, skin in SKINS.items():
-        paint_skin(CHARTS, skin, os.path.join(OUT_DIR, "skins", f"{name}.png"))
-    write_template(CHARTS, os.path.join(OUT_DIR, "skin_template.png"), os.path.join(OUT_DIR, "uv_overlay.png"))
-    with open(os.path.join(OUT_DIR, "skins", "blaze.png"), "rb") as fh:
-        write_glb(os.path.join(OUT_DIR, NAME + ".glb"), parts, baked, fh.read())
-    write_obj(os.path.join(OUT_DIR, NAME + ".obj"), parts, baked, "skins/blaze.png")
-
-    total = 0
-    print(f"{'part':12s} {'group':6s} {'tris':>5s}  size (studs)        pivot")
-    for p, (pos, nor, uv, idx) in zip(parts, baked):
-        size, ctr = pos.max(0) - pos.min(0), (pos.max(0) + pos.min(0)) / 2
-        total += len(idx) // 3
-        note = f"  bbox centre offset {np.abs(ctr).max():.4f}" if p.group == "Wheel" else ""
-        print(f"{p.name:12s} {p.group:6s} {len(idx) // 3:5d}  {size[0]:.2f} x {size[1]:.2f} x {size[2]:.2f}  "
-              f"{np.round(p.pivot, 3).tolist()}{note}")
-    allv = np.concatenate([b[0] + p.pivot for p, b in zip(parts, baked)])
-    ext = allv.max(0) - allv.min(0)
-    print(f"total: {total} triangles; bike {ext[0]:.2f} W x {ext[1]:.2f} H x {ext[2]:.2f} L studs; "
-          f"panel texel density {density:.0f} px/stud")
+    build(OUT_DIR, NAME, ATLAS, parts, SKINS, paint_skin, math.degrees(RAKE), "Motorcycle Tag build_dirtbike.py",
+          "DirtBikeSkin", up_labels=("FRONT_PLATE",))
     if "--check" in sys.argv:
         kit.check(parts, axis=D, front=FRONT_AXLE, rear=REAR_AXLE, lock_rad=STEER_LOCK, spin_period=90)
 

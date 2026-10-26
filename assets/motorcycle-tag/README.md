@@ -2,7 +2,7 @@
 
 A stylized low-poly motorcycle built for Roblox. Each wheel is its own mesh centred on its axle, so it can spin on its own, and the front wheel turns with the fork for steering.
 
-The second bike, a skinnable dirt bike, is in [`dirtbike/`](dirtbike). Both bikes share the same rig script.
+More bikes, built for skins: the [dirt bike](dirtbike) and the [superbike](superbike). All of them share the same rig script.
 
 ![Hero view](previews/hero.png)
 
@@ -73,7 +73,7 @@ MotorcycleRig.SetHighlight(bike, Color3.fromRGB(255, 0, 0)) -- outline the playe
 `Rig` does the following:
 
 - Welds the steering parts to `Fork` and every other part except the wheels to `Frame`.
-- Reads the fork angle from the model name (24° here, 27° for the dirt bike), a `SteeringRake` attribute, or `Rig(bike, { rake = degrees })`.
+- Reads the fork angle from the model name (24° here, 27° for the dirt bike, 23° for the superbike), a `SteeringRake` attribute, or `Rig(bike, { rake = degrees })`.
 - Adds three `HingeConstraint`s, all placed on wheel centres so the rig works at any scale: a servo `SteerHinge` from Frame to Fork, a free `FrontWheelHinge` from Fork to FrontWheel, and a motorised `RearWheelHinge` from Swingarm to RearWheel.
 - Adds a `KeepUpright` AlignOrientation and sets the materials (Metal, Neon lights, Glass windscreen).
 - Leaves only the wheels with `CanCollide` on. Every part keeps `CanTouch` on, so `Touched` still fires for tagging.

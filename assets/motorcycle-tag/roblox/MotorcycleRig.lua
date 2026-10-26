@@ -1,5 +1,5 @@
 -- MotorcycleRig (ModuleScript)
--- Turns an imported Motorcycle Tag bike (street bike or dirt bike) into a physics rig:
+-- Turns an imported Motorcycle Tag bike (street bike, dirt bike or superbike) into a physics rig:
 --   * every body part welded to Frame (Frame becomes the PrimaryPart)
 --   * steering parts welded to Fork, Fork hinged to Frame on the raked steering axis (servo)
 --   * FrontWheel hinged to Fork (free spin), RearWheel hinged to Swingarm (motor drive)
@@ -28,10 +28,12 @@ MotorcycleRig.DRIVE_TORQUE = 20000
 MotorcycleRig.RAKE_BY_MODEL = {
 	MotorcycleTag_Bike = 24,
 	MotorcycleTag_DirtBike = 27,
+	MotorcycleTag_SuperBike = 23,
 }
 
 -- Parts that turn with the handlebars (whichever of them a model has). Everything else
--- except the wheels is welded to Frame.
+-- except the wheels is welded to Frame, including the superbike's frame-mounted
+-- Headlights and Windshield.
 local STEER_PARTS = { "Handlebars", "FrontFender", "HeadlightCowl", "Headlight", "Windscreen", "FrontPlate" }
 -- The street bike's single-colour paint parts, recoloured by SetPaint.
 local PAINT_PARTS = { "Bodywork", "FrontFender", "HeadlightCowl" }
@@ -44,8 +46,10 @@ local LOOK = {
 	Engine = { Enum.Material.Metal },
 	Exhaust = { Enum.Material.Metal },
 	Headlight = { Enum.Material.Neon, Color3.fromRGB(225, 240, 255) },
+	Headlights = { Enum.Material.Neon, Color3.fromRGB(225, 240, 255) },
 	TailLight = { Enum.Material.Neon, Color3.fromRGB(255, 40, 55) },
 	Windscreen = { Enum.Material.Glass, Color3.fromRGB(52, 62, 76), 0.35 },
+	Windshield = { Enum.Material.Glass, Color3.fromRGB(40, 52, 70), 0.35 },
 }
 
 local function getPart(model, name)
