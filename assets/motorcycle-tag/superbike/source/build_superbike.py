@@ -25,8 +25,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "source"))
-import build_motorcycle as kit  # noqa: E402
-from build_motorcycle import X, Y, Z, beam, catmull, cbox, cylinder, lathe, loft, ring, rotation, superellipse, tube, unit  # noqa: E402
+from shapes import X, Y, Z, beam, catmull, cbox, check, cylinder, lathe, loft, ring, rotation, superellipse, tube, unit  # noqa: E402
 from skinkit import Atlas, Chart, SkinPart, build, front_chart, side_chart, side_panel, top_chart  # noqa: E402
 
 OUT_DIR = os.path.abspath(os.path.join(HERE, ".."))
@@ -288,7 +287,7 @@ def main():
     build(OUT_DIR, NAME, ATLAS, parts, SKINS, paint_skin, math.degrees(RAKE), "Motorcycle Tag build_superbike.py",
           "SuperBikeSkin", up_labels=("NOSE_FRONT",))
     if "--check" in sys.argv:
-        kit.check(parts, axis=D, front=FRONT_AXLE, rear=REAR_AXLE, lock_rad=STEER_LOCK, spin_period=120)
+        check(parts, axis=D, front=FRONT_AXLE, rear=REAR_AXLE, lock_rad=STEER_LOCK, spin_period=120)
 
 
 if __name__ == "__main__":

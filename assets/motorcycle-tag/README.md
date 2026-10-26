@@ -1,8 +1,8 @@
 # Motorcycle Tag: bike model
 
-A stylized low-poly motorcycle built for Roblox. Each wheel is its own mesh centred on its axle, so it can spin on its own, and the front wheel turns with the fork for steering.
+A stylized low-poly motorcycle built for Roblox. Each wheel is its own mesh centred on its axle, so it can spin on its own, and the front wheel turns with the fork for steering. Like every bike here, it is **built for skins**: one 1024×1024 texture per skin.
 
-More bikes, built for skins: the [dirt bike](dirtbike), [superbike](superbike), [chopper](chopper) and [scooter](scooter). All of them share the same rig script.
+More bikes: the [dirt bike](dirtbike), [superbike](superbike), [chopper](chopper) and [scooter](scooter). All of them share the same rig script and skin system.
 
 ![Hero view](previews/hero.png)
 
@@ -16,17 +16,19 @@ More angles are in [`previews/`](previews).
 
 | File | What it is |
 |---|---|
-| `MotorcycleTag_Bike.glb` | Main file. Use it with the Roblox 3D Importer or open it in Blender. The palette texture is embedded. |
-| `MotorcycleTag_Bike.obj` + `.mtl` + `palette.png` | The same 15 parts as OBJ objects, for tools that prefer OBJ. |
-| `roblox/MotorcycleRig.lua` | Optional ModuleScript that welds, hinges and drives the imported model. |
-| `source/build_motorcycle.py` | Generator for all of the above. Edit the numbers in it and rerun. |
+| `MotorcycleTag_Bike.glb` | Main file. Use it with the Roblox 3D Importer or open it in Blender. The Classic skin is embedded. |
+| `MotorcycleTag_Bike.obj` + `.mtl` | The same 15 parts as OBJ objects, for tools that prefer OBJ, using `skins/classic.png`. |
+| `skin_template.png` / `uv_overlay.png` | The labelled texture layout, and a transparent wireframe to paint over. |
+| `skins/*.png` | Example skins: `classic` (the original coral red and gold), `nightrider`, `glacier`, `sunset`. |
+| `roblox/MotorcycleRig.lua` | Optional ModuleScript that welds, hinges and drives any of the bikes. |
+| `source/build_motorcycle.py` | Generator for all of the above. Shared code lives in `source/shapes.py` (shapes and clearance check) and `source/skinkit.py` (skin pipeline). |
 
 ## Specs
 
 - **Size:** 8.1 L × 4.5 H × 2.6 W studs. The seat is at 3.3 studs and the footpegs at 1.3 studs, which suits an R15 rider.
 - **Axes:** +Y is up and the bike faces **−Z**, Roblox's LookVector. X points to the bike's right.
-- **Budget:** 8,120 triangles across 15 meshes, with one shared 64×64 palette texture and no interior faces.
-- **Shading:** flat-colour palette. Edges sharper than 40° are hard and everything else is smoothed.
+- **Budget:** 8,120 triangles across 15 meshes, with one 1024×1024 skin texture and no interior faces.
+- **Shading:** edges sharper than 40° are hard and everything else is smoothed.
 
 ### Parts
 
@@ -37,7 +39,22 @@ More angles are in [`previews/`](previews).
 | **Steering** (turns together) | `Fork`, `Handlebars`, `FrontFender`, `HeadlightCowl`, `Headlight`, `Windscreen` | Pivot is the front axle. The steering axis runs through the front wheel centre, tilted back 24° from vertical. |
 | **Body** (welded) | `Frame`, `Bodywork`, `Seat`, `Engine`, `Exhaust`, `Swingarm`, `TailLight` | Pivot is the model origin, on the ground midway between the axles. `Frame` is the root. |
 
-`Bodywork`, `FrontFender` and `HeadlightCowl` use only the paint colour. Remove their texture and set `Color` to recolour the bike per player, for example to mark who is "it". `Headlight` and `TailLight` are separate parts so you can set them to Neon.
+`Headlight` and `TailLight` are separate parts so you can set them to Neon.
+
+### Making skins
+
+![Skin template](skin_template.png)
+
+The texture works the same way on every bike. Panels at the top are laid out as you'd see them from outside the bike, so text reads correctly, and the blocks at the bottom are solid colours for the mechanical parts.
+
+| Panel | Notes |
+|---|---|
+| Bodywork right / left side | The whole side view on one canvas: cowl sides, shrouds, tank, side covers and tail. |
+| Cowl, tank and tail (top) | Seen from above, with the front at the top. |
+| Headlight cowl (front) | Seen from the front. |
+| Front fender (unrolled), seat (top), swingarm right / left | Smaller detail areas. |
+
+`PAINT` colours the edges and inner faces of the bodywork, so match it to your main colour. Upload the PNG and apply it with `MotorcycleRig.SetSkin(bike, "rbxassetid://<id>")`.
 
 ### Clearances
 
@@ -66,7 +83,7 @@ MotorcycleRig.Rig(bike)            -- once, while the bike stands upright
 
 MotorcycleRig.SetThrottle(bike, 1) -- -1 .. 1, drives the rear wheel
 MotorcycleRig.SetSteer(bike, -0.5) -- -1 (left) .. 1 (right), servo on the raked steering axis
-MotorcycleRig.SetPaint(bike, Color3.fromRGB(40, 140, 255))
+MotorcycleRig.SetSkin(bike, "rbxassetid://<id>") -- any uploaded skin texture
 MotorcycleRig.SetHighlight(bike, Color3.fromRGB(255, 0, 0)) -- outline the player who is "it"; nil clears
 ```
 
@@ -84,4 +101,4 @@ If your game moves the bike kinematically instead, skip the module and just rota
 
 ## Changing the design
 
-All proportions, colours and part splits are plain numbers in `source/build_motorcycle.py`, which only needs `numpy`. Rerun it to regenerate the GLB, OBJ and palette.
+All proportions, colours and part splits are plain numbers in `source/build_motorcycle.py`, which needs numpy and Pillow. Rerun it to regenerate the GLB, OBJ, template and skins.

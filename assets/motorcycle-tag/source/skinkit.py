@@ -19,7 +19,7 @@ from collections import defaultdict
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from build_motorcycle import X, Y, Z, beam, lathe, loft, unit
+from shapes import X, Y, Z, beam, lathe, loft, unit
 
 TEX = 1024
 
