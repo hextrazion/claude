@@ -23,7 +23,7 @@ More angles, including steering at 30° and the wheels pulled out, are in [`prev
 | `MotorcycleTag_Scooter.glb` | Main file for the Roblox 3D Importer or Blender, with the Mint skin embedded. |
 | `MotorcycleTag_Scooter.obj` + `.mtl` | The same 12 parts as OBJ objects, using `skins/mint.png`. |
 | `skin_template.png` / `uv_overlay.png` | The labelled texture layout, and a transparent wireframe to paint over. |
-| `skins/*.png` | Example skins: `mint` (mint and cream), `bubblegum` (pink polka dots), `taxi` (yellow and checkers), `racer` (white with red and blue stripes, #5). |
+| `skins/*.png` | Skins: `mint` (mint and cream), `bubblegum` (pink polka dots), `taxi` (yellow and checkers), `racer` (white with red and blue stripes, #5), `lemonade`, `ocean`, `cherry_cola`, `galaxy`. |
 | `source/build_scooter.py` | Generator for all of the above. It needs numpy and Pillow, and uses the shared `../source/skinkit.py`. |
 
 ## Making skins

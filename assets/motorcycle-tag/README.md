@@ -1,8 +1,53 @@
-# Motorcycle Tag: bike model
+# Motorcycle Tag: bikes
 
-A stylized low-poly motorcycle built for Roblox. Each wheel is its own mesh centred on its axle, so it can spin on its own, and the front wheel turns with the fork for steering. Like every bike here, it is **built for skins**: one 1024×1024 texture per skin.
+Stylized low-poly motorcycles built for Roblox: a street bike (this page), a [dirt bike](dirtbike), a [superbike](superbike), a [chopper](chopper) and a [scooter](scooter). On every bike each wheel is its own mesh centred on its axle, so it can spin on its own, and the front wheel turns with the fork for steering. Every bike is **built for skins**: one 1024×1024 texture per skin. All five share the same rig script and skin system.
 
-More bikes: the [dirt bike](dirtbike), [superbike](superbike), [chopper](chopper) and [scooter](scooter). All of them share the same rig script and skin system.
+## The garage: 41 bikes from 5 models
+
+Like most Roblox motorcycle games, the shop sells many bikes that share a handful of base models, each with its own name, colourway and price. All names are made up, so rename anything you like.
+
+![Garage](catalog/catalog_sheet.png)
+
+| Brand | Base model | Bikes | Prices |
+|---|---|---|---|
+| Pipwick (Zip 50 / Zip 125) | [Scooter](scooter) | 8 | FREE to $20,000 |
+| Mudrik (MX-125 / 250 / 450) | [Dirt bike](dirtbike) | 8 | $6,000 to $110,000 |
+| Torvan (T7 / T9) | Street bike (this page) | 8 | $25,000 to $160,000 |
+| Ironbark (Drifter / Baron) | [Chopper](chopper) | 8 | $80,000 to $650,000 |
+| Halvex (HX-6 / HX-10 / HX-1R) | [Superbike](superbike) | 9 | $250,000 to $2,500,000 |
+
+Tiers by price: Starter (free), Common, Rare (from $25,000), Epic (from $150,000) and Legendary (from $800,000). Each bike also has suggested Speed, Acceleration and Handling stats. They're set per base model, with a +1 or +2 Speed bonus on higher trims; tune or ignore them.
+
+| File | What it is |
+|---|---|
+| `roblox/BikeCatalog.lua` | ModuleScript listing every bike (Id, Name, Brand, Base, Skin, Price, Tier, Stats, TextureId, ThumbnailId) with `Get`, `Filter` and `Spawn` helpers. |
+| `catalog/thumbnails/*.png` | A 512×384 shop thumbnail per bike, transparent background. |
+| `catalog/catalog_sheet.png` | The overview above. |
+| `catalog/catalog.json` | The same catalog as JSON. |
+| `source/catalog.py` | The single source of truth: brands, names, prices and which skin each bike wears. |
+
+### Setting it up in Roblox Studio
+
+1. Import the five GLBs (`MotorcycleTag_Bike`, `_DirtBike`, `_SuperBike`, `_Chopper`, `_Scooter`) and put them in a folder such as `ServerStorage.Bikes`. Keep their names.
+2. Bulk-import the skin PNGs from each bike's `skins/` folder and the thumbnails from `catalog/thumbnails/` (**Asset Manager → Bulk Import**). Paste each image's id into `TextureId` and `ThumbnailId` in `BikeCatalog.lua`.
+3. Put `MotorcycleRig.lua` and `BikeCatalog.lua` as ModuleScripts in the same place, for example ServerStorage. Then:
+
+   ```lua
+   local BikeCatalog = require(game.ServerStorage.BikeCatalog)
+   local bike = BikeCatalog.Spawn("halvex_hx6_apex", game.ServerStorage.Bikes) -- cloned, skinned and rigged
+   bike.Parent = workspace
+   ```
+
+   For the shop UI, loop over `BikeCatalog.Bikes` and use `Name`, `Price`, `Tier` and `ThumbnailId` for each card.
+
+### Adding a bike
+
+1. Add a skin to `SKINS` in the base model's build script and run it.
+2. Add a line to `BIKES` in `source/catalog.py` and run `python3 source/catalog.py`.
+3. Render the thumbnails: run `npm install` once in `source/render`, then `npm run thumbnails`.
+4. Run `python3 source/catalog.py --sheet` to trim the thumbnails and rebuild the overview.
+
+## The street bike (Torvan base model)
 
 ![Hero view](previews/hero.png)
 
@@ -19,7 +64,7 @@ More angles are in [`previews/`](previews).
 | `MotorcycleTag_Bike.glb` | Main file. Use it with the Roblox 3D Importer or open it in Blender. The Classic skin is embedded. |
 | `MotorcycleTag_Bike.obj` + `.mtl` | The same 15 parts as OBJ objects, for tools that prefer OBJ, using `skins/classic.png`. |
 | `skin_template.png` / `uv_overlay.png` | The labelled texture layout, and a transparent wireframe to paint over. |
-| `skins/*.png` | Example skins: `classic` (the original coral red and gold), `nightrider`, `glacier`, `sunset`. |
+| `skins/*.png` | Skins: `classic` (the original coral red and gold), `nightrider`, `glacier`, `sunset`, `cobalt`, `lime`, `copper`, `phantom`. |
 | `roblox/MotorcycleRig.lua` | Optional ModuleScript that welds, hinges and drives any of the bikes. |
 | `source/build_motorcycle.py` | Generator for all of the above. Shared code lives in `source/shapes.py` (shapes and clearance check) and `source/skinkit.py` (skin pipeline). |
 

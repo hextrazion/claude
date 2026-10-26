@@ -18,7 +18,7 @@ More angles, including steering at 30° and the wheels pulled out, are in [`prev
 | `MotorcycleTag_DirtBike.obj` + `.mtl` | The same 14 parts as OBJ objects, using `skins/blaze.png`. |
 | `skin_template.png` | The texture layout with every paintable area labelled. Start new skins from this. |
 | `uv_overlay.png` | Transparent wireframe of the layout. Put it on a top layer while you paint and hide it before export. |
-| `skins/*.png` | Example skins: `blaze`, `toxic`, `frost`, `midnight`. |
+| `skins/*.png` | Skins: `blaze`, `toxic`, `frost`, `midnight`, `ruby`, `sandstorm`, `aqua`, `factory`. |
 | `source/build_dirtbike.py` | Generator for all of the above. It needs numpy and Pillow, and reuses the street bike's shape code. |
 
 ## Making skins

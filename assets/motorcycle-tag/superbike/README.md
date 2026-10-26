@@ -22,7 +22,7 @@ As on a real superbike, the **fairing, headlights and windshield are fixed to th
 | `MotorcycleTag_SuperBike.obj` + `.mtl` | The same 14 parts as OBJ objects, using `skins/apex.png`. |
 | `skin_template.png` | The texture layout with every paintable area labelled. Start new skins from this. |
 | `uv_overlay.png` | Transparent wireframe of the layout. Put it on a top layer while you paint and hide it before export. |
-| `skins/*.png` | Example skins: `apex`, `inferno`, `phantom`, `sakura`. |
+| `skins/*.png` | Skins: `apex`, `inferno`, `phantom`, `sakura`, `verde`, `solar`, `ice`, `obsidian`, `prism`. |
 | `source/build_superbike.py` | Generator for all of the above. It needs numpy and Pillow, and uses the shared `../source/skinkit.py`. |
 
 ## Making skins

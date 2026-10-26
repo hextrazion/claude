@@ -174,6 +174,17 @@ SKINS = {
                   pattern="racing", number="5",
                   blocks=dict(PAINT=(248, 248, 250), APRON_INNER=(30, 70, 200), SEAT_SIDE=(30, 30, 34),
                               WHITEWALL=(34, 34, 37))),
+    "lemonade": dict(primary=(255, 225, 90), secondary=(255, 255, 255), accent=(255, 255, 255), seat=(255, 255, 255),
+                     pattern="dots", blocks=dict(PAINT=(255, 225, 90), APRON_INNER=(255, 255, 255),
+                                                 SEAT_SIDE=(255, 255, 255))),
+    "ocean": dict(primary=(40, 110, 200), secondary=(250, 250, 250), accent=(250, 250, 250), seat=(250, 250, 250),
+                  pattern="stripe", blocks=dict(PAINT=(40, 110, 200), APRON_INNER=(250, 250, 250), SEAT_SIDE=(250, 250, 250))),
+    "cherry_cola": dict(primary=(110, 15, 25), secondary=(245, 235, 215), accent=(245, 235, 215), seat=(245, 235, 215),
+                        pattern="stripe", blocks=dict(PAINT=(110, 15, 25), APRON_INNER=(245, 235, 215),
+                                                      SEAT_SIDE=(245, 235, 215))),
+    "galaxy": dict(primary=(40, 20, 80), secondary=(255, 255, 255), accent=(180, 140, 255), seat=(20, 12, 40),
+                   pattern="dots", blocks=dict(PAINT=(40, 20, 80), APRON_INNER=(20, 12, 40), SEAT_SIDE=(20, 12, 40),
+                                               WHITEWALL=(34, 34, 37))),
 }
 
 

@@ -1,0 +1,12 @@
+{
+  "name": "motorcycle-tag-render",
+  "private": true,
+  "description": "Renders catalog thumbnails and previews of the Motorcycle Tag bikes with three.js in headless Chromium.",
+  "scripts": {
+    "thumbnails": "node render.cjs ../../catalog/render_jobs.json"
+  },
+  "dependencies": {
+    "playwright": "^1.48.0",
+    "three": "0.169.0"
+  }
+}

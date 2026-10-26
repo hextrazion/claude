@@ -17,7 +17,7 @@ More angles, including steering at 30° and the wheels pulled out, are in [`prev
 | `MotorcycleTag_Chopper.glb` | Main file for the Roblox 3D Importer or Blender, with the Outlaw skin embedded. |
 | `MotorcycleTag_Chopper.obj` + `.mtl` | The same 13 parts as OBJ objects, using `skins/outlaw.png`. |
 | `skin_template.png` / `uv_overlay.png` | The labelled texture layout, and a transparent wireframe to paint over. |
-| `skins/*.png` | Example skins: `outlaw` (black, orange flames), `cherry` (candy red, whitewalls), `ghost` (white, blue flames), `desert` (olive with a star). |
+| `skins/*.png` | Skins: `outlaw` (black, orange flames), `cherry` (candy red, whitewalls), `ghost` (white, blue flames), `desert` (olive with a star), `midnight_blue`, `emerald`, `hellfire`, `chrome_king`. |
 | `source/build_chopper.py` | Generator for all of the above. It needs numpy and Pillow, and uses the shared `../source/skinkit.py`. |
 
 ## Making skins

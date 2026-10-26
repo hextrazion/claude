@@ -1,0 +1,740 @@
+[
+ {
+  "id": "pipwick_zip_50_mint",
+  "name": "Pipwick Zip 50 Mint",
+  "brand": "Pipwick",
+  "model": "Zip 50",
+  "colorway": "Mint",
+  "base": "MotorcycleTag_Scooter",
+  "skin": "mint",
+  "skinFile": "scooter/skins/mint.png",
+  "thumbnail": "catalog/thumbnails/pipwick_zip_50_mint.png",
+  "price": 0,
+  "tier": "Starter",
+  "stats": {
+   "Speed": 4,
+   "Acceleration": 7,
+   "Handling": 9
+  }
+ },
+ {
+  "id": "pipwick_zip_50_bubblegum",
+  "name": "Pipwick Zip 50 Bubblegum",
+  "brand": "Pipwick",
+  "model": "Zip 50",
+  "colorway": "Bubblegum",
+  "base": "MotorcycleTag_Scooter",
+  "skin": "bubblegum",
+  "skinFile": "scooter/skins/bubblegum.png",
+  "thumbnail": "catalog/thumbnails/pipwick_zip_50_bubblegum.png",
+  "price": 2500,
+  "tier": "Common",
+  "stats": {
+   "Speed": 4,
+   "Acceleration": 7,
+   "Handling": 9
+  }
+ },
+ {
+  "id": "pipwick_zip_50_taxi",
+  "name": "Pipwick Zip 50 Taxi",
+  "brand": "Pipwick",
+  "model": "Zip 50",
+  "colorway": "Taxi",
+  "base": "MotorcycleTag_Scooter",
+  "skin": "taxi",
+  "skinFile": "scooter/skins/taxi.png",
+  "thumbnail": "catalog/thumbnails/pipwick_zip_50_taxi.png",
+  "price": 4000,
+  "tier": "Common",
+  "stats": {
+   "Speed": 4,
+   "Acceleration": 7,
+   "Handling": 9
+  }
+ },
+ {
+  "id": "pipwick_zip_50_lemonade",
+  "name": "Pipwick Zip 50 Lemonade",
+  "brand": "Pipwick",
+  "model": "Zip 50",
+  "colorway": "Lemonade",
+  "base": "MotorcycleTag_Scooter",
+  "skin": "lemonade",
+  "skinFile": "scooter/skins/lemonade.png",
+  "thumbnail": "catalog/thumbnails/pipwick_zip_50_lemonade.png",
+  "price": 5500,
+  "tier": "Common",
+  "stats": {
+   "Speed": 4,
+   "Acceleration": 7,
+   "Handling": 9
+  }
+ },
+ {
+  "id": "pipwick_zip_125_racer",
+  "name": "Pipwick Zip 125 Racer",
+  "brand": "Pipwick",
+  "model": "Zip 125",
+  "colorway": "Racer",
+  "base": "MotorcycleTag_Scooter",
+  "skin": "racer",
+  "skinFile": "scooter/skins/racer.png",
+  "thumbnail": "catalog/thumbnails/pipwick_zip_125_racer.png",
+  "price": 8000,
+  "tier": "Common",
+  "stats": {
+   "Speed": 5,
+   "Acceleration": 7,
+   "Handling": 9
+  }
+ },
+ {
+  "id": "pipwick_zip_125_ocean",
+  "name": "Pipwick Zip 125 Ocean",
+  "brand": "Pipwick",
+  "model": "Zip 125",
+  "colorway": "Ocean",
+  "base": "MotorcycleTag_Scooter",
+  "skin": "ocean",
+  "skinFile": "scooter/skins/ocean.png",
+  "thumbnail": "catalog/thumbnails/pipwick_zip_125_ocean.png",
+  "price": 10000,
+  "tier": "Common",
+  "stats": {
+   "Speed": 5,
+   "Acceleration": 7,
+   "Handling": 9
+  }
+ },
+ {
+  "id": "pipwick_zip_125_cherry_cola",
+  "name": "Pipwick Zip 125 Cherry Cola",
+  "brand": "Pipwick",
+  "model": "Zip 125",
+  "colorway": "Cherry Cola",
+  "base": "MotorcycleTag_Scooter",
+  "skin": "cherry_cola",
+  "skinFile": "scooter/skins/cherry_cola.png",
+  "thumbnail": "catalog/thumbnails/pipwick_zip_125_cherry_cola.png",
+  "price": 12500,
+  "tier": "Common",
+  "stats": {
+   "Speed": 5,
+   "Acceleration": 7,
+   "Handling": 9
+  }
+ },
+ {
+  "id": "pipwick_zip_125_galaxy",
+  "name": "Pipwick Zip 125 Galaxy",
+  "brand": "Pipwick",
+  "model": "Zip 125",
+  "colorway": "Galaxy",
+  "base": "MotorcycleTag_Scooter",
+  "skin": "galaxy",
+  "skinFile": "scooter/skins/galaxy.png",
+  "thumbnail": "catalog/thumbnails/pipwick_zip_125_galaxy.png",
+  "price": 20000,
+  "tier": "Common",
+  "stats": {
+   "Speed": 5,
+   "Acceleration": 7,
+   "Handling": 9
+  }
+ },
+ {
+  "id": "mudrik_mx125_blaze",
+  "name": "Mudrik MX-125 Blaze",
+  "brand": "Mudrik",
+  "model": "MX-125",
+  "colorway": "Blaze",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "blaze",
+  "skinFile": "dirtbike/skins/blaze.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx125_blaze.png",
+  "price": 6000,
+  "tier": "Common",
+  "stats": {
+   "Speed": 6,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "mudrik_mx125_toxic",
+  "name": "Mudrik MX-125 Toxic",
+  "brand": "Mudrik",
+  "model": "MX-125",
+  "colorway": "Toxic",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "toxic",
+  "skinFile": "dirtbike/skins/toxic.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx125_toxic.png",
+  "price": 9000,
+  "tier": "Common",
+  "stats": {
+   "Speed": 6,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "mudrik_mx250_frost",
+  "name": "Mudrik MX-250 Frost",
+  "brand": "Mudrik",
+  "model": "MX-250",
+  "colorway": "Frost",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "frost",
+  "skinFile": "dirtbike/skins/frost.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx250_frost.png",
+  "price": 15000,
+  "tier": "Common",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "mudrik_mx250_midnight",
+  "name": "Mudrik MX-250 Midnight",
+  "brand": "Mudrik",
+  "model": "MX-250",
+  "colorway": "Midnight",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "midnight",
+  "skinFile": "dirtbike/skins/midnight.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx250_midnight.png",
+  "price": 22000,
+  "tier": "Common",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "mudrik_mx250_ruby",
+  "name": "Mudrik MX-250 Ruby",
+  "brand": "Mudrik",
+  "model": "MX-250",
+  "colorway": "Ruby",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "ruby",
+  "skinFile": "dirtbike/skins/ruby.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx250_ruby.png",
+  "price": 30000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "mudrik_mx450_sandstorm",
+  "name": "Mudrik MX-450 Sandstorm",
+  "brand": "Mudrik",
+  "model": "MX-450",
+  "colorway": "Sandstorm",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "sandstorm",
+  "skinFile": "dirtbike/skins/sandstorm.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx450_sandstorm.png",
+  "price": 45000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "mudrik_mx450_aqua",
+  "name": "Mudrik MX-450 Aqua",
+  "brand": "Mudrik",
+  "model": "MX-450",
+  "colorway": "Aqua",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "aqua",
+  "skinFile": "dirtbike/skins/aqua.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx450_aqua.png",
+  "price": 60000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "mudrik_mx450_factory",
+  "name": "Mudrik MX-450 Factory",
+  "brand": "Mudrik",
+  "model": "MX-450",
+  "colorway": "Factory",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "factory",
+  "skinFile": "dirtbike/skins/factory.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx450_factory.png",
+  "price": 110000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "torvan_t7_classic",
+  "name": "Torvan T7 Classic",
+  "brand": "Torvan",
+  "model": "T7",
+  "colorway": "Classic",
+  "base": "MotorcycleTag_Bike",
+  "skin": "classic",
+  "skinFile": "skins/classic.png",
+  "thumbnail": "catalog/thumbnails/torvan_t7_classic.png",
+  "price": 25000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 7,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "torvan_t7_nightrider",
+  "name": "Torvan T7 Nightrider",
+  "brand": "Torvan",
+  "model": "T7",
+  "colorway": "Nightrider",
+  "base": "MotorcycleTag_Bike",
+  "skin": "nightrider",
+  "skinFile": "skins/nightrider.png",
+  "thumbnail": "catalog/thumbnails/torvan_t7_nightrider.png",
+  "price": 32000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 7,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "torvan_t7_glacier",
+  "name": "Torvan T7 Glacier",
+  "brand": "Torvan",
+  "model": "T7",
+  "colorway": "Glacier",
+  "base": "MotorcycleTag_Bike",
+  "skin": "glacier",
+  "skinFile": "skins/glacier.png",
+  "thumbnail": "catalog/thumbnails/torvan_t7_glacier.png",
+  "price": 40000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 7,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "torvan_t7_sunset",
+  "name": "Torvan T7 Sunset",
+  "brand": "Torvan",
+  "model": "T7",
+  "colorway": "Sunset",
+  "base": "MotorcycleTag_Bike",
+  "skin": "sunset",
+  "skinFile": "skins/sunset.png",
+  "thumbnail": "catalog/thumbnails/torvan_t7_sunset.png",
+  "price": 50000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 7,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "torvan_t9_cobalt",
+  "name": "Torvan T9 Cobalt",
+  "brand": "Torvan",
+  "model": "T9",
+  "colorway": "Cobalt",
+  "base": "MotorcycleTag_Bike",
+  "skin": "cobalt",
+  "skinFile": "skins/cobalt.png",
+  "thumbnail": "catalog/thumbnails/torvan_t9_cobalt.png",
+  "price": 75000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "torvan_t9_lime",
+  "name": "Torvan T9 Lime",
+  "brand": "Torvan",
+  "model": "T9",
+  "colorway": "Lime",
+  "base": "MotorcycleTag_Bike",
+  "skin": "lime",
+  "skinFile": "skins/lime.png",
+  "thumbnail": "catalog/thumbnails/torvan_t9_lime.png",
+  "price": 95000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "torvan_t9_copper",
+  "name": "Torvan T9 Copper",
+  "brand": "Torvan",
+  "model": "T9",
+  "colorway": "Copper",
+  "base": "MotorcycleTag_Bike",
+  "skin": "copper",
+  "skinFile": "skins/copper.png",
+  "thumbnail": "catalog/thumbnails/torvan_t9_copper.png",
+  "price": 120000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "torvan_t9_phantom",
+  "name": "Torvan T9 Phantom",
+  "brand": "Torvan",
+  "model": "T9",
+  "colorway": "Phantom",
+  "base": "MotorcycleTag_Bike",
+  "skin": "phantom",
+  "skinFile": "skins/phantom.png",
+  "thumbnail": "catalog/thumbnails/torvan_t9_phantom.png",
+  "price": 160000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "ironbark_drifter_outlaw",
+  "name": "Ironbark Drifter Outlaw",
+  "brand": "Ironbark",
+  "model": "Drifter",
+  "colorway": "Outlaw",
+  "base": "MotorcycleTag_Chopper",
+  "skin": "outlaw",
+  "skinFile": "chopper/skins/outlaw.png",
+  "thumbnail": "catalog/thumbnails/ironbark_drifter_outlaw.png",
+  "price": 80000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 6,
+   "Handling": 5
+  }
+ },
+ {
+  "id": "ironbark_drifter_cherry",
+  "name": "Ironbark Drifter Cherry",
+  "brand": "Ironbark",
+  "model": "Drifter",
+  "colorway": "Cherry",
+  "base": "MotorcycleTag_Chopper",
+  "skin": "cherry",
+  "skinFile": "chopper/skins/cherry.png",
+  "thumbnail": "catalog/thumbnails/ironbark_drifter_cherry.png",
+  "price": 100000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 6,
+   "Handling": 5
+  }
+ },
+ {
+  "id": "ironbark_drifter_ghost",
+  "name": "Ironbark Drifter Ghost",
+  "brand": "Ironbark",
+  "model": "Drifter",
+  "colorway": "Ghost",
+  "base": "MotorcycleTag_Chopper",
+  "skin": "ghost",
+  "skinFile": "chopper/skins/ghost.png",
+  "thumbnail": "catalog/thumbnails/ironbark_drifter_ghost.png",
+  "price": 125000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 6,
+   "Handling": 5
+  }
+ },
+ {
+  "id": "ironbark_drifter_desert",
+  "name": "Ironbark Drifter Desert",
+  "brand": "Ironbark",
+  "model": "Drifter",
+  "colorway": "Desert",
+  "base": "MotorcycleTag_Chopper",
+  "skin": "desert",
+  "skinFile": "chopper/skins/desert.png",
+  "thumbnail": "catalog/thumbnails/ironbark_drifter_desert.png",
+  "price": 150000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 6,
+   "Handling": 5
+  }
+ },
+ {
+  "id": "ironbark_baron_midnight_blue",
+  "name": "Ironbark Baron Midnight Blue",
+  "brand": "Ironbark",
+  "model": "Baron",
+  "colorway": "Midnight Blue",
+  "base": "MotorcycleTag_Chopper",
+  "skin": "midnight_blue",
+  "skinFile": "chopper/skins/midnight_blue.png",
+  "thumbnail": "catalog/thumbnails/ironbark_baron_midnight_blue.png",
+  "price": 220000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 6,
+   "Handling": 5
+  }
+ },
+ {
+  "id": "ironbark_baron_emerald",
+  "name": "Ironbark Baron Emerald",
+  "brand": "Ironbark",
+  "model": "Baron",
+  "colorway": "Emerald",
+  "base": "MotorcycleTag_Chopper",
+  "skin": "emerald",
+  "skinFile": "chopper/skins/emerald.png",
+  "thumbnail": "catalog/thumbnails/ironbark_baron_emerald.png",
+  "price": 300000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 6,
+   "Handling": 5
+  }
+ },
+ {
+  "id": "ironbark_baron_hellfire",
+  "name": "Ironbark Baron Hellfire",
+  "brand": "Ironbark",
+  "model": "Baron",
+  "colorway": "Hellfire",
+  "base": "MotorcycleTag_Chopper",
+  "skin": "hellfire",
+  "skinFile": "chopper/skins/hellfire.png",
+  "thumbnail": "catalog/thumbnails/ironbark_baron_hellfire.png",
+  "price": 400000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 6,
+   "Handling": 5
+  }
+ },
+ {
+  "id": "ironbark_baron_chrome_king",
+  "name": "Ironbark Baron Chrome King",
+  "brand": "Ironbark",
+  "model": "Baron",
+  "colorway": "Chrome King",
+  "base": "MotorcycleTag_Chopper",
+  "skin": "chrome_king",
+  "skinFile": "chopper/skins/chrome_king.png",
+  "thumbnail": "catalog/thumbnails/ironbark_baron_chrome_king.png",
+  "price": 650000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 6,
+   "Handling": 5
+  }
+ },
+ {
+  "id": "halvex_hx6_apex",
+  "name": "Halvex HX-6 Apex",
+  "brand": "Halvex",
+  "model": "HX-6",
+  "colorway": "Apex",
+  "base": "MotorcycleTag_SuperBike",
+  "skin": "apex",
+  "skinFile": "superbike/skins/apex.png",
+  "thumbnail": "catalog/thumbnails/halvex_hx6_apex.png",
+  "price": 250000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 8,
+   "Handling": 6
+  }
+ },
+ {
+  "id": "halvex_hx6_inferno",
+  "name": "Halvex HX-6 Inferno",
+  "brand": "Halvex",
+  "model": "HX-6",
+  "colorway": "Inferno",
+  "base": "MotorcycleTag_SuperBike",
+  "skin": "inferno",
+  "skinFile": "superbike/skins/inferno.png",
+  "thumbnail": "catalog/thumbnails/halvex_hx6_inferno.png",
+  "price": 300000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 8,
+   "Handling": 6
+  }
+ },
+ {
+  "id": "halvex_hx6_phantom",
+  "name": "Halvex HX-6 Phantom",
+  "brand": "Halvex",
+  "model": "HX-6",
+  "colorway": "Phantom",
+  "base": "MotorcycleTag_SuperBike",
+  "skin": "phantom",
+  "skinFile": "superbike/skins/phantom.png",
+  "thumbnail": "catalog/thumbnails/halvex_hx6_phantom.png",
+  "price": 350000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 8,
+   "Handling": 6
+  }
+ },
+ {
+  "id": "halvex_hx6_sakura",
+  "name": "Halvex HX-6 Sakura",
+  "brand": "Halvex",
+  "model": "HX-6",
+  "colorway": "Sakura",
+  "base": "MotorcycleTag_SuperBike",
+  "skin": "sakura",
+  "skinFile": "superbike/skins/sakura.png",
+  "thumbnail": "catalog/thumbnails/halvex_hx6_sakura.png",
+  "price": 400000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 8,
+   "Handling": 6
+  }
+ },
+ {
+  "id": "halvex_hx10_verde",
+  "name": "Halvex HX-10 Verde",
+  "brand": "Halvex",
+  "model": "HX-10",
+  "colorway": "Verde",
+  "base": "MotorcycleTag_SuperBike",
+  "skin": "verde",
+  "skinFile": "superbike/skins/verde.png",
+  "thumbnail": "catalog/thumbnails/halvex_hx10_verde.png",
+  "price": 650000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 10,
+   "Acceleration": 8,
+   "Handling": 6
+  }
+ },
+ {
+  "id": "halvex_hx10_solar",
+  "name": "Halvex HX-10 Solar",
+  "brand": "Halvex",
+  "model": "HX-10",
+  "colorway": "Solar",
+  "base": "MotorcycleTag_SuperBike",
+  "skin": "solar",
+  "skinFile": "superbike/skins/solar.png",
+  "thumbnail": "catalog/thumbnails/halvex_hx10_solar.png",
+  "price": 850000,
+  "tier": "Legendary",
+  "stats": {
+   "Speed": 10,
+   "Acceleration": 8,
+   "Handling": 6
+  }
+ },
+ {
+  "id": "halvex_hx10_ice",
+  "name": "Halvex HX-10 Ice",
+  "brand": "Halvex",
+  "model": "HX-10",
+  "colorway": "Ice",
+  "base": "MotorcycleTag_SuperBike",
+  "skin": "ice",
+  "skinFile": "superbike/skins/ice.png",
+  "thumbnail": "catalog/thumbnails/halvex_hx10_ice.png",
+  "price": 1100000,
+  "tier": "Legendary",
+  "stats": {
+   "Speed": 10,
+   "Acceleration": 8,
+   "Handling": 6
+  }
+ },
+ {
+  "id": "halvex_hx1r_obsidian",
+  "name": "Halvex HX-1R Obsidian",
+  "brand": "Halvex",
+  "model": "HX-1R",
+  "colorway": "Obsidian",
+  "base": "MotorcycleTag_SuperBike",
+  "skin": "obsidian",
+  "skinFile": "superbike/skins/obsidian.png",
+  "thumbnail": "catalog/thumbnails/halvex_hx1r_obsidian.png",
+  "price": 1800000,
+  "tier": "Legendary",
+  "stats": {
+   "Speed": 10,
+   "Acceleration": 8,
+   "Handling": 6
+  }
+ },
+ {
+  "id": "halvex_hx1r_prism",
+  "name": "Halvex HX-1R Prism",
+  "brand": "Halvex",
+  "model": "HX-1R",
+  "colorway": "Prism",
+  "base": "MotorcycleTag_SuperBike",
+  "skin": "prism",
+  "skinFile": "superbike/skins/prism.png",
+  "thumbnail": "catalog/thumbnails/halvex_hx1r_prism.png",
+  "price": 2500000,
+  "tier": "Legendary",
+  "stats": {
+   "Speed": 10,
+   "Acceleration": 8,
+   "Handling": 6
+  }
+ }
+]

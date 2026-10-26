@@ -237,6 +237,21 @@ SKINS = {
                    seat=(40, 20, 50), swingarm=(60, 40, 80),
                    blocks=dict(RIM=(150, 40, 200), SPOKES=(150, 40, 200), FORK_LOWERS=(255, 150, 40),
                                CLAMPS=(150, 40, 200), SWINGARM=(60, 40, 80))),
+    "cobalt": dict(primary=(25, 70, 200), secondary=(240, 244, 250), accent=(240, 244, 250), style="stripe", number="3",
+                   seat=(20, 24, 40), swingarm=(200, 205, 214),
+                   blocks=dict(RIM=(240, 244, 250), SPOKES=(25, 70, 200), CLAMPS=(240, 244, 250), FORK_LOWERS=(25, 70, 200))),
+    "lime": dict(primary=(150, 230, 30), secondary=(22, 22, 26), accent=(22, 22, 26), style="racing",
+                 seat=(22, 22, 26), swingarm=(22, 22, 26),
+                 blocks=dict(RIM=(22, 22, 26), SPOKES=(150, 230, 30), CLAMPS=(22, 22, 26), FORK_LOWERS=(22, 22, 26),
+                             SWINGARM=(22, 22, 26))),
+    "copper": dict(primary=(190, 105, 60), secondary=(40, 30, 26), accent=(40, 30, 26), style="stripe", number="7",
+                   seat=(40, 30, 26), swingarm=(40, 30, 26),
+                   blocks=dict(RIM=(40, 30, 26), SPOKES=(190, 105, 60), CLAMPS=(190, 105, 60), FORK_LOWERS=(40, 30, 26),
+                               SWINGARM=(40, 30, 26))),
+    "phantom": dict(primary=(130, 60, 220), secondary=(18, 18, 22), accent=(200, 160, 255), style="fade",
+                    seat=(18, 18, 22), swingarm=(18, 18, 22),
+                    blocks=dict(RIM=(18, 18, 22), SPOKES=(130, 60, 220), CLAMPS=(130, 60, 220), FORK_LOWERS=(18, 18, 22),
+                                SWINGARM=(18, 18, 22))),
 }
 
 

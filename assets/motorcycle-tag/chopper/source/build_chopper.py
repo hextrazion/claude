@@ -230,6 +230,15 @@ SKINS = {
                    blocks=dict(PAINT=(150, 140, 96), FRAME=(60, 62, 52), RIM=(60, 62, 52), HUB=(60, 62, 52),
                                SPOKES=(60, 62, 52), FORK=(60, 62, 52), EXHAUST=(40, 40, 40), SEAT_SIDE=(95, 70, 45),
                                ENGINE_CHROME=(90, 92, 84), CLAMPS=(60, 62, 52), BARS=(60, 62, 52))),
+    "midnight_blue": dict(primary=(18, 30, 80), flame=None, accent=(205, 210, 218), seat=(30, 22, 18),
+                          blocks=dict(PAINT=(18, 30, 80), FRAME=(18, 30, 80), WHITEWALL=(240, 240, 240))),
+    "emerald": dict(primary=(10, 90, 50), flame=(232, 180, 60), flame_tip=(255, 230, 140), accent=(232, 180, 60),
+                    seat=(60, 38, 26), blocks=dict(PAINT=(10, 90, 50), FRAME=(10, 90, 50))),
+    "hellfire": dict(primary=(170, 10, 20), flame=(255, 200, 20), flame_tip=(255, 240, 150), accent=(255, 200, 20),
+                     seat=(24, 24, 26), blocks=dict(PAINT=(170, 10, 20), FRAME=(24, 24, 26))),
+    "chrome_king": dict(primary=(200, 205, 214), flame=(24, 24, 28), flame_tip=(80, 84, 92), accent=(24, 24, 28),
+                        seat=(24, 24, 28), blocks=dict(PAINT=(200, 205, 214), FRAME=(200, 205, 214), RIM=(24, 24, 28),
+                                                       SPOKES=(24, 24, 28), WHITEWALL=(240, 240, 240))),
 }
 
 
