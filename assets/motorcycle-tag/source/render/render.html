@@ -7,7 +7,8 @@
 </head>
 <body>
 <script type="module">
-// Loads one bike GLB, optionally swaps its skin, poses the steering and renders on a transparent background.
+// Loads one bike GLB, optionally swaps its skin, poses the steering and renders it (transparent unless the
+// job gives a background colour).
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -42,6 +43,10 @@ const textures = new THREE.TextureLoader();
 let bike = null;
 
 window.renderJob = async (job) => {
+  scene.background = job.background ? new THREE.Color(job.background) : null;
+  renderer.setSize(job.width || W, job.height || H);
+  camera.aspect = (job.width || W) / (job.height || H);
+  camera.updateProjectionMatrix();
   if (bike) scene.remove(bike);
   bike = (await loader.loadAsync(job.model)).scene;
   bike.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
@@ -62,6 +67,10 @@ window.renderJob = async (job) => {
       o.position.sub(pivot).applyQuaternion(q).add(pivot);
       o.quaternion.premultiply(q);
     }
+  }
+  if (job.explode) {  // pull the wheels out sideways to show they are separate objects
+    bike.getObjectByName('FrontWheel').position.x += job.explode;
+    bike.getObjectByName('RearWheel').position.x += job.explode;
   }
   const [px, py, pz, tx, ty, tz] = job.camera;
   camera.position.set(px, py, pz);

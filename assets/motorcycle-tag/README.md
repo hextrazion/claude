@@ -1,8 +1,8 @@
 # Motorcycle Tag: bikes
 
-Stylized low-poly motorcycles built for Roblox: a street bike (this page), a [dirt bike](dirtbike), a [superbike](superbike), a [chopper](chopper) and a [scooter](scooter). On every bike each wheel is its own mesh centred on its axle, so it can spin on its own, and the front wheel turns with the fork for steering. Every bike is **built for skins**: one 1024×1024 texture per skin. All five share the same rig script and skin system.
+Stylized low-poly motorcycles built for Roblox: a street bike (this page), a [dirt bike](dirtbike), a [superbike](superbike), a [chopper](chopper), a [scooter](scooter), an [adventure bike](adventure), an [electric bike](electric) and a [café racer](cafe). On every bike each wheel is its own mesh centred on its axle, so it can spin on its own, and the front wheel turns with the fork for steering. Every bike is **built for skins**: one 1024×1024 texture per skin. All eight share the same rig script and skin system.
 
-## The garage: 41 bikes from 5 models
+## The garage: 65 bikes from 8 models
 
 Like most Roblox motorcycle games, the shop sells many bikes that share a handful of base models, each with its own name, colourway and price. All names are made up, so rename anything you like.
 
@@ -15,12 +15,15 @@ Like most Roblox motorcycle games, the shop sells many bikes that share a handfu
 | Torvan (T7 / T9) | Street bike (this page) | 8 | $25,000 to $160,000 |
 | Ironbark (Drifter / Baron) | [Chopper](chopper) | 8 | $80,000 to $650,000 |
 | Halvex (HX-6 / HX-10 / HX-1R) | [Superbike](superbike) | 9 | $250,000 to $2,500,000 |
+| Ashcombe (Bolt 500 / Bolt 900 S) | [Café racer](cafe) | 8 | $30,000 to $175,000 |
+| Haldor (Trek 800 / Trek 1200 Rally) | [Adventure bike](adventure) | 8 | $60,000 to $300,000 |
+| Ionyx (Pulse / Pulse X) | [Electric bike](electric) | 8 | $120,000 to $900,000 |
 
 Tiers by price: Starter (free), Common, Rare (from $25,000), Epic (from $150,000) and Legendary (from $800,000). Each bike also has suggested Speed, Acceleration and Handling stats. They're set per base model, with a +1 or +2 Speed bonus on higher trims; tune or ignore them.
 
 | File | What it is |
 |---|---|
-| `roblox/BikeCatalog.lua` | ModuleScript listing every bike (Id, Name, Brand, Base, Skin, Price, Tier, Stats, TextureId, ThumbnailId) with `Get`, `Filter` and `Spawn` helpers. |
+| `roblox/BikeCatalog.lua` | ModuleScript listing every bike (Id, Name, Brand, Base, Skin, Price, Tier, Stats, TextureId, ThumbnailId, and NeonColor for the electric bikes) with `Get`, `Filter` and `Spawn` helpers. The list is in price order. |
 | `catalog/thumbnails/*.png` | A 512×384 shop thumbnail per bike, transparent background. |
 | `catalog/catalog_sheet.png` | The overview above. |
 | `catalog/catalog.json` | The same catalog as JSON. |
@@ -28,7 +31,7 @@ Tiers by price: Starter (free), Common, Rare (from $25,000), Epic (from $150,000
 
 ### Setting it up in Roblox Studio
 
-1. Import the five GLBs (`MotorcycleTag_Bike`, `_DirtBike`, `_SuperBike`, `_Chopper`, `_Scooter`) and put them in a folder such as `ServerStorage.Bikes`. Keep their names.
+1. Import the eight GLBs (`MotorcycleTag_Bike`, `_DirtBike`, `_SuperBike`, `_Chopper`, `_Scooter`, `_Adventure`, `_Electric`, `_Cafe`) and put them in a folder such as `ServerStorage.Bikes`. Keep their names.
 2. Bulk-import the skin PNGs from each bike's `skins/` folder and the thumbnails from `catalog/thumbnails/` (**Asset Manager → Bulk Import**). Paste each image's id into `TextureId` and `ThumbnailId` in `BikeCatalog.lua`.
 3. Put `MotorcycleRig.lua` and `BikeCatalog.lua` as ModuleScripts in the same place, for example ServerStorage. Then:
 
@@ -135,7 +138,7 @@ MotorcycleRig.SetHighlight(bike, Color3.fromRGB(255, 0, 0)) -- outline the playe
 `Rig` does the following:
 
 - Welds the steering parts to `Fork` and every other part except the wheels to `Frame`.
-- Reads the fork angle from the model name (24° here, 27° dirt bike, 23° superbike, 34° chopper, 26° scooter), a `SteeringRake` attribute, or `Rig(bike, { rake = degrees })`.
+- Reads the fork angle from the model name (24° here, 27° dirt bike, 23° superbike, 34° chopper, 26° scooter, 26° adventure, 24° electric, 25° café racer), a `SteeringRake` attribute, or `Rig(bike, { rake = degrees })`.
 - Adds three `HingeConstraint`s, all placed on wheel centres so the rig works at any scale: a servo `SteerHinge` from Frame to Fork, a free `FrontWheelHinge` from Fork to FrontWheel, and a motorised `RearWheelHinge` from Swingarm to RearWheel.
 - Adds a `KeepUpright` AlignOrientation and sets the materials (Metal, Neon lights, Glass windscreen).
 - Leaves only the wheels with `CanCollide` on. Every part keeps `CanTouch` on, so `Touched` still fires for tagging.

@@ -84,6 +84,28 @@
   "out": "catalog/thumbnails/pipwick_zip_50_lemonade.png"
  },
  {
+  "id": "mudrik_mx125_blaze",
+  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
+  "skin": "dirtbike/skins/blaze.png",
+  "rake": 27,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "FrontPlate",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   5,
+   -9.5,
+   0,
+   2.1,
+   0.2
+  ],
+  "out": "catalog/thumbnails/mudrik_mx125_blaze.png"
+ },
+ {
   "id": "pipwick_zip_125_racer",
   "model": "scooter/MotorcycleTag_Scooter.glb",
   "skin": "scooter/skins/racer.png",
@@ -103,6 +125,28 @@
    0
   ],
   "out": "catalog/thumbnails/pipwick_zip_125_racer.png"
+ },
+ {
+  "id": "mudrik_mx125_toxic",
+  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
+  "skin": "dirtbike/skins/toxic.png",
+  "rake": 27,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "FrontPlate",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   5,
+   -9.5,
+   0,
+   2.1,
+   0.2
+  ],
+  "out": "catalog/thumbnails/mudrik_mx125_toxic.png"
  },
  {
   "id": "pipwick_zip_125_ocean",
@@ -147,71 +191,6 @@
   "out": "catalog/thumbnails/pipwick_zip_125_cherry_cola.png"
  },
  {
-  "id": "pipwick_zip_125_galaxy",
-  "model": "scooter/MotorcycleTag_Scooter.glb",
-  "skin": "scooter/skins/galaxy.png",
-  "rake": 26,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender",
-   "Headlight"
-  ],
-  "camera": [
-   -9,
-   4.2,
-   -8.5,
-   0,
-   1.5,
-   0
-  ],
-  "out": "catalog/thumbnails/pipwick_zip_125_galaxy.png"
- },
- {
-  "id": "mudrik_mx125_blaze",
-  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
-  "skin": "dirtbike/skins/blaze.png",
-  "rake": 27,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender",
-   "FrontPlate",
-   "Headlight"
-  ],
-  "camera": [
-   -10.5,
-   5,
-   -9.5,
-   0,
-   2.1,
-   0.2
-  ],
-  "out": "catalog/thumbnails/mudrik_mx125_blaze.png"
- },
- {
-  "id": "mudrik_mx125_toxic",
-  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
-  "skin": "dirtbike/skins/toxic.png",
-  "rake": 27,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender",
-   "FrontPlate",
-   "Headlight"
-  ],
-  "camera": [
-   -10.5,
-   5,
-   -9.5,
-   0,
-   2.1,
-   0.2
-  ],
-  "out": "catalog/thumbnails/mudrik_mx125_toxic.png"
- },
- {
   "id": "mudrik_mx250_frost",
   "model": "dirtbike/MotorcycleTag_DirtBike.glb",
   "skin": "dirtbike/skins/frost.png",
@@ -234,6 +213,27 @@
   "out": "catalog/thumbnails/mudrik_mx250_frost.png"
  },
  {
+  "id": "pipwick_zip_125_galaxy",
+  "model": "scooter/MotorcycleTag_Scooter.glb",
+  "skin": "scooter/skins/galaxy.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "Headlight"
+  ],
+  "camera": [
+   -9,
+   4.2,
+   -8.5,
+   0,
+   1.5,
+   0
+  ],
+  "out": "catalog/thumbnails/pipwick_zip_125_galaxy.png"
+ },
+ {
   "id": "mudrik_mx250_midnight",
   "model": "dirtbike/MotorcycleTag_DirtBike.glb",
   "skin": "dirtbike/skins/midnight.png",
@@ -254,94 +254,6 @@
    0.2
   ],
   "out": "catalog/thumbnails/mudrik_mx250_midnight.png"
- },
- {
-  "id": "mudrik_mx250_ruby",
-  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
-  "skin": "dirtbike/skins/ruby.png",
-  "rake": 27,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender",
-   "FrontPlate",
-   "Headlight"
-  ],
-  "camera": [
-   -10.5,
-   5,
-   -9.5,
-   0,
-   2.1,
-   0.2
-  ],
-  "out": "catalog/thumbnails/mudrik_mx250_ruby.png"
- },
- {
-  "id": "mudrik_mx450_sandstorm",
-  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
-  "skin": "dirtbike/skins/sandstorm.png",
-  "rake": 27,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender",
-   "FrontPlate",
-   "Headlight"
-  ],
-  "camera": [
-   -10.5,
-   5,
-   -9.5,
-   0,
-   2.1,
-   0.2
-  ],
-  "out": "catalog/thumbnails/mudrik_mx450_sandstorm.png"
- },
- {
-  "id": "mudrik_mx450_aqua",
-  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
-  "skin": "dirtbike/skins/aqua.png",
-  "rake": 27,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender",
-   "FrontPlate",
-   "Headlight"
-  ],
-  "camera": [
-   -10.5,
-   5,
-   -9.5,
-   0,
-   2.1,
-   0.2
-  ],
-  "out": "catalog/thumbnails/mudrik_mx450_aqua.png"
- },
- {
-  "id": "mudrik_mx450_factory",
-  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
-  "skin": "dirtbike/skins/factory.png",
-  "rake": 27,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender",
-   "FrontPlate",
-   "Headlight"
-  ],
-  "camera": [
-   -10.5,
-   5,
-   -9.5,
-   0,
-   2.1,
-   0.2
-  ],
-  "out": "catalog/thumbnails/mudrik_mx450_factory.png"
  },
  {
   "id": "torvan_t7_classic",
@@ -367,6 +279,49 @@
   "out": "catalog/thumbnails/torvan_t7_classic.png"
  },
  {
+  "id": "mudrik_mx250_ruby",
+  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
+  "skin": "dirtbike/skins/ruby.png",
+  "rake": 27,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "FrontPlate",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   5,
+   -9.5,
+   0,
+   2.1,
+   0.2
+  ],
+  "out": "catalog/thumbnails/mudrik_mx250_ruby.png"
+ },
+ {
+  "id": "ashcombe_bolt_500_british_green",
+  "model": "cafe/MotorcycleTag_Cafe.glb",
+  "skin": "cafe/skins/british_green.png",
+  "rake": 25,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0
+  ],
+  "out": "catalog/thumbnails/ashcombe_bolt_500_british_green.png"
+ },
+ {
   "id": "torvan_t7_nightrider",
   "model": "MotorcycleTag_Bike.glb",
   "skin": "skins/nightrider.png",
@@ -388,6 +343,27 @@
    0.2
   ],
   "out": "catalog/thumbnails/torvan_t7_nightrider.png"
+ },
+ {
+  "id": "ashcombe_bolt_500_cream",
+  "model": "cafe/MotorcycleTag_Cafe.glb",
+  "skin": "cafe/skins/cream.png",
+  "rake": 25,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0
+  ],
+  "out": "catalog/thumbnails/ashcombe_bolt_500_cream.png"
  },
  {
   "id": "torvan_t7_glacier",
@@ -413,6 +389,49 @@
   "out": "catalog/thumbnails/torvan_t7_glacier.png"
  },
  {
+  "id": "mudrik_mx450_sandstorm",
+  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
+  "skin": "dirtbike/skins/sandstorm.png",
+  "rake": 27,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "FrontPlate",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   5,
+   -9.5,
+   0,
+   2.1,
+   0.2
+  ],
+  "out": "catalog/thumbnails/mudrik_mx450_sandstorm.png"
+ },
+ {
+  "id": "ashcombe_bolt_500_silver_bullet",
+  "model": "cafe/MotorcycleTag_Cafe.glb",
+  "skin": "cafe/skins/silver_bullet.png",
+  "rake": 25,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0
+  ],
+  "out": "catalog/thumbnails/ashcombe_bolt_500_silver_bullet.png"
+ },
+ {
   "id": "torvan_t7_sunset",
   "model": "MotorcycleTag_Bike.glb",
   "skin": "skins/sunset.png",
@@ -434,6 +453,89 @@
    0.2
   ],
   "out": "catalog/thumbnails/torvan_t7_sunset.png"
+ },
+ {
+  "id": "ashcombe_bolt_500_brat",
+  "model": "cafe/MotorcycleTag_Cafe.glb",
+  "skin": "cafe/skins/brat.png",
+  "rake": 25,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0
+  ],
+  "out": "catalog/thumbnails/ashcombe_bolt_500_brat.png"
+ },
+ {
+  "id": "mudrik_mx450_aqua",
+  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
+  "skin": "dirtbike/skins/aqua.png",
+  "rake": 27,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "FrontPlate",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   5,
+   -9.5,
+   0,
+   2.1,
+   0.2
+  ],
+  "out": "catalog/thumbnails/mudrik_mx450_aqua.png"
+ },
+ {
+  "id": "haldor_trek_800_summit",
+  "model": "adventure/MotorcycleTag_Adventure.glb",
+  "skin": "adventure/skins/summit.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.2,
+   0
+  ],
+  "out": "catalog/thumbnails/haldor_trek_800_summit.png"
+ },
+ {
+  "id": "haldor_trek_800_dune",
+  "model": "adventure/MotorcycleTag_Adventure.glb",
+  "skin": "adventure/skins/dune.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.2,
+   0
+  ],
+  "out": "catalog/thumbnails/haldor_trek_800_dune.png"
  },
  {
   "id": "torvan_t9_cobalt",
@@ -459,6 +561,88 @@
   "out": "catalog/thumbnails/torvan_t9_cobalt.png"
  },
  {
+  "id": "ironbark_drifter_outlaw",
+  "model": "chopper/MotorcycleTag_Chopper.glb",
+  "skin": "chopper/skins/outlaw.png",
+  "rake": 34,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "Headlight"
+  ],
+  "camera": [
+   -11.5,
+   5,
+   -10,
+   0,
+   2.0,
+   0
+  ],
+  "out": "catalog/thumbnails/ironbark_drifter_outlaw.png"
+ },
+ {
+  "id": "ashcombe_bolt_900_s_racing_red",
+  "model": "cafe/MotorcycleTag_Cafe.glb",
+  "skin": "cafe/skins/racing_red.png",
+  "rake": 25,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0
+  ],
+  "out": "catalog/thumbnails/ashcombe_bolt_900_s_racing_red.png"
+ },
+ {
+  "id": "haldor_trek_800_arctic",
+  "model": "adventure/MotorcycleTag_Adventure.glb",
+  "skin": "adventure/skins/arctic.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.2,
+   0
+  ],
+  "out": "catalog/thumbnails/haldor_trek_800_arctic.png"
+ },
+ {
+  "id": "haldor_trek_800_jungle",
+  "model": "adventure/MotorcycleTag_Adventure.glb",
+  "skin": "adventure/skins/jungle.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.2,
+   0
+  ],
+  "out": "catalog/thumbnails/haldor_trek_800_jungle.png"
+ },
+ {
   "id": "torvan_t9_lime",
   "model": "MotorcycleTag_Bike.glb",
   "skin": "skins/lime.png",
@@ -480,6 +664,70 @@
    0.2
   ],
   "out": "catalog/thumbnails/torvan_t9_lime.png"
+ },
+ {
+  "id": "ironbark_drifter_cherry",
+  "model": "chopper/MotorcycleTag_Chopper.glb",
+  "skin": "chopper/skins/cherry.png",
+  "rake": 34,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "Headlight"
+  ],
+  "camera": [
+   -11.5,
+   5,
+   -10,
+   0,
+   2.0,
+   0
+  ],
+  "out": "catalog/thumbnails/ironbark_drifter_cherry.png"
+ },
+ {
+  "id": "ashcombe_bolt_900_s_petrol",
+  "model": "cafe/MotorcycleTag_Cafe.glb",
+  "skin": "cafe/skins/petrol.png",
+  "rake": 25,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0
+  ],
+  "out": "catalog/thumbnails/ashcombe_bolt_900_s_petrol.png"
+ },
+ {
+  "id": "mudrik_mx450_factory",
+  "model": "dirtbike/MotorcycleTag_DirtBike.glb",
+  "skin": "dirtbike/skins/factory.png",
+  "rake": 27,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "FrontPlate",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   5,
+   -9.5,
+   0,
+   2.1,
+   0.2
+  ],
+  "out": "catalog/thumbnails/mudrik_mx450_factory.png"
  },
  {
   "id": "torvan_t9_copper",
@@ -505,69 +753,24 @@
   "out": "catalog/thumbnails/torvan_t9_copper.png"
  },
  {
-  "id": "torvan_t9_phantom",
-  "model": "MotorcycleTag_Bike.glb",
-  "skin": "skins/phantom.png",
+  "id": "ionyx_pulse_volt",
+  "model": "electric/MotorcycleTag_Electric.glb",
+  "skin": "electric/skins/volt.png",
   "rake": 24,
   "steer": [
    "Fork",
    "Handlebars",
-   "FrontFender",
-   "HeadlightCowl",
-   "Headlight",
-   "Windscreen"
+   "FrontFender"
   ],
   "camera": [
    -10.5,
-   5,
+   4.8,
    -9.5,
    0,
-   1.9,
+   2.0,
    0.2
   ],
-  "out": "catalog/thumbnails/torvan_t9_phantom.png"
- },
- {
-  "id": "ironbark_drifter_outlaw",
-  "model": "chopper/MotorcycleTag_Chopper.glb",
-  "skin": "chopper/skins/outlaw.png",
-  "rake": 34,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender",
-   "Headlight"
-  ],
-  "camera": [
-   -11.5,
-   5,
-   -10,
-   0,
-   2.0,
-   0
-  ],
-  "out": "catalog/thumbnails/ironbark_drifter_outlaw.png"
- },
- {
-  "id": "ironbark_drifter_cherry",
-  "model": "chopper/MotorcycleTag_Chopper.glb",
-  "skin": "chopper/skins/cherry.png",
-  "rake": 34,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender",
-   "Headlight"
-  ],
-  "camera": [
-   -11.5,
-   5,
-   -10,
-   0,
-   2.0,
-   0
-  ],
-  "out": "catalog/thumbnails/ironbark_drifter_cherry.png"
+  "out": "catalog/thumbnails/ionyx_pulse_volt.png"
  },
  {
   "id": "ironbark_drifter_ghost",
@@ -591,6 +794,47 @@
   "out": "catalog/thumbnails/ironbark_drifter_ghost.png"
  },
  {
+  "id": "ashcombe_bolt_900_s_midnight",
+  "model": "cafe/MotorcycleTag_Cafe.glb",
+  "skin": "cafe/skins/midnight.png",
+  "rake": 25,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0
+  ],
+  "out": "catalog/thumbnails/ashcombe_bolt_900_s_midnight.png"
+ },
+ {
+  "id": "haldor_trek_1200_rally_volcano",
+  "model": "adventure/MotorcycleTag_Adventure.glb",
+  "skin": "adventure/skins/volcano.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.2,
+   0
+  ],
+  "out": "catalog/thumbnails/haldor_trek_1200_rally_volcano.png"
+ },
+ {
   "id": "ironbark_drifter_desert",
   "model": "chopper/MotorcycleTag_Chopper.glb",
   "skin": "chopper/skins/desert.png",
@@ -610,6 +854,110 @@
    0
   ],
   "out": "catalog/thumbnails/ironbark_drifter_desert.png"
+ },
+ {
+  "id": "ionyx_pulse_carbon",
+  "model": "electric/MotorcycleTag_Electric.glb",
+  "skin": "electric/skins/carbon.png",
+  "rake": 24,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -10.5,
+   4.8,
+   -9.5,
+   0,
+   2.0,
+   0.2
+  ],
+  "out": "catalog/thumbnails/ionyx_pulse_carbon.png"
+ },
+ {
+  "id": "torvan_t9_phantom",
+  "model": "MotorcycleTag_Bike.glb",
+  "skin": "skins/phantom.png",
+  "rake": 24,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "HeadlightCowl",
+   "Headlight",
+   "Windscreen"
+  ],
+  "camera": [
+   -10.5,
+   5,
+   -9.5,
+   0,
+   1.9,
+   0.2
+  ],
+  "out": "catalog/thumbnails/torvan_t9_phantom.png"
+ },
+ {
+  "id": "ashcombe_bolt_900_s_rocker",
+  "model": "cafe/MotorcycleTag_Cafe.glb",
+  "skin": "cafe/skins/rocker.png",
+  "rake": 25,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender",
+   "Headlight"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0
+  ],
+  "out": "catalog/thumbnails/ashcombe_bolt_900_s_rocker.png"
+ },
+ {
+  "id": "haldor_trek_1200_rally_rally",
+  "model": "adventure/MotorcycleTag_Adventure.glb",
+  "skin": "adventure/skins/rally.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.2,
+   0
+  ],
+  "out": "catalog/thumbnails/haldor_trek_1200_rally_rally.png"
+ },
+ {
+  "id": "ionyx_pulse_solar",
+  "model": "electric/MotorcycleTag_Electric.glb",
+  "skin": "electric/skins/solar.png",
+  "rake": 24,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -10.5,
+   4.8,
+   -9.5,
+   0,
+   2.0,
+   0.2
+  ],
+  "out": "catalog/thumbnails/ionyx_pulse_solar.png"
  },
  {
   "id": "ironbark_baron_midnight_blue",
@@ -633,6 +981,66 @@
   "out": "catalog/thumbnails/ironbark_baron_midnight_blue.png"
  },
  {
+  "id": "haldor_trek_1200_rally_ocean",
+  "model": "adventure/MotorcycleTag_Adventure.glb",
+  "skin": "adventure/skins/ocean.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.2,
+   0
+  ],
+  "out": "catalog/thumbnails/haldor_trek_1200_rally_ocean.png"
+ },
+ {
+  "id": "ionyx_pulse_aurora",
+  "model": "electric/MotorcycleTag_Electric.glb",
+  "skin": "electric/skins/aurora.png",
+  "rake": 24,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -10.5,
+   4.8,
+   -9.5,
+   0,
+   2.0,
+   0.2
+  ],
+  "out": "catalog/thumbnails/ionyx_pulse_aurora.png"
+ },
+ {
+  "id": "halvex_hx6_apex",
+  "model": "superbike/MotorcycleTag_SuperBike.glb",
+  "skin": "superbike/skins/apex.png",
+  "rake": 23,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0.2
+  ],
+  "out": "catalog/thumbnails/halvex_hx6_apex.png"
+ },
+ {
   "id": "ironbark_baron_emerald",
   "model": "chopper/MotorcycleTag_Chopper.glb",
   "skin": "chopper/skins/emerald.png",
@@ -652,6 +1060,86 @@
    0
   ],
   "out": "catalog/thumbnails/ironbark_baron_emerald.png"
+ },
+ {
+  "id": "halvex_hx6_inferno",
+  "model": "superbike/MotorcycleTag_SuperBike.glb",
+  "skin": "superbike/skins/inferno.png",
+  "rake": 23,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0.2
+  ],
+  "out": "catalog/thumbnails/halvex_hx6_inferno.png"
+ },
+ {
+  "id": "haldor_trek_1200_rally_stealth",
+  "model": "adventure/MotorcycleTag_Adventure.glb",
+  "skin": "adventure/skins/stealth.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.2,
+   0
+  ],
+  "out": "catalog/thumbnails/haldor_trek_1200_rally_stealth.png"
+ },
+ {
+  "id": "halvex_hx6_phantom",
+  "model": "superbike/MotorcycleTag_SuperBike.glb",
+  "skin": "superbike/skins/phantom.png",
+  "rake": 23,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0.2
+  ],
+  "out": "catalog/thumbnails/halvex_hx6_phantom.png"
+ },
+ {
+  "id": "ionyx_pulse_x_nebula",
+  "model": "electric/MotorcycleTag_Electric.glb",
+  "skin": "electric/skins/nebula.png",
+  "rake": 24,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -10.5,
+   4.8,
+   -9.5,
+   0,
+   2.0,
+   0.2
+  ],
+  "out": "catalog/thumbnails/ionyx_pulse_x_nebula.png"
  },
  {
   "id": "ironbark_baron_hellfire",
@@ -675,6 +1163,66 @@
   "out": "catalog/thumbnails/ironbark_baron_hellfire.png"
  },
  {
+  "id": "halvex_hx6_sakura",
+  "model": "superbike/MotorcycleTag_SuperBike.glb",
+  "skin": "superbike/skins/sakura.png",
+  "rake": 23,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -10.5,
+   4.6,
+   -9.5,
+   0,
+   1.9,
+   0.2
+  ],
+  "out": "catalog/thumbnails/halvex_hx6_sakura.png"
+ },
+ {
+  "id": "ionyx_pulse_x_synthwave",
+  "model": "electric/MotorcycleTag_Electric.glb",
+  "skin": "electric/skins/synthwave.png",
+  "rake": 24,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -10.5,
+   4.8,
+   -9.5,
+   0,
+   2.0,
+   0.2
+  ],
+  "out": "catalog/thumbnails/ionyx_pulse_x_synthwave.png"
+ },
+ {
+  "id": "ionyx_pulse_x_chrome",
+  "model": "electric/MotorcycleTag_Electric.glb",
+  "skin": "electric/skins/chrome.png",
+  "rake": 24,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -10.5,
+   4.8,
+   -9.5,
+   0,
+   2.0,
+   0.2
+  ],
+  "out": "catalog/thumbnails/ionyx_pulse_x_chrome.png"
+ },
+ {
   "id": "ironbark_baron_chrome_king",
   "model": "chopper/MotorcycleTag_Chopper.glb",
   "skin": "chopper/skins/chrome_king.png",
@@ -694,86 +1242,6 @@
    0
   ],
   "out": "catalog/thumbnails/ironbark_baron_chrome_king.png"
- },
- {
-  "id": "halvex_hx6_apex",
-  "model": "superbike/MotorcycleTag_SuperBike.glb",
-  "skin": "superbike/skins/apex.png",
-  "rake": 23,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender"
-  ],
-  "camera": [
-   -10.5,
-   4.6,
-   -9.5,
-   0,
-   1.9,
-   0.2
-  ],
-  "out": "catalog/thumbnails/halvex_hx6_apex.png"
- },
- {
-  "id": "halvex_hx6_inferno",
-  "model": "superbike/MotorcycleTag_SuperBike.glb",
-  "skin": "superbike/skins/inferno.png",
-  "rake": 23,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender"
-  ],
-  "camera": [
-   -10.5,
-   4.6,
-   -9.5,
-   0,
-   1.9,
-   0.2
-  ],
-  "out": "catalog/thumbnails/halvex_hx6_inferno.png"
- },
- {
-  "id": "halvex_hx6_phantom",
-  "model": "superbike/MotorcycleTag_SuperBike.glb",
-  "skin": "superbike/skins/phantom.png",
-  "rake": 23,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender"
-  ],
-  "camera": [
-   -10.5,
-   4.6,
-   -9.5,
-   0,
-   1.9,
-   0.2
-  ],
-  "out": "catalog/thumbnails/halvex_hx6_phantom.png"
- },
- {
-  "id": "halvex_hx6_sakura",
-  "model": "superbike/MotorcycleTag_SuperBike.glb",
-  "skin": "superbike/skins/sakura.png",
-  "rake": 23,
-  "steer": [
-   "Fork",
-   "Handlebars",
-   "FrontFender"
-  ],
-  "camera": [
-   -10.5,
-   4.6,
-   -9.5,
-   0,
-   1.9,
-   0.2
-  ],
-  "out": "catalog/thumbnails/halvex_hx6_sakura.png"
  },
  {
   "id": "halvex_hx10_verde",
@@ -814,6 +1282,26 @@
    0.2
   ],
   "out": "catalog/thumbnails/halvex_hx10_solar.png"
+ },
+ {
+  "id": "ionyx_pulse_x_venom",
+  "model": "electric/MotorcycleTag_Electric.glb",
+  "skin": "electric/skins/venom.png",
+  "rake": 24,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -10.5,
+   4.8,
+   -9.5,
+   0,
+   2.0,
+   0.2
+  ],
+  "out": "catalog/thumbnails/ionyx_pulse_x_venom.png"
  },
  {
   "id": "halvex_hx10_ice",

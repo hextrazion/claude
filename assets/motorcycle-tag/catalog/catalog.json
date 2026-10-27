@@ -72,6 +72,24 @@
   }
  },
  {
+  "id": "mudrik_mx125_blaze",
+  "name": "Mudrik MX-125 Blaze",
+  "brand": "Mudrik",
+  "model": "MX-125",
+  "colorway": "Blaze",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "blaze",
+  "skinFile": "dirtbike/skins/blaze.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx125_blaze.png",
+  "price": 6000,
+  "tier": "Common",
+  "stats": {
+   "Speed": 6,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
   "id": "pipwick_zip_125_racer",
   "name": "Pipwick Zip 125 Racer",
   "brand": "Pipwick",
@@ -87,6 +105,24 @@
    "Speed": 5,
    "Acceleration": 7,
    "Handling": 9
+  }
+ },
+ {
+  "id": "mudrik_mx125_toxic",
+  "name": "Mudrik MX-125 Toxic",
+  "brand": "Mudrik",
+  "model": "MX-125",
+  "colorway": "Toxic",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "toxic",
+  "skinFile": "dirtbike/skins/toxic.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx125_toxic.png",
+  "price": 9000,
+  "tier": "Common",
+  "stats": {
+   "Speed": 6,
+   "Acceleration": 8,
+   "Handling": 8
   }
  },
  {
@@ -126,60 +162,6 @@
   }
  },
  {
-  "id": "pipwick_zip_125_galaxy",
-  "name": "Pipwick Zip 125 Galaxy",
-  "brand": "Pipwick",
-  "model": "Zip 125",
-  "colorway": "Galaxy",
-  "base": "MotorcycleTag_Scooter",
-  "skin": "galaxy",
-  "skinFile": "scooter/skins/galaxy.png",
-  "thumbnail": "catalog/thumbnails/pipwick_zip_125_galaxy.png",
-  "price": 20000,
-  "tier": "Common",
-  "stats": {
-   "Speed": 5,
-   "Acceleration": 7,
-   "Handling": 9
-  }
- },
- {
-  "id": "mudrik_mx125_blaze",
-  "name": "Mudrik MX-125 Blaze",
-  "brand": "Mudrik",
-  "model": "MX-125",
-  "colorway": "Blaze",
-  "base": "MotorcycleTag_DirtBike",
-  "skin": "blaze",
-  "skinFile": "dirtbike/skins/blaze.png",
-  "thumbnail": "catalog/thumbnails/mudrik_mx125_blaze.png",
-  "price": 6000,
-  "tier": "Common",
-  "stats": {
-   "Speed": 6,
-   "Acceleration": 8,
-   "Handling": 8
-  }
- },
- {
-  "id": "mudrik_mx125_toxic",
-  "name": "Mudrik MX-125 Toxic",
-  "brand": "Mudrik",
-  "model": "MX-125",
-  "colorway": "Toxic",
-  "base": "MotorcycleTag_DirtBike",
-  "skin": "toxic",
-  "skinFile": "dirtbike/skins/toxic.png",
-  "thumbnail": "catalog/thumbnails/mudrik_mx125_toxic.png",
-  "price": 9000,
-  "tier": "Common",
-  "stats": {
-   "Speed": 6,
-   "Acceleration": 8,
-   "Handling": 8
-  }
- },
- {
   "id": "mudrik_mx250_frost",
   "name": "Mudrik MX-250 Frost",
   "brand": "Mudrik",
@@ -198,6 +180,24 @@
   }
  },
  {
+  "id": "pipwick_zip_125_galaxy",
+  "name": "Pipwick Zip 125 Galaxy",
+  "brand": "Pipwick",
+  "model": "Zip 125",
+  "colorway": "Galaxy",
+  "base": "MotorcycleTag_Scooter",
+  "skin": "galaxy",
+  "skinFile": "scooter/skins/galaxy.png",
+  "thumbnail": "catalog/thumbnails/pipwick_zip_125_galaxy.png",
+  "price": 20000,
+  "tier": "Common",
+  "stats": {
+   "Speed": 5,
+   "Acceleration": 7,
+   "Handling": 9
+  }
+ },
+ {
   "id": "mudrik_mx250_midnight",
   "name": "Mudrik MX-250 Midnight",
   "brand": "Mudrik",
@@ -211,78 +211,6 @@
   "tier": "Common",
   "stats": {
    "Speed": 7,
-   "Acceleration": 8,
-   "Handling": 8
-  }
- },
- {
-  "id": "mudrik_mx250_ruby",
-  "name": "Mudrik MX-250 Ruby",
-  "brand": "Mudrik",
-  "model": "MX-250",
-  "colorway": "Ruby",
-  "base": "MotorcycleTag_DirtBike",
-  "skin": "ruby",
-  "skinFile": "dirtbike/skins/ruby.png",
-  "thumbnail": "catalog/thumbnails/mudrik_mx250_ruby.png",
-  "price": 30000,
-  "tier": "Rare",
-  "stats": {
-   "Speed": 7,
-   "Acceleration": 8,
-   "Handling": 8
-  }
- },
- {
-  "id": "mudrik_mx450_sandstorm",
-  "name": "Mudrik MX-450 Sandstorm",
-  "brand": "Mudrik",
-  "model": "MX-450",
-  "colorway": "Sandstorm",
-  "base": "MotorcycleTag_DirtBike",
-  "skin": "sandstorm",
-  "skinFile": "dirtbike/skins/sandstorm.png",
-  "thumbnail": "catalog/thumbnails/mudrik_mx450_sandstorm.png",
-  "price": 45000,
-  "tier": "Rare",
-  "stats": {
-   "Speed": 8,
-   "Acceleration": 8,
-   "Handling": 8
-  }
- },
- {
-  "id": "mudrik_mx450_aqua",
-  "name": "Mudrik MX-450 Aqua",
-  "brand": "Mudrik",
-  "model": "MX-450",
-  "colorway": "Aqua",
-  "base": "MotorcycleTag_DirtBike",
-  "skin": "aqua",
-  "skinFile": "dirtbike/skins/aqua.png",
-  "thumbnail": "catalog/thumbnails/mudrik_mx450_aqua.png",
-  "price": 60000,
-  "tier": "Rare",
-  "stats": {
-   "Speed": 8,
-   "Acceleration": 8,
-   "Handling": 8
-  }
- },
- {
-  "id": "mudrik_mx450_factory",
-  "name": "Mudrik MX-450 Factory",
-  "brand": "Mudrik",
-  "model": "MX-450",
-  "colorway": "Factory",
-  "base": "MotorcycleTag_DirtBike",
-  "skin": "factory",
-  "skinFile": "dirtbike/skins/factory.png",
-  "thumbnail": "catalog/thumbnails/mudrik_mx450_factory.png",
-  "price": 110000,
-  "tier": "Rare",
-  "stats": {
-   "Speed": 8,
    "Acceleration": 8,
    "Handling": 8
   }
@@ -306,6 +234,42 @@
   }
  },
  {
+  "id": "mudrik_mx250_ruby",
+  "name": "Mudrik MX-250 Ruby",
+  "brand": "Mudrik",
+  "model": "MX-250",
+  "colorway": "Ruby",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "ruby",
+  "skinFile": "dirtbike/skins/ruby.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx250_ruby.png",
+  "price": 30000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "ashcombe_bolt_500_british_green",
+  "name": "Ashcombe Bolt 500 British Green",
+  "brand": "Ashcombe",
+  "model": "Bolt 500",
+  "colorway": "British Green",
+  "base": "MotorcycleTag_Cafe",
+  "skin": "british_green",
+  "skinFile": "cafe/skins/british_green.png",
+  "thumbnail": "catalog/thumbnails/ashcombe_bolt_500_british_green.png",
+  "price": 30000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 7,
+   "Handling": 8
+  }
+ },
+ {
   "id": "torvan_t7_nightrider",
   "name": "Torvan T7 Nightrider",
   "brand": "Torvan",
@@ -321,6 +285,24 @@
    "Speed": 7,
    "Acceleration": 7,
    "Handling": 7
+  }
+ },
+ {
+  "id": "ashcombe_bolt_500_cream",
+  "name": "Ashcombe Bolt 500 Cream",
+  "brand": "Ashcombe",
+  "model": "Bolt 500",
+  "colorway": "Cream",
+  "base": "MotorcycleTag_Cafe",
+  "skin": "cream",
+  "skinFile": "cafe/skins/cream.png",
+  "thumbnail": "catalog/thumbnails/ashcombe_bolt_500_cream.png",
+  "price": 38000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 7,
+   "Handling": 8
   }
  },
  {
@@ -342,6 +324,42 @@
   }
  },
  {
+  "id": "mudrik_mx450_sandstorm",
+  "name": "Mudrik MX-450 Sandstorm",
+  "brand": "Mudrik",
+  "model": "MX-450",
+  "colorway": "Sandstorm",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "sandstorm",
+  "skinFile": "dirtbike/skins/sandstorm.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx450_sandstorm.png",
+  "price": 45000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "ashcombe_bolt_500_silver_bullet",
+  "name": "Ashcombe Bolt 500 Silver Bullet",
+  "brand": "Ashcombe",
+  "model": "Bolt 500",
+  "colorway": "Silver Bullet",
+  "base": "MotorcycleTag_Cafe",
+  "skin": "silver_bullet",
+  "skinFile": "cafe/skins/silver_bullet.png",
+  "thumbnail": "catalog/thumbnails/ashcombe_bolt_500_silver_bullet.png",
+  "price": 45000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 7,
+   "Handling": 8
+  }
+ },
+ {
   "id": "torvan_t7_sunset",
   "name": "Torvan T7 Sunset",
   "brand": "Torvan",
@@ -360,6 +378,78 @@
   }
  },
  {
+  "id": "ashcombe_bolt_500_brat",
+  "name": "Ashcombe Bolt 500 Brat",
+  "brand": "Ashcombe",
+  "model": "Bolt 500",
+  "colorway": "Brat",
+  "base": "MotorcycleTag_Cafe",
+  "skin": "brat",
+  "skinFile": "cafe/skins/brat.png",
+  "thumbnail": "catalog/thumbnails/ashcombe_bolt_500_brat.png",
+  "price": 55000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 7,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "mudrik_mx450_aqua",
+  "name": "Mudrik MX-450 Aqua",
+  "brand": "Mudrik",
+  "model": "MX-450",
+  "colorway": "Aqua",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "aqua",
+  "skinFile": "dirtbike/skins/aqua.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx450_aqua.png",
+  "price": 60000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "haldor_trek_800_summit",
+  "name": "Haldor Trek 800 Summit",
+  "brand": "Haldor",
+  "model": "Trek 800",
+  "colorway": "Summit",
+  "base": "MotorcycleTag_Adventure",
+  "skin": "summit",
+  "skinFile": "adventure/skins/summit.png",
+  "thumbnail": "catalog/thumbnails/haldor_trek_800_summit.png",
+  "price": 60000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 6,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "haldor_trek_800_dune",
+  "name": "Haldor Trek 800 Dune",
+  "brand": "Haldor",
+  "model": "Trek 800",
+  "colorway": "Dune",
+  "base": "MotorcycleTag_Adventure",
+  "skin": "dune",
+  "skinFile": "adventure/skins/dune.png",
+  "thumbnail": "catalog/thumbnails/haldor_trek_800_dune.png",
+  "price": 70000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 6,
+   "Handling": 7
+  }
+ },
+ {
   "id": "torvan_t9_cobalt",
   "name": "Torvan T9 Cobalt",
   "brand": "Torvan",
@@ -371,60 +461,6 @@
   "thumbnail": "catalog/thumbnails/torvan_t9_cobalt.png",
   "price": 75000,
   "tier": "Rare",
-  "stats": {
-   "Speed": 8,
-   "Acceleration": 7,
-   "Handling": 7
-  }
- },
- {
-  "id": "torvan_t9_lime",
-  "name": "Torvan T9 Lime",
-  "brand": "Torvan",
-  "model": "T9",
-  "colorway": "Lime",
-  "base": "MotorcycleTag_Bike",
-  "skin": "lime",
-  "skinFile": "skins/lime.png",
-  "thumbnail": "catalog/thumbnails/torvan_t9_lime.png",
-  "price": 95000,
-  "tier": "Rare",
-  "stats": {
-   "Speed": 8,
-   "Acceleration": 7,
-   "Handling": 7
-  }
- },
- {
-  "id": "torvan_t9_copper",
-  "name": "Torvan T9 Copper",
-  "brand": "Torvan",
-  "model": "T9",
-  "colorway": "Copper",
-  "base": "MotorcycleTag_Bike",
-  "skin": "copper",
-  "skinFile": "skins/copper.png",
-  "thumbnail": "catalog/thumbnails/torvan_t9_copper.png",
-  "price": 120000,
-  "tier": "Rare",
-  "stats": {
-   "Speed": 8,
-   "Acceleration": 7,
-   "Handling": 7
-  }
- },
- {
-  "id": "torvan_t9_phantom",
-  "name": "Torvan T9 Phantom",
-  "brand": "Torvan",
-  "model": "T9",
-  "colorway": "Phantom",
-  "base": "MotorcycleTag_Bike",
-  "skin": "phantom",
-  "skinFile": "skins/phantom.png",
-  "thumbnail": "catalog/thumbnails/torvan_t9_phantom.png",
-  "price": 160000,
-  "tier": "Epic",
   "stats": {
    "Speed": 8,
    "Acceleration": 7,
@@ -450,6 +486,78 @@
   }
  },
  {
+  "id": "ashcombe_bolt_900_s_racing_red",
+  "name": "Ashcombe Bolt 900 S Racing Red",
+  "brand": "Ashcombe",
+  "model": "Bolt 900 S",
+  "colorway": "Racing Red",
+  "base": "MotorcycleTag_Cafe",
+  "skin": "racing_red",
+  "skinFile": "cafe/skins/racing_red.png",
+  "thumbnail": "catalog/thumbnails/ashcombe_bolt_900_s_racing_red.png",
+  "price": 80000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "haldor_trek_800_arctic",
+  "name": "Haldor Trek 800 Arctic",
+  "brand": "Haldor",
+  "model": "Trek 800",
+  "colorway": "Arctic",
+  "base": "MotorcycleTag_Adventure",
+  "skin": "arctic",
+  "skinFile": "adventure/skins/arctic.png",
+  "thumbnail": "catalog/thumbnails/haldor_trek_800_arctic.png",
+  "price": 80000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 6,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "haldor_trek_800_jungle",
+  "name": "Haldor Trek 800 Jungle",
+  "brand": "Haldor",
+  "model": "Trek 800",
+  "colorway": "Jungle",
+  "base": "MotorcycleTag_Adventure",
+  "skin": "jungle",
+  "skinFile": "adventure/skins/jungle.png",
+  "thumbnail": "catalog/thumbnails/haldor_trek_800_jungle.png",
+  "price": 90000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 7,
+   "Acceleration": 6,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "torvan_t9_lime",
+  "name": "Torvan T9 Lime",
+  "brand": "Torvan",
+  "model": "T9",
+  "colorway": "Lime",
+  "base": "MotorcycleTag_Bike",
+  "skin": "lime",
+  "skinFile": "skins/lime.png",
+  "thumbnail": "catalog/thumbnails/torvan_t9_lime.png",
+  "price": 95000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 7
+  }
+ },
+ {
   "id": "ironbark_drifter_cherry",
   "name": "Ironbark Drifter Cherry",
   "brand": "Ironbark",
@@ -468,6 +576,83 @@
   }
  },
  {
+  "id": "ashcombe_bolt_900_s_petrol",
+  "name": "Ashcombe Bolt 900 S Petrol",
+  "brand": "Ashcombe",
+  "model": "Bolt 900 S",
+  "colorway": "Petrol",
+  "base": "MotorcycleTag_Cafe",
+  "skin": "petrol",
+  "skinFile": "cafe/skins/petrol.png",
+  "thumbnail": "catalog/thumbnails/ashcombe_bolt_900_s_petrol.png",
+  "price": 100000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "mudrik_mx450_factory",
+  "name": "Mudrik MX-450 Factory",
+  "brand": "Mudrik",
+  "model": "MX-450",
+  "colorway": "Factory",
+  "base": "MotorcycleTag_DirtBike",
+  "skin": "factory",
+  "skinFile": "dirtbike/skins/factory.png",
+  "thumbnail": "catalog/thumbnails/mudrik_mx450_factory.png",
+  "price": 110000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 8,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "torvan_t9_copper",
+  "name": "Torvan T9 Copper",
+  "brand": "Torvan",
+  "model": "T9",
+  "colorway": "Copper",
+  "base": "MotorcycleTag_Bike",
+  "skin": "copper",
+  "skinFile": "skins/copper.png",
+  "thumbnail": "catalog/thumbnails/torvan_t9_copper.png",
+  "price": 120000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "ionyx_pulse_volt",
+  "name": "Ionyx Pulse Volt",
+  "brand": "Ionyx",
+  "model": "Pulse",
+  "colorway": "Volt",
+  "base": "MotorcycleTag_Electric",
+  "skin": "volt",
+  "skinFile": "electric/skins/volt.png",
+  "thumbnail": "catalog/thumbnails/ionyx_pulse_volt.png",
+  "price": 120000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 10,
+   "Handling": 7
+  },
+  "neonColor": [
+   0,
+   230,
+   255
+  ]
+ },
+ {
   "id": "ironbark_drifter_ghost",
   "name": "Ironbark Drifter Ghost",
   "brand": "Ironbark",
@@ -483,6 +668,42 @@
    "Speed": 7,
    "Acceleration": 6,
    "Handling": 5
+  }
+ },
+ {
+  "id": "ashcombe_bolt_900_s_midnight",
+  "name": "Ashcombe Bolt 900 S Midnight",
+  "brand": "Ashcombe",
+  "model": "Bolt 900 S",
+  "colorway": "Midnight",
+  "base": "MotorcycleTag_Cafe",
+  "skin": "midnight",
+  "skinFile": "cafe/skins/midnight.png",
+  "thumbnail": "catalog/thumbnails/ashcombe_bolt_900_s_midnight.png",
+  "price": 130000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "haldor_trek_1200_rally_volcano",
+  "name": "Haldor Trek 1200 Rally Volcano",
+  "brand": "Haldor",
+  "model": "Trek 1200 Rally",
+  "colorway": "Volcano",
+  "base": "MotorcycleTag_Adventure",
+  "skin": "volcano",
+  "skinFile": "adventure/skins/volcano.png",
+  "thumbnail": "catalog/thumbnails/haldor_trek_1200_rally_volcano.png",
+  "price": 140000,
+  "tier": "Rare",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 6,
+   "Handling": 7
   }
  },
  {
@@ -504,6 +725,106 @@
   }
  },
  {
+  "id": "ionyx_pulse_carbon",
+  "name": "Ionyx Pulse Carbon",
+  "brand": "Ionyx",
+  "model": "Pulse",
+  "colorway": "Carbon",
+  "base": "MotorcycleTag_Electric",
+  "skin": "carbon",
+  "skinFile": "electric/skins/carbon.png",
+  "thumbnail": "catalog/thumbnails/ionyx_pulse_carbon.png",
+  "price": 150000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 10,
+   "Handling": 7
+  },
+  "neonColor": [
+   255,
+   40,
+   50
+  ]
+ },
+ {
+  "id": "torvan_t9_phantom",
+  "name": "Torvan T9 Phantom",
+  "brand": "Torvan",
+  "model": "T9",
+  "colorway": "Phantom",
+  "base": "MotorcycleTag_Bike",
+  "skin": "phantom",
+  "skinFile": "skins/phantom.png",
+  "thumbnail": "catalog/thumbnails/torvan_t9_phantom.png",
+  "price": 160000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "ashcombe_bolt_900_s_rocker",
+  "name": "Ashcombe Bolt 900 S Rocker",
+  "brand": "Ashcombe",
+  "model": "Bolt 900 S",
+  "colorway": "Rocker",
+  "base": "MotorcycleTag_Cafe",
+  "skin": "rocker",
+  "skinFile": "cafe/skins/rocker.png",
+  "thumbnail": "catalog/thumbnails/ashcombe_bolt_900_s_rocker.png",
+  "price": 175000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 8
+  }
+ },
+ {
+  "id": "haldor_trek_1200_rally_rally",
+  "name": "Haldor Trek 1200 Rally Rally",
+  "brand": "Haldor",
+  "model": "Trek 1200 Rally",
+  "colorway": "Rally",
+  "base": "MotorcycleTag_Adventure",
+  "skin": "rally",
+  "skinFile": "adventure/skins/rally.png",
+  "thumbnail": "catalog/thumbnails/haldor_trek_1200_rally_rally.png",
+  "price": 180000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 6,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "ionyx_pulse_solar",
+  "name": "Ionyx Pulse Solar",
+  "brand": "Ionyx",
+  "model": "Pulse",
+  "colorway": "Solar",
+  "base": "MotorcycleTag_Electric",
+  "skin": "solar",
+  "skinFile": "electric/skins/solar.png",
+  "thumbnail": "catalog/thumbnails/ionyx_pulse_solar.png",
+  "price": 180000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 10,
+   "Handling": 7
+  },
+  "neonColor": [
+   255,
+   230,
+   80
+  ]
+ },
+ {
   "id": "ironbark_baron_midnight_blue",
   "name": "Ironbark Baron Midnight Blue",
   "brand": "Ironbark",
@@ -519,6 +840,65 @@
    "Speed": 8,
    "Acceleration": 6,
    "Handling": 5
+  }
+ },
+ {
+  "id": "haldor_trek_1200_rally_ocean",
+  "name": "Haldor Trek 1200 Rally Ocean",
+  "brand": "Haldor",
+  "model": "Trek 1200 Rally",
+  "colorway": "Ocean",
+  "base": "MotorcycleTag_Adventure",
+  "skin": "ocean",
+  "skinFile": "adventure/skins/ocean.png",
+  "thumbnail": "catalog/thumbnails/haldor_trek_1200_rally_ocean.png",
+  "price": 220000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 6,
+   "Handling": 7
+  }
+ },
+ {
+  "id": "ionyx_pulse_aurora",
+  "name": "Ionyx Pulse Aurora",
+  "brand": "Ionyx",
+  "model": "Pulse",
+  "colorway": "Aurora",
+  "base": "MotorcycleTag_Electric",
+  "skin": "aurora",
+  "skinFile": "electric/skins/aurora.png",
+  "thumbnail": "catalog/thumbnails/ionyx_pulse_aurora.png",
+  "price": 220000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 10,
+   "Handling": 7
+  },
+  "neonColor": [
+   120,
+   255,
+   200
+  ]
+ },
+ {
+  "id": "halvex_hx6_apex",
+  "name": "Halvex HX-6 Apex",
+  "brand": "Halvex",
+  "model": "HX-6",
+  "colorway": "Apex",
+  "base": "MotorcycleTag_SuperBike",
+  "skin": "apex",
+  "skinFile": "superbike/skins/apex.png",
+  "thumbnail": "catalog/thumbnails/halvex_hx6_apex.png",
+  "price": 250000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 8,
+   "Handling": 6
   }
  },
  {
@@ -540,60 +920,6 @@
   }
  },
  {
-  "id": "ironbark_baron_hellfire",
-  "name": "Ironbark Baron Hellfire",
-  "brand": "Ironbark",
-  "model": "Baron",
-  "colorway": "Hellfire",
-  "base": "MotorcycleTag_Chopper",
-  "skin": "hellfire",
-  "skinFile": "chopper/skins/hellfire.png",
-  "thumbnail": "catalog/thumbnails/ironbark_baron_hellfire.png",
-  "price": 400000,
-  "tier": "Epic",
-  "stats": {
-   "Speed": 8,
-   "Acceleration": 6,
-   "Handling": 5
-  }
- },
- {
-  "id": "ironbark_baron_chrome_king",
-  "name": "Ironbark Baron Chrome King",
-  "brand": "Ironbark",
-  "model": "Baron",
-  "colorway": "Chrome King",
-  "base": "MotorcycleTag_Chopper",
-  "skin": "chrome_king",
-  "skinFile": "chopper/skins/chrome_king.png",
-  "thumbnail": "catalog/thumbnails/ironbark_baron_chrome_king.png",
-  "price": 650000,
-  "tier": "Epic",
-  "stats": {
-   "Speed": 8,
-   "Acceleration": 6,
-   "Handling": 5
-  }
- },
- {
-  "id": "halvex_hx6_apex",
-  "name": "Halvex HX-6 Apex",
-  "brand": "Halvex",
-  "model": "HX-6",
-  "colorway": "Apex",
-  "base": "MotorcycleTag_SuperBike",
-  "skin": "apex",
-  "skinFile": "superbike/skins/apex.png",
-  "thumbnail": "catalog/thumbnails/halvex_hx6_apex.png",
-  "price": 250000,
-  "tier": "Epic",
-  "stats": {
-   "Speed": 9,
-   "Acceleration": 8,
-   "Handling": 6
-  }
- },
- {
   "id": "halvex_hx6_inferno",
   "name": "Halvex HX-6 Inferno",
   "brand": "Halvex",
@@ -609,6 +935,24 @@
    "Speed": 9,
    "Acceleration": 8,
    "Handling": 6
+  }
+ },
+ {
+  "id": "haldor_trek_1200_rally_stealth",
+  "name": "Haldor Trek 1200 Rally Stealth",
+  "brand": "Haldor",
+  "model": "Trek 1200 Rally",
+  "colorway": "Stealth",
+  "base": "MotorcycleTag_Adventure",
+  "skin": "stealth",
+  "skinFile": "adventure/skins/stealth.png",
+  "thumbnail": "catalog/thumbnails/haldor_trek_1200_rally_stealth.png",
+  "price": 300000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 6,
+   "Handling": 7
   }
  },
  {
@@ -630,6 +974,47 @@
   }
  },
  {
+  "id": "ionyx_pulse_x_nebula",
+  "name": "Ionyx Pulse X Nebula",
+  "brand": "Ionyx",
+  "model": "Pulse X",
+  "colorway": "Nebula",
+  "base": "MotorcycleTag_Electric",
+  "skin": "nebula",
+  "skinFile": "electric/skins/nebula.png",
+  "thumbnail": "catalog/thumbnails/ionyx_pulse_x_nebula.png",
+  "price": 350000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 10,
+   "Handling": 7
+  },
+  "neonColor": [
+   255,
+   60,
+   220
+  ]
+ },
+ {
+  "id": "ironbark_baron_hellfire",
+  "name": "Ironbark Baron Hellfire",
+  "brand": "Ironbark",
+  "model": "Baron",
+  "colorway": "Hellfire",
+  "base": "MotorcycleTag_Chopper",
+  "skin": "hellfire",
+  "skinFile": "chopper/skins/hellfire.png",
+  "thumbnail": "catalog/thumbnails/ironbark_baron_hellfire.png",
+  "price": 400000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 6,
+   "Handling": 5
+  }
+ },
+ {
   "id": "halvex_hx6_sakura",
   "name": "Halvex HX-6 Sakura",
   "brand": "Halvex",
@@ -645,6 +1030,70 @@
    "Speed": 9,
    "Acceleration": 8,
    "Handling": 6
+  }
+ },
+ {
+  "id": "ionyx_pulse_x_synthwave",
+  "name": "Ionyx Pulse X Synthwave",
+  "brand": "Ionyx",
+  "model": "Pulse X",
+  "colorway": "Synthwave",
+  "base": "MotorcycleTag_Electric",
+  "skin": "synthwave",
+  "skinFile": "electric/skins/synthwave.png",
+  "thumbnail": "catalog/thumbnails/ionyx_pulse_x_synthwave.png",
+  "price": 450000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 10,
+   "Handling": 7
+  },
+  "neonColor": [
+   60,
+   220,
+   255
+  ]
+ },
+ {
+  "id": "ionyx_pulse_x_chrome",
+  "name": "Ionyx Pulse X Chrome",
+  "brand": "Ionyx",
+  "model": "Pulse X",
+  "colorway": "Chrome",
+  "base": "MotorcycleTag_Electric",
+  "skin": "chrome",
+  "skinFile": "electric/skins/chrome.png",
+  "thumbnail": "catalog/thumbnails/ionyx_pulse_x_chrome.png",
+  "price": 600000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 10,
+   "Handling": 7
+  },
+  "neonColor": [
+   40,
+   120,
+   255
+  ]
+ },
+ {
+  "id": "ironbark_baron_chrome_king",
+  "name": "Ironbark Baron Chrome King",
+  "brand": "Ironbark",
+  "model": "Baron",
+  "colorway": "Chrome King",
+  "base": "MotorcycleTag_Chopper",
+  "skin": "chrome_king",
+  "skinFile": "chopper/skins/chrome_king.png",
+  "thumbnail": "catalog/thumbnails/ironbark_baron_chrome_king.png",
+  "price": 650000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 6,
+   "Handling": 5
   }
  },
  {
@@ -682,6 +1131,29 @@
    "Acceleration": 8,
    "Handling": 6
   }
+ },
+ {
+  "id": "ionyx_pulse_x_venom",
+  "name": "Ionyx Pulse X Venom",
+  "brand": "Ionyx",
+  "model": "Pulse X",
+  "colorway": "Venom",
+  "base": "MotorcycleTag_Electric",
+  "skin": "venom",
+  "skinFile": "electric/skins/venom.png",
+  "thumbnail": "catalog/thumbnails/ionyx_pulse_x_venom.png",
+  "price": 900000,
+  "tier": "Legendary",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 10,
+   "Handling": 7
+  },
+  "neonColor": [
+   150,
+   255,
+   30
+  ]
  },
  {
   "id": "halvex_hx10_ice",

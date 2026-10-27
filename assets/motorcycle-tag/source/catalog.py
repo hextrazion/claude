@@ -38,7 +38,17 @@ BASES = {
                                   stats=dict(Speed=7, Acceleration=6, Handling=5), camera=[-11.5, 5, -10, 0, 2.0, 0]),
     "MotorcycleTag_SuperBike": dict(folder="superbike", rake=23, steer=["Fork", "Handlebars", "FrontFender"],
                                     stats=dict(Speed=9, Acceleration=8, Handling=6), camera=[-10.5, 4.6, -9.5, 0, 1.9, 0.2]),
+    "MotorcycleTag_Adventure": dict(folder="adventure", rake=26, steer=["Fork", "Handlebars", "FrontFender"],
+                                    stats=dict(Speed=7, Acceleration=6, Handling=7), camera=[-11, 5.2, -10, 0, 2.2, 0]),
+    "MotorcycleTag_Electric": dict(folder="electric", rake=24, steer=["Fork", "Handlebars", "FrontFender"],
+                                   stats=dict(Speed=8, Acceleration=10, Handling=7), camera=[-10.5, 4.8, -9.5, 0, 2.0, 0.2]),
+    "MotorcycleTag_Cafe": dict(folder="cafe", rake=25, steer=["Fork", "Handlebars", "FrontFender", "Headlight"],
+                               stats=dict(Speed=7, Acceleration=7, Handling=8), camera=[-10.5, 4.6, -9.5, 0, 1.9, 0]),
 }
+
+# Electric bikes: colour for their LightStrips part, which BikeCatalog.Spawn makes Neon.
+NEON = {"volt": (0, 230, 255), "carbon": (255, 40, 50), "solar": (255, 230, 80), "aurora": (120, 255, 200),
+        "nebula": (255, 60, 220), "synthwave": (60, 220, 255), "chrome": (40, 120, 255), "venom": (150, 255, 30)}
 
 # (brand, model, colourway, base, skin, price, stat bonus). Brand and model names are invented.
 BIKES = [
@@ -87,6 +97,33 @@ BIKES = [
     ("Halvex", "HX-10", "Ice", "MotorcycleTag_SuperBike", "ice", 1100000, 1),
     ("Halvex", "HX-1R", "Obsidian", "MotorcycleTag_SuperBike", "obsidian", 1800000, 1),
     ("Halvex", "HX-1R", "Prism", "MotorcycleTag_SuperBike", "prism", 2500000, 1),
+
+    ("Ashcombe", "Bolt 500", "British Green", "MotorcycleTag_Cafe", "british_green", 30000, 0),
+    ("Ashcombe", "Bolt 500", "Cream", "MotorcycleTag_Cafe", "cream", 38000, 0),
+    ("Ashcombe", "Bolt 500", "Silver Bullet", "MotorcycleTag_Cafe", "silver_bullet", 45000, 0),
+    ("Ashcombe", "Bolt 500", "Brat", "MotorcycleTag_Cafe", "brat", 55000, 0),
+    ("Ashcombe", "Bolt 900 S", "Racing Red", "MotorcycleTag_Cafe", "racing_red", 80000, 1),
+    ("Ashcombe", "Bolt 900 S", "Petrol", "MotorcycleTag_Cafe", "petrol", 100000, 1),
+    ("Ashcombe", "Bolt 900 S", "Midnight", "MotorcycleTag_Cafe", "midnight", 130000, 1),
+    ("Ashcombe", "Bolt 900 S", "Rocker", "MotorcycleTag_Cafe", "rocker", 175000, 1),
+
+    ("Haldor", "Trek 800", "Summit", "MotorcycleTag_Adventure", "summit", 60000, 0),
+    ("Haldor", "Trek 800", "Dune", "MotorcycleTag_Adventure", "dune", 70000, 0),
+    ("Haldor", "Trek 800", "Arctic", "MotorcycleTag_Adventure", "arctic", 80000, 0),
+    ("Haldor", "Trek 800", "Jungle", "MotorcycleTag_Adventure", "jungle", 90000, 0),
+    ("Haldor", "Trek 1200 Rally", "Volcano", "MotorcycleTag_Adventure", "volcano", 140000, 1),
+    ("Haldor", "Trek 1200 Rally", "Rally", "MotorcycleTag_Adventure", "rally", 180000, 1),
+    ("Haldor", "Trek 1200 Rally", "Ocean", "MotorcycleTag_Adventure", "ocean", 220000, 1),
+    ("Haldor", "Trek 1200 Rally", "Stealth", "MotorcycleTag_Adventure", "stealth", 300000, 1),
+
+    ("Ionyx", "Pulse", "Volt", "MotorcycleTag_Electric", "volt", 120000, 0),
+    ("Ionyx", "Pulse", "Carbon", "MotorcycleTag_Electric", "carbon", 150000, 0),
+    ("Ionyx", "Pulse", "Solar", "MotorcycleTag_Electric", "solar", 180000, 0),
+    ("Ionyx", "Pulse", "Aurora", "MotorcycleTag_Electric", "aurora", 220000, 0),
+    ("Ionyx", "Pulse X", "Nebula", "MotorcycleTag_Electric", "nebula", 350000, 1),
+    ("Ionyx", "Pulse X", "Synthwave", "MotorcycleTag_Electric", "synthwave", 450000, 1),
+    ("Ionyx", "Pulse X", "Chrome", "MotorcycleTag_Electric", "chrome", 600000, 1),
+    ("Ionyx", "Pulse X", "Venom", "MotorcycleTag_Electric", "venom", 900000, 1),
 ]
 
 # Tier by price: free bikes are Starter, then each tier starts at its floor.
@@ -112,6 +149,9 @@ def entries():
         out.append(dict(id=bike_id, name=f"{brand} {model} {colour}", brand=brand, model=model, colorway=colour, base=base,
                         skin=skin, skinFile=os.path.normpath(os.path.join(folder, "skins", f"{skin}.png")),
                         thumbnail=f"catalog/thumbnails/{bike_id}.png", price=price, tier=tier(price), stats=stats))
+        if base == "MotorcycleTag_Electric":
+            out[-1]["neonColor"] = list(NEON[skin])
+    out.sort(key=lambda b: b["price"])  # shop order
     return out
 
 
@@ -150,6 +190,10 @@ def write_lua(bikes, path):
             f"\t\tPrice = {b['price']},",
             f"\t\tTier = {lua_string(b['tier'])},",
             f"\t\tStats = {{ {stats} }},",
+        ]
+        if "neonColor" in b:
+            lines.append("\t\tNeonColor = Color3.fromRGB({}, {}, {}),".format(*b["neonColor"]))
+        lines += [
             '\t\tTextureId = "",',
             '\t\tThumbnailId = "",',
             "\t},",
@@ -195,6 +239,17 @@ def write_lua(bikes, path):
         "\tmodel.Name = bike.Name",
         "\tif bike.TextureId ~= \"\" then",
         "\t\tMotorcycleRig.SetSkin(model, bike.TextureId)",
+        "\tend",
+        "\tif bike.NeonColor then -- electric bikes: glowing light strips",
+        "\t\tfor _, part in ipairs(model:GetDescendants()) do",
+        "\t\t\tif part:IsA(\"MeshPart\") and part.Name == \"LightStrips\" then",
+        "\t\t\t\tpcall(function()",
+        "\t\t\t\t\tpart.TextureID = \"\"",
+        "\t\t\t\tend)",
+        "\t\t\t\tpart.Material = Enum.Material.Neon",
+        "\t\t\t\tpart.Color = bike.NeonColor",
+        "\t\t\tend",
+        "\t\tend",
         "\tend",
         "\tMotorcycleRig.Rig(model)",
         "\treturn model",
