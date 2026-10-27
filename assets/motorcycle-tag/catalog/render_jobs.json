@@ -1041,6 +1041,26 @@
   "out": "catalog/thumbnails/halvex_hx6_apex.png"
  },
  {
+  "id": "vigil_patrol_1000_highway",
+  "model": "police/MotorcycleTag_Police.glb",
+  "skin": "police/skins/highway.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.3,
+   0
+  ],
+  "out": "catalog/thumbnails/vigil_patrol_1000_highway.png"
+ },
+ {
   "id": "ironbark_baron_emerald",
   "model": "chopper/MotorcycleTag_Chopper.glb",
   "skin": "chopper/skins/emerald.png",
@@ -1102,6 +1122,26 @@
   "out": "catalog/thumbnails/haldor_trek_1200_rally_stealth.png"
  },
  {
+  "id": "vigil_patrol_1000_metro",
+  "model": "police/MotorcycleTag_Police.glb",
+  "skin": "police/skins/metro.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.3,
+   0
+  ],
+  "out": "catalog/thumbnails/vigil_patrol_1000_metro.png"
+ },
+ {
   "id": "halvex_hx6_phantom",
   "model": "superbike/MotorcycleTag_SuperBike.glb",
   "skin": "superbike/skins/phantom.png",
@@ -1140,6 +1180,26 @@
    0.2
   ],
   "out": "catalog/thumbnails/ionyx_pulse_x_nebula.png"
+ },
+ {
+  "id": "vigil_patrol_1000_sheriff",
+  "model": "police/MotorcycleTag_Police.glb",
+  "skin": "police/skins/sheriff.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.3,
+   0
+  ],
+  "out": "catalog/thumbnails/vigil_patrol_1000_sheriff.png"
  },
  {
   "id": "ironbark_baron_hellfire",
@@ -1183,6 +1243,26 @@
   "out": "catalog/thumbnails/halvex_hx6_sakura.png"
  },
  {
+  "id": "vigil_patrol_1000_ranger",
+  "model": "police/MotorcycleTag_Police.glb",
+  "skin": "police/skins/ranger.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.3,
+   0
+  ],
+  "out": "catalog/thumbnails/vigil_patrol_1000_ranger.png"
+ },
+ {
   "id": "ionyx_pulse_x_synthwave",
   "model": "electric/MotorcycleTag_Electric.glb",
   "skin": "electric/skins/synthwave.png",
@@ -1201,6 +1281,26 @@
    0.2
   ],
   "out": "catalog/thumbnails/ionyx_pulse_x_synthwave.png"
+ },
+ {
+  "id": "vigil_pursuit_1300_battenburg",
+  "model": "police/MotorcycleTag_Police.glb",
+  "skin": "police/skins/battenburg.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.3,
+   0
+  ],
+  "out": "catalog/thumbnails/vigil_pursuit_1300_battenburg.png"
  },
  {
   "id": "ionyx_pulse_x_chrome",
@@ -1264,6 +1364,26 @@
   "out": "catalog/thumbnails/halvex_hx10_verde.png"
  },
  {
+  "id": "vigil_pursuit_1300_interceptor",
+  "model": "police/MotorcycleTag_Police.glb",
+  "skin": "police/skins/interceptor.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.3,
+   0
+  ],
+  "out": "catalog/thumbnails/vigil_pursuit_1300_interceptor.png"
+ },
+ {
   "id": "halvex_hx10_solar",
   "model": "superbike/MotorcycleTag_SuperBike.glb",
   "skin": "superbike/skins/solar.png",
@@ -1304,6 +1424,26 @@
   "out": "catalog/thumbnails/ionyx_pulse_x_venom.png"
  },
  {
+  "id": "vigil_pursuit_1300_tactical",
+  "model": "police/MotorcycleTag_Police.glb",
+  "skin": "police/skins/tactical.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.3,
+   0
+  ],
+  "out": "catalog/thumbnails/vigil_pursuit_1300_tactical.png"
+ },
+ {
   "id": "halvex_hx10_ice",
   "model": "superbike/MotorcycleTag_SuperBike.glb",
   "skin": "superbike/skins/ice.png",
@@ -1322,6 +1462,26 @@
    0.2
   ],
   "out": "catalog/thumbnails/halvex_hx10_ice.png"
+ },
+ {
+  "id": "vigil_pursuit_1300_unmarked",
+  "model": "police/MotorcycleTag_Police.glb",
+  "skin": "police/skins/unmarked.png",
+  "rake": 26,
+  "steer": [
+   "Fork",
+   "Handlebars",
+   "FrontFender"
+  ],
+  "camera": [
+   -11,
+   5.2,
+   -10,
+   0,
+   2.3,
+   0
+  ],
+  "out": "catalog/thumbnails/vigil_pursuit_1300_unmarked.png"
  },
  {
   "id": "halvex_hx1r_obsidian",

@@ -126,6 +126,11 @@ def front_chart(name, label, min_dot=0.5):
     return Chart(name, label, lambda n, c: -n[2] > min_dot, lambda p: (-p[0], p[1]), "up")
 
 
+def back_chart(name, label, min_dot=0.6):
+    # Viewed from behind the bike: the bike's right (+X) is on the viewer's right.
+    return Chart(name, label, lambda n, c: n[2] > min_dot, lambda p: (p[0], p[1]), "up")
+
+
 def fender_chart(name, label, axle, radius, min_dot=0.6):
     """A fender arcing around an axle, unrolled: across the bike to the right, front at the top."""
     axle = np.asarray(axle, float)

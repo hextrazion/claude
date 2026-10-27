@@ -902,6 +902,25 @@
   }
  },
  {
+  "id": "vigil_patrol_1000_highway",
+  "name": "Vigil Patrol 1000 Highway",
+  "brand": "Vigil",
+  "model": "Patrol 1000",
+  "colorway": "Highway",
+  "base": "MotorcycleTag_Police",
+  "skin": "highway",
+  "skinFile": "police/skins/highway.png",
+  "thumbnail": "catalog/thumbnails/vigil_patrol_1000_highway.png",
+  "price": 250000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 6
+  },
+  "hasSirens": true
+ },
+ {
   "id": "ironbark_baron_emerald",
   "name": "Ironbark Baron Emerald",
   "brand": "Ironbark",
@@ -956,6 +975,25 @@
   }
  },
  {
+  "id": "vigil_patrol_1000_metro",
+  "name": "Vigil Patrol 1000 Metro",
+  "brand": "Vigil",
+  "model": "Patrol 1000",
+  "colorway": "Metro",
+  "base": "MotorcycleTag_Police",
+  "skin": "metro",
+  "skinFile": "police/skins/metro.png",
+  "thumbnail": "catalog/thumbnails/vigil_patrol_1000_metro.png",
+  "price": 300000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 6
+  },
+  "hasSirens": true
+ },
+ {
   "id": "halvex_hx6_phantom",
   "name": "Halvex HX-6 Phantom",
   "brand": "Halvex",
@@ -997,6 +1035,25 @@
   ]
  },
  {
+  "id": "vigil_patrol_1000_sheriff",
+  "name": "Vigil Patrol 1000 Sheriff",
+  "brand": "Vigil",
+  "model": "Patrol 1000",
+  "colorway": "Sheriff",
+  "base": "MotorcycleTag_Police",
+  "skin": "sheriff",
+  "skinFile": "police/skins/sheriff.png",
+  "thumbnail": "catalog/thumbnails/vigil_patrol_1000_sheriff.png",
+  "price": 350000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 6
+  },
+  "hasSirens": true
+ },
+ {
   "id": "ironbark_baron_hellfire",
   "name": "Ironbark Baron Hellfire",
   "brand": "Ironbark",
@@ -1033,6 +1090,25 @@
   }
  },
  {
+  "id": "vigil_patrol_1000_ranger",
+  "name": "Vigil Patrol 1000 Ranger",
+  "brand": "Vigil",
+  "model": "Patrol 1000",
+  "colorway": "Ranger",
+  "base": "MotorcycleTag_Police",
+  "skin": "ranger",
+  "skinFile": "police/skins/ranger.png",
+  "thumbnail": "catalog/thumbnails/vigil_patrol_1000_ranger.png",
+  "price": 400000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 8,
+   "Acceleration": 7,
+   "Handling": 6
+  },
+  "hasSirens": true
+ },
+ {
   "id": "ionyx_pulse_x_synthwave",
   "name": "Ionyx Pulse X Synthwave",
   "brand": "Ionyx",
@@ -1054,6 +1130,25 @@
    220,
    255
   ]
+ },
+ {
+  "id": "vigil_pursuit_1300_battenburg",
+  "name": "Vigil Pursuit 1300 Battenburg",
+  "brand": "Vigil",
+  "model": "Pursuit 1300",
+  "colorway": "Battenburg",
+  "base": "MotorcycleTag_Police",
+  "skin": "battenburg",
+  "skinFile": "police/skins/battenburg.png",
+  "thumbnail": "catalog/thumbnails/vigil_pursuit_1300_battenburg.png",
+  "price": 550000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 7,
+   "Handling": 6
+  },
+  "hasSirens": true
  },
  {
   "id": "ionyx_pulse_x_chrome",
@@ -1115,6 +1210,25 @@
   }
  },
  {
+  "id": "vigil_pursuit_1300_interceptor",
+  "name": "Vigil Pursuit 1300 Interceptor",
+  "brand": "Vigil",
+  "model": "Pursuit 1300",
+  "colorway": "Interceptor",
+  "base": "MotorcycleTag_Police",
+  "skin": "interceptor",
+  "skinFile": "police/skins/interceptor.png",
+  "thumbnail": "catalog/thumbnails/vigil_pursuit_1300_interceptor.png",
+  "price": 700000,
+  "tier": "Epic",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 7,
+   "Handling": 6
+  },
+  "hasSirens": true
+ },
+ {
   "id": "halvex_hx10_solar",
   "name": "Halvex HX-10 Solar",
   "brand": "Halvex",
@@ -1156,6 +1270,25 @@
   ]
  },
  {
+  "id": "vigil_pursuit_1300_tactical",
+  "name": "Vigil Pursuit 1300 Tactical",
+  "brand": "Vigil",
+  "model": "Pursuit 1300",
+  "colorway": "Tactical",
+  "base": "MotorcycleTag_Police",
+  "skin": "tactical",
+  "skinFile": "police/skins/tactical.png",
+  "thumbnail": "catalog/thumbnails/vigil_pursuit_1300_tactical.png",
+  "price": 900000,
+  "tier": "Legendary",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 7,
+   "Handling": 6
+  },
+  "hasSirens": true
+ },
+ {
   "id": "halvex_hx10_ice",
   "name": "Halvex HX-10 Ice",
   "brand": "Halvex",
@@ -1172,6 +1305,25 @@
    "Acceleration": 8,
    "Handling": 6
   }
+ },
+ {
+  "id": "vigil_pursuit_1300_unmarked",
+  "name": "Vigil Pursuit 1300 Unmarked",
+  "brand": "Vigil",
+  "model": "Pursuit 1300",
+  "colorway": "Unmarked",
+  "base": "MotorcycleTag_Police",
+  "skin": "unmarked",
+  "skinFile": "police/skins/unmarked.png",
+  "thumbnail": "catalog/thumbnails/vigil_pursuit_1300_unmarked.png",
+  "price": 1200000,
+  "tier": "Legendary",
+  "stats": {
+   "Speed": 9,
+   "Acceleration": 7,
+   "Handling": 6
+  },
+  "hasSirens": true
  },
  {
   "id": "halvex_hx1r_obsidian",

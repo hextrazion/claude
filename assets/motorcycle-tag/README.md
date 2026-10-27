@@ -1,8 +1,8 @@
 # Motorcycle Tag: bikes
 
-Stylized low-poly motorcycles built for Roblox: a street bike (this page), a [dirt bike](dirtbike), a [superbike](superbike), a [chopper](chopper), a [scooter](scooter), an [adventure bike](adventure), an [electric bike](electric) and a [café racer](cafe). On every bike each wheel is its own mesh centred on its axle, so it can spin on its own, and the front wheel turns with the fork for steering. Every bike is **built for skins**: one 1024×1024 texture per skin. All eight share the same rig script and skin system.
+Stylized low-poly motorcycles built for Roblox: a street bike (this page), a [dirt bike](dirtbike), a [superbike](superbike), a [chopper](chopper), a [scooter](scooter), an [adventure bike](adventure), an [electric bike](electric), a [café racer](cafe) and a [police bike](police). On every bike each wheel is its own mesh centred on its axle, so it can spin on its own, and the front wheel turns with the fork for steering. Every bike is **built for skins**: one 1024×1024 texture per skin. All nine share the same rig script and skin system.
 
-## The garage: 65 bikes from 8 models
+## The garage: 73 bikes from 9 models
 
 Like most Roblox motorcycle games, the shop sells many bikes that share a handful of base models, each with its own name, colourway and price. All names are made up, so rename anything you like.
 
@@ -18,12 +18,13 @@ Like most Roblox motorcycle games, the shop sells many bikes that share a handfu
 | Ashcombe (Bolt 500 / Bolt 900 S) | [Café racer](cafe) | 8 | $30,000 to $175,000 |
 | Haldor (Trek 800 / Trek 1200 Rally) | [Adventure bike](adventure) | 8 | $60,000 to $300,000 |
 | Ionyx (Pulse / Pulse X) | [Electric bike](electric) | 8 | $120,000 to $900,000 |
+| Vigil (Patrol 1000 / Pursuit 1300) | [Police bike](police) | 8 | $250,000 to $1,200,000 |
 
 Tiers by price: Starter (free), Common, Rare (from $25,000), Epic (from $150,000) and Legendary (from $800,000). Each bike also has suggested Speed, Acceleration and Handling stats. They're set per base model, with a +1 or +2 Speed bonus on higher trims; tune or ignore them.
 
 | File | What it is |
 |---|---|
-| `roblox/BikeCatalog.lua` | ModuleScript listing every bike (Id, Name, Brand, Base, Skin, Price, Tier, Stats, TextureId, ThumbnailId, and NeonColor for the electric bikes) with `Get`, `Filter` and `Spawn` helpers. The list is in price order. |
+| `roblox/BikeCatalog.lua` | ModuleScript listing every bike (Id, Name, Brand, Base, Skin, Price, Tier, Stats, TextureId, ThumbnailId, NeonColor for the electric bikes and HasSirens for the police bikes) with `Get`, `Filter` and `Spawn` helpers. The list is in price order. |
 | `catalog/thumbnails/*.png` | A 512×384 shop thumbnail per bike, transparent background. |
 | `catalog/catalog_sheet.png` | The overview above. |
 | `catalog/catalog.json` | The same catalog as JSON. |
@@ -31,7 +32,7 @@ Tiers by price: Starter (free), Common, Rare (from $25,000), Epic (from $150,000
 
 ### Setting it up in Roblox Studio
 
-1. Import the eight GLBs (`MotorcycleTag_Bike`, `_DirtBike`, `_SuperBike`, `_Chopper`, `_Scooter`, `_Adventure`, `_Electric`, `_Cafe`) and put them in a folder such as `ServerStorage.Bikes`. Keep their names.
+1. Import the nine GLBs (`MotorcycleTag_Bike`, `_DirtBike`, `_SuperBike`, `_Chopper`, `_Scooter`, `_Adventure`, `_Electric`, `_Cafe`, `_Police`) and put them in a folder such as `ServerStorage.Bikes`. Keep their names.
 2. Bulk-import the skin PNGs from each bike's `skins/` folder and the thumbnails from `catalog/thumbnails/` (**Asset Manager → Bulk Import**). Paste each image's id into `TextureId` and `ThumbnailId` in `BikeCatalog.lua`.
 3. Put `MotorcycleRig.lua` and `BikeCatalog.lua` as ModuleScripts in the same place, for example ServerStorage. Then:
 
@@ -133,12 +134,13 @@ MotorcycleRig.SetThrottle(bike, 1) -- -1 .. 1, drives the rear wheel
 MotorcycleRig.SetSteer(bike, -0.5) -- -1 (left) .. 1 (right), servo on the raked steering axis
 MotorcycleRig.SetSkin(bike, "rbxassetid://<id>") -- any uploaded skin texture
 MotorcycleRig.SetHighlight(bike, Color3.fromRGB(255, 0, 0)) -- outline the player who is "it"; nil clears
+MotorcycleRig.SetSirens(bike, true) -- police bike only: flash the red and blue lights
 ```
 
 `Rig` does the following:
 
 - Welds the steering parts to `Fork` and every other part except the wheels to `Frame`.
-- Reads the fork angle from the model name (24° here, 27° dirt bike, 23° superbike, 34° chopper, 26° scooter, 26° adventure, 24° electric, 25° café racer), a `SteeringRake` attribute, or `Rig(bike, { rake = degrees })`.
+- Reads the fork angle from the model name (24° here, 27° dirt bike, 23° superbike, 34° chopper, 26° scooter, 26° adventure, 24° electric, 25° café racer, 26° police), a `SteeringRake` attribute, or `Rig(bike, { rake = degrees })`.
 - Adds three `HingeConstraint`s, all placed on wheel centres so the rig works at any scale: a servo `SteerHinge` from Frame to Fork, a free `FrontWheelHinge` from Fork to FrontWheel, and a motorised `RearWheelHinge` from Swingarm to RearWheel.
 - Adds a `KeepUpright` AlignOrientation and sets the materials (Metal, Neon lights, Glass windscreen).
 - Leaves only the wheels with `CanCollide` on. Every part keeps `CanTouch` on, so `Touched` still fires for tagging.

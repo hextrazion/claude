@@ -1,6 +1,6 @@
 -- MotorcycleRig (ModuleScript)
 -- Turns an imported Motorcycle Tag bike (street bike, dirt bike, superbike, chopper, scooter, adventure,
--- electric or café racer) into a physics rig:
+-- electric, café racer or police bike) into a physics rig:
 --   * every body part welded to Frame (Frame becomes the PrimaryPart)
 --   * steering parts welded to Fork, Fork hinged to Frame on the raked steering axis (servo)
 --   * FrontWheel hinged to Fork (free spin), RearWheel hinged to Swingarm (motor drive)
@@ -15,6 +15,7 @@
 --   MotorcycleRig.SetThrottle(bike, 1) -- -1 reverse .. 1 full forward
 --   MotorcycleRig.SetSkin(bike, "rbxassetid://123")             -- swap the whole skin texture
 --   MotorcycleRig.SetHighlight(bike, Color3.fromRGB(255, 0, 0)) -- outline whoever is "it"; nil clears
+--   MotorcycleRig.SetSirens(bike, true)  -- police bike: flash the red and blue lights (false stops)
 --
 -- All joints sit on the wheel centres, so the rig works at any import scale.
 
@@ -35,6 +36,7 @@ MotorcycleRig.RAKE_BY_MODEL = {
 	MotorcycleTag_Adventure = 26,
 	MotorcycleTag_Electric = 24,
 	MotorcycleTag_Cafe = 25,
+	MotorcycleTag_Police = 26,
 }
 
 -- Parts that turn with the handlebars (whichever of them a model has). Everything else
@@ -56,6 +58,8 @@ local LOOK = {
 	TailLight = { Enum.Material.Neon, Color3.fromRGB(255, 40, 55) },
 	Windscreen = { Enum.Material.Glass, Color3.fromRGB(52, 62, 76), 0.35 },
 	Windshield = { Enum.Material.Glass, Color3.fromRGB(40, 52, 70), 0.35 },
+	LightsRed = { Enum.Material.SmoothPlastic, Color3.fromRGB(255, 30, 40) }, -- unlit until SetSirens
+	LightsBlue = { Enum.Material.SmoothPlastic, Color3.fromRGB(30, 80, 255) },
 }
 
 local function getPart(model, name)
@@ -216,6 +220,30 @@ function MotorcycleRig.SetSkin(model, textureId)
 			part.TextureID = textureId
 		end
 	end
+end
+
+-- Police bike: alternately flashes the LightsRed and LightsBlue parts until called with false.
+-- Call it once the bike is in the workspace; the flashing stops by itself if the bike is removed.
+function MotorcycleRig.SetSirens(model, on)
+	model:SetAttribute("SirensOn", on == true)
+	local red = model:FindFirstChild("LightsRed", true)
+	local blue = model:FindFirstChild("LightsBlue", true)
+	if not (on and red and blue) or model:GetAttribute("SirensRunning") then
+		return
+	end
+	model:SetAttribute("SirensRunning", true)
+	task.spawn(function()
+		local phase = false
+		while model:IsDescendantOf(game) and model:GetAttribute("SirensOn") do
+			phase = not phase
+			red.Material = phase and Enum.Material.Neon or Enum.Material.SmoothPlastic
+			blue.Material = phase and Enum.Material.SmoothPlastic or Enum.Material.Neon
+			task.wait(0.25)
+		end
+		red.Material = Enum.Material.SmoothPlastic
+		blue.Material = Enum.Material.SmoothPlastic
+		model:SetAttribute("SirensRunning", false)
+	end)
 end
 
 -- Outlines the whole bike (e.g. the player who is "it"); pass nil to remove.

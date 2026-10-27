@@ -44,6 +44,8 @@ BASES = {
                                    stats=dict(Speed=8, Acceleration=10, Handling=7), camera=[-10.5, 4.8, -9.5, 0, 2.0, 0.2]),
     "MotorcycleTag_Cafe": dict(folder="cafe", rake=25, steer=["Fork", "Handlebars", "FrontFender", "Headlight"],
                                stats=dict(Speed=7, Acceleration=7, Handling=8), camera=[-10.5, 4.6, -9.5, 0, 1.9, 0]),
+    "MotorcycleTag_Police": dict(folder="police", rake=26, steer=["Fork", "Handlebars", "FrontFender"],
+                                 stats=dict(Speed=8, Acceleration=7, Handling=6), camera=[-11, 5.2, -10, 0, 2.3, 0]),
 }
 
 # Electric bikes: colour for their LightStrips part, which BikeCatalog.Spawn makes Neon.
@@ -124,6 +126,15 @@ BIKES = [
     ("Ionyx", "Pulse X", "Synthwave", "MotorcycleTag_Electric", "synthwave", 450000, 1),
     ("Ionyx", "Pulse X", "Chrome", "MotorcycleTag_Electric", "chrome", 600000, 1),
     ("Ionyx", "Pulse X", "Venom", "MotorcycleTag_Electric", "venom", 900000, 1),
+
+    ("Vigil", "Patrol 1000", "Highway", "MotorcycleTag_Police", "highway", 250000, 0),
+    ("Vigil", "Patrol 1000", "Metro", "MotorcycleTag_Police", "metro", 300000, 0),
+    ("Vigil", "Patrol 1000", "Sheriff", "MotorcycleTag_Police", "sheriff", 350000, 0),
+    ("Vigil", "Patrol 1000", "Ranger", "MotorcycleTag_Police", "ranger", 400000, 0),
+    ("Vigil", "Pursuit 1300", "Battenburg", "MotorcycleTag_Police", "battenburg", 550000, 1),
+    ("Vigil", "Pursuit 1300", "Interceptor", "MotorcycleTag_Police", "interceptor", 700000, 1),
+    ("Vigil", "Pursuit 1300", "Tactical", "MotorcycleTag_Police", "tactical", 900000, 1),
+    ("Vigil", "Pursuit 1300", "Unmarked", "MotorcycleTag_Police", "unmarked", 1200000, 1),
 ]
 
 # Tier by price: free bikes are Starter, then each tier starts at its floor.
@@ -151,6 +162,8 @@ def entries():
                         thumbnail=f"catalog/thumbnails/{bike_id}.png", price=price, tier=tier(price), stats=stats))
         if base == "MotorcycleTag_Electric":
             out[-1]["neonColor"] = list(NEON[skin])
+        if base == "MotorcycleTag_Police":
+            out[-1]["hasSirens"] = True   # LightsRed / LightsBlue: MotorcycleRig.SetSirens
     out.sort(key=lambda b: b["price"])  # shop order
     return out
 
@@ -193,6 +206,8 @@ def write_lua(bikes, path):
         ]
         if "neonColor" in b:
             lines.append("\t\tNeonColor = Color3.fromRGB({}, {}, {}),".format(*b["neonColor"]))
+        if b.get("hasSirens"):
+            lines.append("\t\tHasSirens = true,")
         lines += [
             '\t\tTextureId = "",',
             '\t\tThumbnailId = "",',

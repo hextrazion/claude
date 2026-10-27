@@ -1,0 +1,8 @@
+newmtl PoliceSkin
+Ka 0 0 0
+Kd 1 1 1
+Ks 0.1 0.1 0.1
+Ns 30
+d 1
+illum 2
+map_Kd skins/highway.png
