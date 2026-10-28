@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/
+logs/
+tools/
+config/studio.env
+app/frontend/node_modules/
+app/frontend/dist/
+*.part

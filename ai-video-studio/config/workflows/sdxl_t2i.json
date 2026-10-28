@@ -1,0 +1,168 @@
+{
+  "name": "sdxl_t2i",
+  "label": "SDXL \u2014 text to image (optional still stage)",
+  "kind": "image",
+  "mode": "t2i",
+  "description": "Standard SDXL text-to-image graph for scene stills that are then animated with an image-to-video workflow. Fits comfortably in 12 GB.",
+  "defaults": {
+    "width": 768,
+    "height": 1344,
+    "fps": 1,
+    "max_frames": 1
+  },
+  "requirements": {
+    "vram_note": "~8 GB VRAM.",
+    "models": [
+      {
+        "file": "sd_xl_base_1.0.safetensors",
+        "folder": "ComfyUI/models/checkpoints",
+        "source": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0"
+      }
+    ]
+  },
+  "bindings": {
+    "prompt": [
+      {
+        "node": "6",
+        "input": "text"
+      }
+    ],
+    "negative_prompt": [
+      {
+        "node": "7",
+        "input": "text"
+      }
+    ],
+    "width": [
+      {
+        "node": "5",
+        "input": "width"
+      }
+    ],
+    "height": [
+      {
+        "node": "5",
+        "input": "height"
+      }
+    ],
+    "seed": [
+      {
+        "node": "3",
+        "input": "seed"
+      }
+    ],
+    "filename_prefix": [
+      {
+        "node": "9",
+        "input": "filename_prefix"
+      }
+    ]
+  },
+  "workflow": {
+    "4": {
+      "class_type": "CheckpointLoaderSimple",
+      "inputs": {
+        "ckpt_name": "sd_xl_base_1.0.safetensors"
+      },
+      "_meta": {
+        "title": "Load Checkpoint"
+      }
+    },
+    "6": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "",
+        "clip": [
+          "4",
+          1
+        ]
+      },
+      "_meta": {
+        "title": "Positive Prompt"
+      }
+    },
+    "7": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "",
+        "clip": [
+          "4",
+          1
+        ]
+      },
+      "_meta": {
+        "title": "Negative Prompt"
+      }
+    },
+    "5": {
+      "class_type": "EmptyLatentImage",
+      "inputs": {
+        "width": 768,
+        "height": 1344,
+        "batch_size": 1
+      },
+      "_meta": {
+        "title": "Empty Latent Image"
+      }
+    },
+    "3": {
+      "class_type": "KSampler",
+      "inputs": {
+        "model": [
+          "4",
+          0
+        ],
+        "seed": 0,
+        "steps": 28,
+        "cfg": 6.5,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "positive": [
+          "6",
+          0
+        ],
+        "negative": [
+          "7",
+          0
+        ],
+        "latent_image": [
+          "5",
+          0
+        ],
+        "denoise": 1.0
+      },
+      "_meta": {
+        "title": "KSampler"
+      }
+    },
+    "8": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "3",
+          0
+        ],
+        "vae": [
+          "4",
+          2
+        ]
+      },
+      "_meta": {
+        "title": "VAE Decode"
+      }
+    },
+    "9": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "images": [
+          "8",
+          0
+        ],
+        "filename_prefix": "ai_video_studio/still"
+      },
+      "_meta": {
+        "title": "Save Image"
+      }
+    }
+  }
+}

@@ -1,0 +1,245 @@
+{
+  "name": "wan22_ti2v_5b_t2v",
+  "label": "Wan 2.2 TI2V 5B \u2014 text to video",
+  "kind": "video",
+  "mode": "t2v",
+  "description": "Mirrors ComfyUI's built-in 'Wan 2.2 5B video generation' template (native nodes). 720p-class, 24 fps, up to 121 frames (~5 s). Recommended default for 12 GB GPUs. If 'Check workflow' reports mismatches, export the template from your ComfyUI in API format and import it instead.",
+  "defaults": {
+    "width": 704,
+    "height": 1280,
+    "fps": 24,
+    "max_frames": 121,
+    "frame_multiple": 4
+  },
+  "requirements": {
+    "vram_note": "Runs on ~8 GB VRAM with ComfyUI's automatic offloading. On a 12 GB RTX 4070 Ti expect several minutes per 5 s clip at 704x1280 / 30 steps.",
+    "models": [
+      {
+        "file": "wan2.2_ti2v_5B_fp16.safetensors",
+        "folder": "ComfyUI/models/diffusion_models",
+        "source": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged"
+      },
+      {
+        "file": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+        "folder": "ComfyUI/models/text_encoders",
+        "source": "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged"
+      },
+      {
+        "file": "wan2.2_vae.safetensors",
+        "folder": "ComfyUI/models/vae",
+        "source": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged"
+      }
+    ]
+  },
+  "bindings": {
+    "prompt": [
+      {
+        "node": "6",
+        "input": "text"
+      }
+    ],
+    "negative_prompt": [
+      {
+        "node": "7",
+        "input": "text"
+      }
+    ],
+    "width": [
+      {
+        "node": "55",
+        "input": "width"
+      }
+    ],
+    "height": [
+      {
+        "node": "55",
+        "input": "height"
+      }
+    ],
+    "frames": [
+      {
+        "node": "55",
+        "input": "length"
+      }
+    ],
+    "fps": [
+      {
+        "node": "57",
+        "input": "fps"
+      }
+    ],
+    "seed": [
+      {
+        "node": "3",
+        "input": "seed"
+      }
+    ],
+    "filename_prefix": [
+      {
+        "node": "58",
+        "input": "filename_prefix"
+      }
+    ]
+  },
+  "workflow": {
+    "37": {
+      "class_type": "UNETLoader",
+      "inputs": {
+        "unet_name": "wan2.2_ti2v_5B_fp16.safetensors",
+        "weight_dtype": "default"
+      },
+      "_meta": {
+        "title": "Load Diffusion Model"
+      }
+    },
+    "38": {
+      "class_type": "CLIPLoader",
+      "inputs": {
+        "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+        "type": "wan",
+        "device": "default"
+      },
+      "_meta": {
+        "title": "Load CLIP"
+      }
+    },
+    "39": {
+      "class_type": "VAELoader",
+      "inputs": {
+        "vae_name": "wan2.2_vae.safetensors"
+      },
+      "_meta": {
+        "title": "Load VAE"
+      }
+    },
+    "48": {
+      "class_type": "ModelSamplingSD3",
+      "inputs": {
+        "model": [
+          "37",
+          0
+        ],
+        "shift": 8.0
+      },
+      "_meta": {
+        "title": "ModelSamplingSD3"
+      }
+    },
+    "6": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "",
+        "clip": [
+          "38",
+          0
+        ]
+      },
+      "_meta": {
+        "title": "Positive Prompt"
+      }
+    },
+    "7": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "",
+        "clip": [
+          "38",
+          0
+        ]
+      },
+      "_meta": {
+        "title": "Negative Prompt"
+      }
+    },
+    "55": {
+      "class_type": "Wan22ImageToVideoLatent",
+      "inputs": {
+        "vae": [
+          "39",
+          0
+        ],
+        "width": 704,
+        "height": 1280,
+        "length": 121,
+        "batch_size": 1
+      },
+      "_meta": {
+        "title": "Wan22ImageToVideoLatent"
+      }
+    },
+    "3": {
+      "class_type": "KSampler",
+      "inputs": {
+        "model": [
+          "48",
+          0
+        ],
+        "seed": 0,
+        "steps": 30,
+        "cfg": 5.0,
+        "sampler_name": "uni_pc",
+        "scheduler": "simple",
+        "positive": [
+          "6",
+          0
+        ],
+        "negative": [
+          "7",
+          0
+        ],
+        "latent_image": [
+          "55",
+          0
+        ],
+        "denoise": 1.0
+      },
+      "_meta": {
+        "title": "KSampler"
+      }
+    },
+    "8": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "3",
+          0
+        ],
+        "vae": [
+          "39",
+          0
+        ]
+      },
+      "_meta": {
+        "title": "VAE Decode"
+      }
+    },
+    "57": {
+      "class_type": "CreateVideo",
+      "inputs": {
+        "images": [
+          "8",
+          0
+        ],
+        "fps": 24
+      },
+      "_meta": {
+        "title": "Create Video"
+      }
+    },
+    "58": {
+      "class_type": "SaveVideo",
+      "inputs": {
+        "video": [
+          "57",
+          0
+        ],
+        "filename_prefix": "ai_video_studio/clip",
+        "format": "mp4",
+        "codec": "h264"
+      },
+      "_meta": {
+        "title": "Save Video"
+      }
+    }
+  }
+}
