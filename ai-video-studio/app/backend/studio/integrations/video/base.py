@@ -56,11 +56,16 @@ class Capabilities:
         return self.max_frames / self.fps if self.fps else 0
 
     def frames_for(self, seconds: float) -> int:
+        """Frames for a clip of ``seconds``, rounded *up* to the model's m*n+1 rule
+        (a little extra footage is trimmed; too little would be held) and capped
+        at the largest valid count within ``max_frames``."""
         frames = max(1, round(seconds * self.fps))
-        frames = min(frames, self.max_frames)
-        if self.frame_multiple > 1:
-            frames = max(1, ((frames - 1) // self.frame_multiple) * self.frame_multiple + 1)
-        return frames
+        m = self.frame_multiple
+        if m > 1:
+            frames = -(-(frames - 1) // m) * m + 1
+            cap = ((self.max_frames - 1) // m) * m + 1
+            return max(1, min(frames, cap))
+        return min(frames, self.max_frames)
 
     def to_dict(self) -> dict:
         return {**self.__dict__, "max_clip_s": round(self.max_clip_s, 2)}

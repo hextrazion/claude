@@ -171,6 +171,7 @@ class ComfyUIAdapter:
             "fps": req.fps,
             "seed": req.seed,
             "filename_prefix": f"ai_video_studio/{req.filename_prefix}",
+            "seconds": round(req.num_frames / req.fps, 2) if req.num_frames and req.fps else None,
         }
         if wf.get("mode") == "i2v" or (wf.get("bindings") or {}).get("image"):
             if not req.image_path:

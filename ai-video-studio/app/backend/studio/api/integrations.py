@@ -210,8 +210,10 @@ def patch_workflow(name: str, body: WorkflowPatch, s: Services = Depends(service
     if body.defaults is not None:
         allowed = {"width", "height", "fps", "max_frames", "frame_multiple"}
         for k, v in body.defaults.items():
-            if k not in allowed or not isinstance(v, int) or v <= 0 or v > 8192:
+            if k not in allowed or not isinstance(v, int) or isinstance(v, bool) or v <= 0 or v > 8192:
                 raise ValidationFailed(f"Invalid default '{k}'.")
+            if k in ("width", "height") and v % 2:
+                raise ValidationFailed("Width and height must be even numbers.")
         wf["defaults"] = {**wf.get("defaults", {}), **body.defaults}
     if body.bindings is not None:
         graph = wf["workflow"]
@@ -228,8 +230,9 @@ def patch_workflow(name: str, body: WorkflowPatch, s: Services = Depends(service
 
 @router.delete("/workflows/{name}")
 def delete_workflow(name: str, s: Services = Depends(services)):
+    """Delete an imported workflow, or reset a customised bundled one to its original."""
     if not s.workflows.delete_user(name):
-        raise ValidationFailed("Only imported workflows can be deleted.")
+        raise ValidationFailed("Only imported or customised workflows can be removed.")
     return {"ok": True}
 
 

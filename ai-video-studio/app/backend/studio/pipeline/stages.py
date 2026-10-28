@@ -25,17 +25,21 @@ log = logging.getLogger(__name__)
 
 # Model-specific advice for the scene planner. Keyed by substrings of the workflow name.
 MODEL_NOTES = {
+    "minimax": "MiniMax H3 (open-weights video model; its generated audio is discarded and replaced by the narration). Follows detailed, chronological shot descriptions with explicit camera direction; open weights output up to 768p, so favour bold, simple compositions over fine detail; avoid readable text.",
     "wan": "Wan 2.2 (open-source diffusion video model). Strong at stylised 3D, natural motion and camera moves; weak at readable text and precise diagrams; one subject and one action per clip works best.",
     "ltx": "LTX-2 family (open-weights video model). Good cinematic motion and coherent short shots; keep prompts descriptive and chronological; avoid readable text.",
     "draft": "Draft placeholder cards (no AI video): prompts are shown as text labels only.",
 }
 
 
-def model_notes_for(workflow: str, provider: str) -> str:
+def model_notes_for(workflow: str, provider: str, wf: dict | None = None) -> str:
+    """Planner advice for the model behind a workflow, matched on its name, label and node types."""
     if provider == "draft":
         return MODEL_NOTES["draft"]
+    haystack = " ".join([workflow, (wf or {}).get("label", ""),
+                         *(str(n.get("class_type", "")) for n in ((wf or {}).get("workflow") or {}).values())]).lower()
     for key, note in MODEL_NOTES.items():
-        if key in workflow.lower():
+        if key in haystack:
             return note
     return "Open-source text-to-video diffusion model; one clear subject and action per clip; avoid readable text."
 
@@ -313,7 +317,8 @@ async def run_scene_plan(ctx: JobContext) -> dict:
         data = await s.groq.chat_json(
             prompts.scene_plan_messages(
                 script, duration_s=round(script.get("est_duration_s") or eff.video.duration_s),
-                max_clip_s=caps.max_clip_s, model_notes=model_notes_for(g.video_workflow, g.video_provider),
+                max_clip_s=caps.max_clip_s,
+                model_notes=model_notes_for(g.video_workflow, g.video_provider, _workflow_or_none(s, g)),
                 style=g.style_preset, aspect=eff.video.aspect_ratio, use_images=use_images, feedback=feedback,
             ),
             model=eff.text.model_quality, operation="scene_plan", temperature=0.6, max_tokens=7000,
@@ -361,6 +366,15 @@ async def run_scene_plan(ctx: JobContext) -> dict:
         msg += f"; scenes {long} are longer than one clip and will be slowed or held"
     ctx.log(msg, "warning" if long else "info")
     return {"scenes": len(cleaned), "repaired": repaired}
+
+
+def _workflow_or_none(s, g) -> dict | None:
+    if g.video_provider == "draft":
+        return None
+    try:
+        return s.workflows.get(g.video_workflow)
+    except ValidationFailed:
+        return None
 
 
 def _style_bible(project: dict) -> str:

@@ -222,3 +222,66 @@ def test_detect_bindings_rejects_ui_format():
 
     with pytest.raises(ValidationFailed):
         detect_bindings({"nodes": [], "links": []})
+
+
+# -- other models (e.g. MiniMax H3) ------------------------------------------------
+H3_LIKE = {
+    "1": {"class_type": "CLIPTextEncode", "inputs": {"text": "", "clip": ["9", 0]}, "_meta": {"title": "Positive"}},
+    "2": {"class_type": "MiniMaxH3FL2VASampler", "inputs": {"positive": ["1", 0], "duration": 5, "fps": 24,
+                                                          "width": 480, "height": 832, "seed": 0}},
+    "3": {"class_type": "SaveVideo", "inputs": {"video": ["2", 0], "filename_prefix": "x"}},
+    "9": {"class_type": "CLIPLoader", "inputs": {"clip_name": "h3_text_encoder.safetensors"}},
+}
+
+
+def test_import_infers_frame_rule():
+    from studio.integrations.video.workflows import infer_frame_multiple
+
+    assert infer_frame_multiple({"a": {"class_type": "LTXVScheduler"}}, 97) == 8
+    assert infer_frame_multiple({"a": {"class_type": "WanImageToVideo"}}, 81) == 4
+    assert infer_frame_multiple({"a": {"class_type": "Other"}}, 121) == 8
+    assert infer_frame_multiple({"a": {"class_type": "Other"}}, 50) == 1
+    assert infer_frame_multiple({"a": {"class_type": "Other"}}, None) == 1
+
+
+def test_import_seconds_based_workflow_and_type_coercion():
+    imported = build_imported("minimax_h3", "MiniMax H3", "video", "t2v", H3_LIKE)
+    b = imported["bindings"]
+    assert b["seconds"] == [{"node": "2", "input": "duration"}] and "frames" not in b
+    assert not any("'frames'" in w for w in imported["import_warnings"])
+    d = imported["defaults"]
+    assert (d["width"], d["height"], d["fps"], d["max_frames"], d["frame_multiple"]) == (480, 832, 24, 121, 1)
+    graph = apply_bindings(imported, {"seconds": 3.4, "width": 480, "prompt": "hi"})
+    assert graph["2"]["inputs"]["duration"] == 3  # INT input stays an int
+
+
+def test_planner_notes_detect_model_from_nodes(services):
+    from studio.pipeline.stages import model_notes_for
+
+    wf = build_imported("my_video_wf", "My workflow", "video", "t2v", H3_LIKE)
+    assert "MiniMax H3" in model_notes_for("my_video_wf", "comfyui", wf)
+    assert "Wan 2.2" in model_notes_for("wan22_ti2v_5b_t2v", "comfyui", services.workflows.get("wan22_ti2v_5b_t2v"))
+    assert "Draft" in model_notes_for("anything", "draft", None)
+
+
+def test_edit_frame_settings_and_reset(services):
+    from fastapi.testclient import TestClient
+
+    from studio.main import create_app
+
+    from .conftest import HEADERS
+
+    app = create_app(services=services, start_worker=False)
+    with TestClient(app, base_url="http://127.0.0.1") as c:
+        name = "wan22_ti2v_5b_t2v"
+        r = c.patch(f"/api/workflows/{name}", json={"defaults": {"max_frames": 81, "frame_multiple": 8}}, headers=HEADERS)
+        assert r.status_code == 200
+        wf = next(w for w in c.get("/api/workflows").json()["workflows"] if w["name"] == name)
+        assert wf["overrides_bundled"] and wf["defaults"]["max_frames"] == 81
+        caps = services.comfyui().capabilities(name)
+        assert caps.frames_for(10) == 81 and caps.frames_for(2) == 49  # capped, snapped to 8n+1
+        bad = c.patch(f"/api/workflows/{name}", json={"defaults": {"width": 705}}, headers=HEADERS)
+        assert bad.status_code == 400
+        assert c.request("DELETE", f"/api/workflows/{name}", headers=HEADERS).status_code == 200
+        wf = next(w for w in c.get("/api/workflows").json()["workflows"] if w["name"] == name)
+        assert not wf["user"] and wf["defaults"]["max_frames"] == 121

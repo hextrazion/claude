@@ -17,7 +17,8 @@ from typing import Any
 from ...errors import ValidationFailed
 from ...safety import slugify
 
-BINDABLE = ("prompt", "negative_prompt", "width", "height", "frames", "fps", "seed", "image", "filename_prefix")
+BINDABLE = ("prompt", "negative_prompt", "width", "height", "frames", "seconds", "fps", "seed", "image",
+            "filename_prefix")
 _NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_\-]{0,63}$")
 
 
@@ -58,6 +59,7 @@ class WorkflowLibrary:
                 "requirements": wf.get("requirements", {}),
                 "bindings": wf.get("bindings", {}),
                 "user": path.parent == self.user_dir,
+                "overrides_bundled": path.parent == self.user_dir and (self.bundled_dir / f"{name}.json").is_file(),
             })
         return out
 
@@ -97,8 +99,18 @@ def apply_bindings(wf: dict, values: dict[str, Any]) -> dict:
             node = graph.get(str(t["node"]))
             if node is None:
                 raise ValidationFailed(f"Workflow binding '{key}' points to missing node {t['node']}.")
-            node.setdefault("inputs", {})[t["input"]] = values[key]
+            inputs = node.setdefault("inputs", {})
+            inputs[t["input"]] = _like(inputs.get(t["input"]), values[key])
     return graph
+
+
+def _like(original: Any, value: Any) -> Any:
+    """Keep the graph's own numeric type: ComfyUI rejects 5.0 where an INT is expected."""
+    if isinstance(original, int) and not isinstance(original, bool) and isinstance(value, float):
+        return max(1, round(value))
+    if isinstance(original, float) and isinstance(value, int) and not isinstance(value, bool):
+        return float(value)
+    return value
 
 
 # -- import helpers ----------------------------------------------------------
@@ -155,6 +167,8 @@ def detect_bindings(graph: dict) -> tuple[dict, list[str]]:
     bind_inputs("width", ("width",))
     bind_inputs("height", ("height",))
     bind_inputs("frames", ("length", "num_frames", "frames", "frame_count"))
+    # Some models take clip length in seconds instead of frames.
+    bind_inputs("seconds", ("duration", "seconds", "duration_s", "length_seconds", "video_length"))
     bind_inputs("seed", ("seed", "noise_seed"))
     bind_inputs("fps", ("fps", "frame_rate"))
     for nid, n in graph.items():
@@ -164,6 +178,8 @@ def detect_bindings(graph: dict) -> tuple[dict, list[str]]:
         if "filename_prefix" in (n.get("inputs") or {}):
             b.setdefault("filename_prefix", []).append({"node": nid, "input": "filename_prefix"})
     for key in ("width", "height", "frames", "seed"):
+        if key == "frames" and "seconds" in b:
+            continue
         if key not in b:
             warnings.append(f"No '{key}' input detected; the workflow's own value will be used.")
     if "filename_prefix" not in b:
@@ -171,16 +187,46 @@ def detect_bindings(graph: dict) -> tuple[dict, list[str]]:
     return b, warnings
 
 
+def infer_frame_multiple(graph: dict, frames: int | None) -> int:
+    """Frame-count rule (frames = m*n + 1) for a graph.
+
+    Known families first (LTX needs 8n+1, Wan 4n+1); otherwise the largest
+    rule the exported frame count already satisfies, which keeps every
+    snapped count in the same family as one the workflow is known to accept."""
+    types = " ".join(str(n.get("class_type", "")).lower() for n in graph.values())
+    if "ltx" in types:
+        return 8
+    if "wan" in types:
+        return 4
+    if frames and frames > 1:
+        for m in (8, 4, 2):
+            if (frames - 1) % m == 0:
+                return m
+    return 1
+
+
 def build_imported(name: str, label: str, kind: str, mode: str, graph: dict, defaults: dict | None = None) -> dict:
     bindings, warnings = detect_bindings(graph)
-    d = {"width": 704, "height": 1280, "fps": 24, "max_frames": 121, "frame_multiple": 4}
-    for key, targets in bindings.items():
-        if key in ("width", "height", "fps") and targets:
-            t = targets[0]
-            d[key] = graph[t["node"]]["inputs"][t["input"]]
-        if key == "frames" and targets:
-            t = targets[0]
-            d["max_frames"] = graph[t["node"]]["inputs"][t["input"]]
+    d = {"width": 704, "height": 1280, "fps": 24, "max_frames": 121, "frame_multiple": 1}
+
+    def first(key):
+        t = bindings[key][0]
+        return graph[t["node"]]["inputs"][t["input"]]
+
+    for key in ("width", "height", "fps"):
+        if bindings.get(key):
+            d[key] = int(first(key))
+    if bindings.get("frames"):
+        d["max_frames"] = int(first("frames"))
+    elif bindings.get("seconds"):
+        d["max_frames"] = int(round(float(first("seconds")) * d["fps"])) + 1
+    d["frame_multiple"] = infer_frame_multiple(graph, d["max_frames"] if bindings.get("frames") else None)
+    if bindings.get("frames"):
+        rule = f"{d['frame_multiple']}n+1" if d["frame_multiple"] > 1 else "any number"
+        warnings.append(
+            f"Frame counts will be snapped to {rule} frames (max {d['max_frames']}). If ComfyUI rejects a frame "
+            "count, change the rule with Edit frames."
+        )
     d.update(defaults or {})
     return {
         "name": name,

@@ -1,10 +1,10 @@
 import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, Check, KeyRound, RefreshCw, Search, Trash2, Upload } from "lucide-react";
+import { BookOpen, Check, KeyRound, RefreshCw, RotateCcw, Search, SlidersHorizontal, Trash2, Upload } from "lucide-react";
 import { api } from "../lib/api";
 import { useAction, useSaveSettings, useSettings } from "../lib/hooks";
 import type { Health, Integration, Workflow } from "../lib/types";
-import { Badge, Card, ConfirmDialog, Details, ErrorNote, Field, Modal, Note, PageHeader, Progress, Spinner, StatusBadge } from "../components/ui";
+import { Badge, Card, ConfirmDialog, Details, ErrorNote, Field, Modal, Note, NumberInput, PageHeader, Progress, Spinner, StatusBadge } from "../components/ui";
 import { timeAgo } from "../lib/format";
 
 export default function Integrations() {
@@ -241,10 +241,19 @@ function ComfySection() {
   );
 }
 
+function frameRule(m?: number) {
+  return m && m > 1 ? `${m}n+1 frames` : "any frame count";
+}
+
 function WorkflowRow({ w, active }: { w: Workflow; active: boolean }) {
   const [result, setResult] = useState<Health | null>(null);
+  const [editing, setEditing] = useState(false);
   const check = useAction(() => api.post<Health>(`/workflows/${w.name}/check`));
-  const del = useAction(() => api.del(`/workflows/${w.name}`), { invalidate: [["workflows"]], success: "Workflow removed" });
+  const del = useAction(() => api.del(`/workflows/${w.name}`), {
+    invalidate: [["workflows"]], success: w.overrides_bundled ? "Restored the bundled version" : "Workflow removed",
+  });
+  const d = w.defaults ?? {};
+  const bySeconds = !!w.bindings?.seconds?.length && !w.bindings?.frames?.length;
   return (
     <div className="list-item" style={{ alignItems: "flex-start" }}>
       <div style={{ flex: 1, minWidth: 0 }} className="stack tight">
@@ -252,8 +261,13 @@ function WorkflowRow({ w, active }: { w: Workflow; active: boolean }) {
           <b>{w.label}</b>
           <Badge>{w.mode.toUpperCase()}</Badge>
           {active && <Badge tone="accent">In use</Badge>}
-          {w.user && <Badge>Imported</Badge>}
-          {w.defaults?.width && <span className="tiny faint">{w.defaults.width}×{w.defaults.height} · {w.defaults.fps} fps · up to {w.defaults.max_frames} frames</span>}
+          {w.overrides_bundled ? <Badge tone="warn">Customised</Badge> : w.user && <Badge>Imported</Badge>}
+          {d.width && (
+            <span className="tiny faint">
+              {d.width}×{d.height} · {d.fps} fps · up to {d.max_frames} frames
+              {w.kind === "video" && <> · {bySeconds ? "length set in seconds" : frameRule(d.frame_multiple)}</>}
+            </span>
+          )}
         </div>
         {w.description && <div className="small muted">{w.description}</div>}
         {w.requirements?.vram_note && <div className="tiny faint">{w.requirements.vram_note}</div>}
@@ -264,9 +278,53 @@ function WorkflowRow({ w, active }: { w: Workflow; active: boolean }) {
       </div>
       <div className="row">
         <button className="btn sm" disabled={check.isPending} onClick={() => check.mutate(undefined, { onSuccess: (r) => setResult(r) })}>{check.isPending ? <Spinner size={13} /> : null} Check</button>
-        {w.user && <button className="btn icon ghost" onClick={() => del.mutate()} title="Delete imported workflow"><Trash2 size={13} /></button>}
+        {w.kind === "video" && <button className="btn sm ghost" onClick={() => setEditing(true)}><SlidersHorizontal size={13} /> Edit frames</button>}
+        {w.user && (
+          <button className="btn icon ghost" onClick={() => del.mutate()} title={w.overrides_bundled ? "Reset to the bundled version" : "Delete imported workflow"}>
+            {w.overrides_bundled ? <RotateCcw size={13} /> : <Trash2 size={13} />}
+          </button>
+        )}
       </div>
+      {editing && <FrameSettings w={w} onClose={() => setEditing(false)} />}
     </div>
+  );
+}
+
+function FrameSettings({ w, onClose }: { w: Workflow; onClose: () => void }) {
+  const d = w.defaults ?? {};
+  const [v, setV] = useState({
+    width: d.width ?? 704, height: d.height ?? 1280, fps: d.fps ?? 24, max_frames: d.max_frames ?? 121, frame_multiple: d.frame_multiple ?? 1,
+  });
+  const save = useAction(() => api.patch(`/workflows/${w.name}`, { defaults: v }), { invalidate: [["workflows"]], success: "Frame settings saved" });
+  const set = (k: keyof typeof v) => (n: number) => setV({ ...v, [k]: Math.max(1, Math.round(n)) });
+  const validMax = v.frame_multiple <= 1 || (v.max_frames - 1) % v.frame_multiple === 0;
+  return (
+    <Modal title={`Frame settings · ${w.label}`} onClose={onClose} footer={<>
+      <button className="btn" onClick={onClose}>Cancel</button>
+      <button className="btn primary" disabled={save.isPending || v.width % 2 !== 0 || v.height % 2 !== 0} onClick={() => save.mutate(undefined, { onSuccess: onClose })}>Save</button>
+    </>}>
+      <Note>
+        These values are sent to ComfyUI for every clip. Use what the model supports: the scene planner keeps each scene within
+        <b> max frames ÷ fps</b> seconds{v.fps ? ` (currently ${(v.max_frames / v.fps).toFixed(1)} s)` : ""}.
+        {w.overrides_bundled === false && !w.user && " Saving creates a customised copy; you can reset it later."}
+      </Note>
+      <div className="grid cols-2">
+        <Field label="Width" hint="Even number"><NumberInput value={v.width} min={64} max={4096} step={2} onChange={set("width")} /></Field>
+        <Field label="Height" hint="Even number"><NumberInput value={v.height} min={64} max={4096} step={2} onChange={set("height")} /></Field>
+        <Field label="Frames per second"><NumberInput value={v.fps} min={1} max={60} onChange={set("fps")} /></Field>
+        <Field label="Max frames per clip"><NumberInput value={v.max_frames} min={1} max={2000} onChange={set("max_frames")} /></Field>
+        <Field label="Frame-count rule" hint="Wan: 4n+1 · LTX: 8n+1. Use “any” if the model accepts any count.">
+          <select className="select" value={v.frame_multiple} onChange={(e) => setV({ ...v, frame_multiple: Number(e.target.value) })}>
+            <option value={1}>Any frame count</option>
+            <option value={2}>2n+1</option>
+            <option value={4}>4n+1</option>
+            <option value={8}>8n+1</option>
+            <option value={16}>16n+1</option>
+          </select>
+        </Field>
+      </div>
+      {!validMax && <Note tone="warn">{v.max_frames} doesn't fit {frameRule(v.frame_multiple)}; clips will be capped at {Math.floor((v.max_frames - 1) / v.frame_multiple) * v.frame_multiple + 1} frames.</Note>}
+    </Modal>
   );
 }
 

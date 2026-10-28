@@ -21,6 +21,20 @@ Status: **researched, not yet benchmarked on your PC.** The development environm
 
 **LTX-2.3 GGUF** is the realistic LTX option today on 12 GB: community workflows labelled “12 GB VRAM” use Q4_K_M dev GGUF plus a distilled LoRA. Treat it as an experiment against Wan, not a guaranteed upgrade.
 
+## MiniMax H3 (open weights, Aug 2026)
+
+Usable through ComfyUI's native H3 support. Use the **FL2VA** checkpoint (text-to-video / first-last frame); Ref2VA isn't needed.
+
+- **Licence:** MiniMax H3 Community License. Users in the US, UK, EU and South Korea must apply to MiniMax before use. Check this before publishing anything made with it.
+- **12 GB:** community reports say it runs with the pruned INT8 file (~21 GB on disk, offloaded) or GGUF Q3/Q4 (needs the ComfyUI-GGUF nodes), 32 GB system RAM, at about 0.4 MP (≈480×832), roughly 6 min per clip. One RTX 5090 test measured ~32 GB peak VRAM, so 12 GB is unconfirmed. Skip NVFP4 files (no FP4 hardware on the 4070 Ti).
+- **Output:** open weights top out at 768p; the studio scales to 1080×1920. H3's own generated audio is discarded (the Fish Audio narration is used).
+
+Setup: run the ComfyUI H3 template once by hand → **Export (API)** → Integrations → **Import from ComfyUI** → select it as the text-to-video workflow → **Check** → generate one scene and compare with Wan. The importer handles models that take clip length in seconds instead of frames, keeps integer inputs as integers, and the scene planner gets H3-specific prompting advice automatically (it recognises H3 from the workflow's node types, whatever you name it).
+
+## Frame settings for any workflow
+
+Each video workflow has **Edit frames** on the Integrations page: width, height, fps, max frames per clip and the frame-count rule (any, 2n+1, 4n+1, 8n+1, 16n+1). The importer guesses the rule (LTX → 8n+1, Wan → 4n+1, otherwise the strictest rule the exported frame count already satisfies). If ComfyUI rejects a frame count, change the rule there. Requested frame counts are rounded **up** to the rule (capped at the maximum), so clips are never shorter than needed because of rounding. Editing a bundled workflow saves a customised copy; the reset button restores the original.
+
 ## Installing the default (Wan 2.2 TI2V‑5B)
 
 Into `ComfyUI/models/`:

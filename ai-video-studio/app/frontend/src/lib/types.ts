@@ -194,6 +194,7 @@ export type Workflow = {
   requirements: { vram_note?: string; models?: { file: string; folder: string; source: string }[] };
   bindings: Record<string, { node: string; input: string }[]>;
   user: boolean;
+  overrides_bundled?: boolean;
   error?: string;
 };
 
