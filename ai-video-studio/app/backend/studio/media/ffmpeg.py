@@ -25,6 +25,8 @@ from ..integrations.base import HealthResult
 log = logging.getLogger(__name__)
 
 _TIME_RE = re.compile(r"out_time_us=(\d+)")
+# Keep FFmpeg from flashing console windows when the studio runs without one.
+_NO_WINDOW = {"creationflags": subprocess.CREATE_NO_WINDOW} if sys.platform == "win32" else {}
 
 
 @dataclass
@@ -74,7 +76,8 @@ class FFmpeg:
         if not self.paths:
             return None
         try:
-            out = subprocess.run([self.paths.ffmpeg, "-hide_banner", "-version"], capture_output=True, text=True, timeout=15)
+            out = subprocess.run([self.paths.ffmpeg, "-hide_banner", "-version"], capture_output=True, text=True,
+                                 timeout=15, **_NO_WINDOW)
             return out.stdout.splitlines()[0] if out.stdout else None
         except (OSError, subprocess.TimeoutExpired):
             return None
@@ -83,7 +86,8 @@ class FFmpeg:
         if not self.paths:
             return False
         try:
-            out = subprocess.run([self.paths.ffmpeg, "-hide_banner", "-filters"], capture_output=True, text=True, timeout=15)
+            out = subprocess.run([self.paths.ffmpeg, "-hide_banner", "-filters"], capture_output=True, text=True,
+                                 timeout=15, **_NO_WINDOW)
         except (OSError, subprocess.TimeoutExpired):
             return False
         return any(line.split()[1:2] == [name] for line in out.stdout.splitlines() if line.strip())
@@ -118,12 +122,19 @@ class FFmpeg:
         paths = self._require()
         cmd = [paths.ffmpeg, "-hide_banner", "-nostdin", "-y", "-progress", "pipe:1", "-nostats", *args]
         log.debug("ffmpeg %s", " ".join(cmd[1:]))
-        proc = await asyncio.create_subprocess_exec(
-            *cmd,
-            cwd=str(cwd) if cwd else None,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                cwd=str(cwd) if cwd else None,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                **_NO_WINDOW,
+            )
+        except NotImplementedError as exc:  # pragma: no cover - Windows selector event loop
+            raise StudioError(
+                "This Python event loop cannot start FFmpeg. Launch the studio with scripts\\start.bat.",
+                kind="permanent",
+            ) from exc
         stderr_chunks: list[bytes] = []
 
         async def read_stderr():
@@ -182,7 +193,7 @@ class FFmpeg:
         paths = self._require()
         proc = await asyncio.create_subprocess_exec(
             paths.ffprobe, "-v", "error", "-print_format", "json", "-show_format", "-show_streams", str(path),
-            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, **_NO_WINDOW,
         )
         out, err = await asyncio.wait_for(proc.communicate(), timeout=60)
         if proc.returncode != 0:

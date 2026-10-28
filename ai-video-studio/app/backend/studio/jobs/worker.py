@@ -53,6 +53,7 @@ class Worker:
         self.session_gpu_jobs = 0
         self.lane_state: dict[str, dict] = {lane: {"allowed": True, "reason": ""} for lane in LANES}
         self._last_automation = 0.0
+        self._last_maintenance = 0.0
 
     # -- lifecycle ----------------------------------------------------------------
     async def start(self) -> None:
@@ -130,6 +131,9 @@ class Worker:
                 if loop.time() - self._last_automation > 60:
                     self._last_automation = loop.time()
                     self.s.orchestrator.automation_tick()
+                if loop.time() - self._last_maintenance > 3600:
+                    self._last_maintenance = loop.time()
+                    await asyncio.to_thread(self.cleanup_work_files)
             except Exception:
                 log.exception("worker tick failed")
             self._wake.clear()
@@ -225,6 +229,33 @@ class Worker:
             # GPU/CPU jobs notice the flag and stop their ComfyUI prompt / FFmpeg process cleanly.
             return "cancelling"
         return job["status"]
+
+    def cleanup_work_files(self) -> int:
+        """Delete intermediate render files (project/work) older than the retention period.
+
+        Only the ``work`` folder of projects with no active jobs is touched;
+        clips, narration, captions and exports are never removed automatically."""
+        days = self.s.settings.get().storage.keep_work_files_days
+        if not days:
+            return 0
+        import shutil
+        import time
+
+        cutoff = time.time() - days * 86400
+        removed = 0
+        for p in self.s.projects.list(archived=None):
+            work = self.s.projects.folder(p) / "work"
+            if not work.is_dir() or self.s.jobs.active(p["id"]):
+                continue
+            try:
+                if work.stat().st_mtime < cutoff:
+                    shutil.rmtree(work)
+                    removed += 1
+            except OSError:
+                log.warning("could not clean %s", work)
+        if removed:
+            self.s.activity.add(f"Removed intermediate render files from {removed} project(s)", category="storage")
+        return removed
 
     # -- crash recovery -----------------------------------------------------------------
     async def recover(self) -> None:

@@ -1,0 +1,3 @@
+# Optional: word-accurate caption timing via local speech recognition.
+# Uses ~150 MB model download on first use; runs on CPU or GPU.
+faster-whisper==1.2.1

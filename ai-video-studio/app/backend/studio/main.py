@@ -40,9 +40,14 @@ def create_app(config: AppConfig | None = None, services: Services | None = None
         svc.activity.add(f"AI Video Studio {__version__} started", category="system")
         if start_worker:
             await svc.worker.start()
+            # Fill in service status for the dashboard without blocking startup.
+            startup_checks = asyncio.create_task(_startup_checks(svc))
         else:
             await svc.worker.recover()
+            startup_checks = None
         yield
+        if startup_checks:
+            startup_checks.cancel()
         await svc.worker.stop()
 
     app = FastAPI(title="AI Video Studio", version=__version__, lifespan=lifespan, docs_url="/api/docs",
@@ -122,6 +127,17 @@ def create_app(config: AppConfig | None = None, services: Services | None = None
             return JSONResponse({"message": "Backend running. Frontend not built: run scripts/build-frontend or start.bat."})
 
     return app
+
+
+async def _startup_checks(svc: Services) -> None:
+    from .api.integrations import INTEGRATIONS, run_test
+    from .integrations.base import HealthResult
+
+    for name in INTEGRATIONS:
+        try:
+            await run_test(svc, name)
+        except Exception as exc:  # a failing check must never stop the app
+            svc.save_health(name, HealthResult("error", "Check failed unexpectedly.", detail=repr(exc)))
 
 
 def run() -> None:

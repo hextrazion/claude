@@ -231,3 +231,23 @@ def test_daily_limit_blocks_idea_generation(home, router):
 
 def test_wait_for_helper():
     assert wait_for(lambda: 5, timeout=1) == 5
+
+
+def test_work_file_retention_only_touches_work_folder(home, router):
+    import os
+    import time
+
+    svc = _wired(home, router, {})
+    p = svc.projects.create_project({"id": svc.projects.create_idea({"title": "Old project"}), "title": "Old project"})
+    folder = svc.projects.folder(p)
+    work = folder / "work"
+    work.mkdir()
+    (work / "seg_00.mp4").write_bytes(b"x")
+    keep = folder / "exports" / "final.mp4"
+    keep.parent.mkdir()
+    keep.write_bytes(b"x")
+    old = time.time() - 30 * 86400
+    os.utime(work, (old, old))
+    svc.settings.update({"storage": {"keep_work_files_days": 14}})
+    assert svc.worker.cleanup_work_files() == 1
+    assert not work.exists() and keep.exists()

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -34,6 +35,7 @@ def gpu_stats(max_age_s: float = 3.0) -> list[dict] | None:
             out = subprocess.run(
                 [exe, f"--query-gpu={','.join(_GPU_FIELDS)}", "--format=csv,noheader,nounits"],
                 capture_output=True, text=True, timeout=5,
+                **({"creationflags": subprocess.CREATE_NO_WINDOW} if sys.platform == "win32" else {}),
             )
             if out.returncode == 0:
                 value = []

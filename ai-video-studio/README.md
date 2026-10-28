@@ -1,0 +1,66 @@
+# AI Video Studio
+
+A local, self-hosted production studio for short-form animated explainer videos. One app takes a video from **idea → research → script → scene plan → AI footage → narration → captions → finished vertical MP4**, with a review step wherever you want one.
+
+- **Text:** [Groq](https://console.groq.com) (ideas, scripts, scene plans, claim checks)
+- **Video:** an open-source model running on your own GPU through [ComfyUI](https://github.com/comfyanonymous/ComfyUI) (default: Wan 2.2 TI2V‑5B, chosen for 12 GB cards)
+- **Voice:** [Fish Audio](https://fish.audio) text-to-speech
+- **Assembly:** FFmpeg (timeline, transitions, word-highlighted captions, music ducking, loudness, quality checks)
+- **Research (optional):** Wikipedia (no key) or Tavily web search
+
+Everything is controlled from a dark-themed web UI served by a local Python backend on `127.0.0.1`. Claude is not used anywhere in the pipeline.
+
+## Quick start (Windows)
+
+1. Install **Python 3.11–3.13** (tick “Add to PATH”), **Node.js 22 LTS**, and **FFmpeg** (see [docs/SETUP.md](docs/SETUP.md#3-ffmpeg)).
+2. Double-click **`scripts\start.bat`**. The first run creates a virtual environment, installs packages and builds the UI (a few minutes); later runs start in seconds. Your browser opens at <http://127.0.0.1:8765>.
+3. Open **Integrations**, paste your Groq and Fish Audio keys, pick a voice, and press **Test** on each service.
+4. Start ComfyUI with the Wan 2.2 5B models installed ([docs/VIDEO_MODELS.md](docs/VIDEO_MODELS.md)), then press **Check** on the workflow.
+5. Follow [Your first video](docs/SETUP.md#7-your-first-video).
+
+No GPU model yet? Set **Video provider → Draft cards** to run the whole pipeline with FFmpeg-rendered placeholder cards. They are clearly labelled and flagged in quality checks, so they are never mistaken for AI footage.
+
+## What it does
+
+| Page | Purpose |
+|---|---|
+| **Dashboard** | Real counts, things waiting for you, service health, GPU/VRAM/temperature, disk, API usage, recent errors |
+| **Idea Studio** | Generate batches of specific concepts, duplicate warnings, favourite/edit/reject, approve into production |
+| **Production** | Per-project workspace: script editor, scene-by-scene prompts with per-scene generate/regenerate, narration, research & claim status, final review with QC results |
+| **Queue** | Persistent job queue in three lanes (GPU / API / FFmpeg), pause/resume, cancel, retry, reorder, limits, processing hours |
+| **Library** | All projects and finished videos: preview, rename, archive, export, safe delete |
+| **Integrations** | Keys (masked, stored in Windows Credential Manager), connection tests, Groq model list, Fish voice browser, ComfyUI workflows (import/check) |
+| **Settings** | Everything else, persisted in SQLite |
+
+Automation modes: **Manual** (you start every stage), **Supervised** (default: writes ideas/scripts, stops before footage), **Automated** (works through its own idea pool inside your daily limits, gates and processing hours). Nothing is ever published to social platforms.
+
+## Gaming-friendly GPU use
+
+- **Pause new jobs** (sidebar or Queue page) stops new generations immediately; the current one finishes, or cancel it safely (the app interrupts only its own ComfyUI prompt).
+- **Hold while these programs run:** list game executables and GPU jobs wait until they close.
+- **Wait while the GPU is busy**, **processing hours** (e.g. 01:00–08:00), **one GPU job at a time** by default, per-session limits and a minimum free disk space.
+- The app never kills processes it did not start.
+
+## Repository layout
+
+```
+ai-video-studio/
+  app/backend/studio/   FastAPI app (api/, integrations/, pipeline/, jobs/, media/, db/)
+  app/backend/tests/    pytest suite (unit, integration with mocked providers, real-FFmpeg end-to-end)
+  app/frontend/         React + TypeScript + Vite UI
+  config/workflows/     Bundled ComfyUI workflow templates (Wan 2.2 5B T2V/I2V, SDXL stills)
+  config/studio.env.example
+  scripts/              start.bat, dev.bat, build-ui.bat, test.bat, start.sh
+  docs/                 Setup, models, architecture, homelab, troubleshooting, testing
+  data/                 Created at runtime: studio.db, projects/, library/, music/, workflows/ (git-ignored)
+  logs/                 studio.log (API keys redacted)
+```
+
+## Documentation
+
+- [Setup & first video](docs/SETUP.md): installing, Groq, Fish Audio, ComfyUI, first video
+- [Video models on a 12 GB GPU](docs/VIDEO_MODELS.md): why Wan 2.2 5B is the default, LTX-2.x options, how to benchmark
+- [Architecture](docs/ARCHITECTURE.md): components, data model, job lifecycle, security
+- [Homelab roadmap](docs/HOMELAB.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Testing & current limitations](docs/TESTING.md)

@@ -74,13 +74,14 @@ class AppConfig:
     def user_workflows_dir(self) -> Path:
         return self.data_dir / "workflows"
 
+    # Code-relative paths: these ship with the app, independent of STUDIO_HOME.
     @property
     def bundled_workflows_dir(self) -> Path:
-        return self.config_dir / "workflows"
+        return REPO_ROOT / "config" / "workflows"
 
     @property
     def frontend_dist(self) -> Path:
-        return self.home / "app" / "frontend" / "dist"
+        return REPO_ROOT / "app" / "frontend" / "dist"
 
     def ensure_dirs(self) -> None:
         for d in (
@@ -98,6 +99,8 @@ class AppConfig:
 def load_config(home: Path | None = None) -> AppConfig:
     home = Path(home or os.environ.get("STUDIO_HOME") or REPO_ROOT).resolve()
     _load_env_file(home / "config" / "studio.env")
+    if home != REPO_ROOT:
+        _load_env_file(REPO_ROOT / "config" / "studio.env")
     host = os.environ.get("STUDIO_HOST", "127.0.0.1")
     port = int(os.environ.get("STUDIO_PORT", "8765"))
     extra = [h.strip() for h in os.environ.get("STUDIO_ALLOWED_HOSTS", "").split(",") if h.strip()]

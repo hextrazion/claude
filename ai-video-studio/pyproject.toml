@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+testpaths = ["app/backend/tests"]
+pythonpath = ["app/backend"]
+addopts = "-p no:cacheprovider"
+filterwarnings = ["ignore::DeprecationWarning"]
