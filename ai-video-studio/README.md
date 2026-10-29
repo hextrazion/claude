@@ -10,13 +10,19 @@ A local, self-hosted production studio for short-form animated explainer videos.
 
 Everything is controlled from a dark-themed web UI served by a local Python backend on `127.0.0.1`. Claude is not used anywhere in the pipeline.
 
-## Quick start (Windows)
+## Install (Windows)
 
-1. Install **Python 3.11–3.13** (tick “Add to PATH”), **Node.js 22 LTS**, and **FFmpeg** (see [docs/SETUP.md](docs/SETUP.md#3-ffmpeg)).
-2. Double-click **`scripts\start.bat`**. The first run creates a virtual environment, installs packages and builds the UI (a few minutes); later runs start in seconds. Your browser opens at <http://127.0.0.1:8765>.
-3. Open **Integrations**, paste your Groq and Fish Audio keys, pick a voice, and press **Test** on each service.
-4. Start ComfyUI with the Wan 2.2 5B models installed ([docs/VIDEO_MODELS.md](docs/VIDEO_MODELS.md)), then press **Check** on the workflow.
-5. Follow [Your first video](docs/SETUP.md#7-your-first-video).
+1. Download **[AI-Video-Studio-Setup.exe](https://github.com/hextrazion/claude/releases/download/ai-video-studio-latest/AI-Video-Studio-Setup.exe)** (you must be signed in to GitHub if the repository is private).
+2. Double-click it. If Windows says it protected your PC (the installer isn't code-signed), click **More info → Run anyway**.
+3. Click **Install**. No admin rights, Python, Node or FFmpeg needed: everything is included.
+4. AI Video Studio opens in its own window and adds a Start-menu and desktop icon. A small tray icon near the clock keeps it running while videos render; right-click it → **Quit** to stop.
+5. Open **Integrations**, paste your Groq and Fish Audio keys, pick a voice, then set up ComfyUI ([docs/VIDEO_MODELS.md](docs/VIDEO_MODELS.md)) and follow [Your first video](docs/SETUP.md#7-your-first-video).
+
+Your projects live in `%LOCALAPPDATA%\AI Video Studio` and are kept if you uninstall or update. Each push to the app rebuilds the installer at the same link.
+
+### Running from source (developers)
+
+Install Python 3.11–3.13, Node.js 22 and FFmpeg, then run `scripts\start.bat` ([docs/SETUP.md](docs/SETUP.md)).
 
 No GPU model yet? Set **Video provider → Draft cards** to run the whole pipeline with FFmpeg-rendered placeholder cards. They are clearly labelled and flagged in quality checks, so they are never mistaken for AI footage.
 
@@ -50,7 +56,8 @@ ai-video-studio/
   app/frontend/         React + TypeScript + Vite UI
   config/workflows/     Bundled ComfyUI workflow templates (Wan 2.2 5B T2V/I2V, SDXL stills)
   config/studio.env.example
-  scripts/              start.bat, dev.bat, build-ui.bat, test.bat, start.sh
+  scripts/              start.bat, dev.bat, build-ui.bat, test.bat, start.sh (running from source)
+  packaging/            desktop launcher entry, PyInstaller build, Inno Setup installer script
   docs/                 Setup, models, architecture, homelab, troubleshooting, testing
   data/                 Created at runtime: studio.db, projects/, library/, music/, workflows/ (git-ignored)
   logs/                 studio.log (API keys redacted)
