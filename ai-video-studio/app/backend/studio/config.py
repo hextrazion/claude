@@ -8,11 +8,26 @@ These values come from environment variables (optionally loaded from
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-# ai-video-studio/app/backend/studio/config.py -> ai-video-studio/
-REPO_ROOT = Path(__file__).resolve().parents[3]
+FROZEN = bool(getattr(sys, "frozen", False))
+
+if FROZEN:
+    # Installed desktop build (PyInstaller): bundled files sit next to the code
+    # in the read-only install folder; user data goes to %LOCALAPPDATA%.
+    REPO_ROOT = Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent))
+else:
+    # ai-video-studio/app/backend/studio/config.py -> ai-video-studio/
+    REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
+def default_home() -> Path:
+    if FROZEN:
+        base = os.environ.get("LOCALAPPDATA") or str(Path.home() / ".local" / "share")
+        return Path(base) / "AI Video Studio"
+    return REPO_ROOT
 
 
 def _load_env_file(path: Path) -> None:
@@ -97,7 +112,7 @@ class AppConfig:
 
 
 def load_config(home: Path | None = None) -> AppConfig:
-    home = Path(home or os.environ.get("STUDIO_HOME") or REPO_ROOT).resolve()
+    home = Path(home or os.environ.get("STUDIO_HOME") or default_home()).resolve()
     _load_env_file(home / "config" / "studio.env")
     if home != REPO_ROOT:
         _load_env_file(REPO_ROOT / "config" / "studio.env")

@@ -9,3 +9,7 @@ config/studio.env
 app/frontend/node_modules/
 app/frontend/dist/
 *.part
+dist/
+build/
+dist-installer/
+packaging/icon.ico
