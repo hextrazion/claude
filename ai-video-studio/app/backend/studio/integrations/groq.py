@@ -72,6 +72,22 @@ class GroqClient:
             key=lambda m: m["id"],
         )
 
+    async def pick_vision_model(self, preferred: str) -> str | None:
+        """An available model that accepts images: the preferred one, else any vision-capable id."""
+        try:
+            ids = [m["id"] for m in await self.list_models() if m.get("active", True)]
+        except ProviderError:
+            return preferred or None
+        if preferred in ids:
+            return preferred
+        from ..styles import VISION_PATTERNS
+
+        for pattern in VISION_PATTERNS:
+            for mid in ids:
+                if pattern in mid.lower():
+                    return mid
+        return None
+
     async def test(self) -> HealthResult:
         if not self.secrets.get("groq"):
             return HealthResult("not_configured", "Add a Groq API key to enable ideas and scripts.")

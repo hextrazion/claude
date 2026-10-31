@@ -10,3 +10,5 @@ websockets==17.3
 # Free local narration voice (Kokoro, Apache 2.0) on ONNX Runtime (CPU)
 kokoro-onnx==0.6.1
 onnxruntime==1.31.1
+# Image analysis for the style library (colours, reference thumbnails)
+pillow==13.0.0

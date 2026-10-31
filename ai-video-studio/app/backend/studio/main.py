@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from . import __version__
-from .api import integrations, jobs, projects, system
+from .api import integrations, jobs, projects, styles, system
 from .config import AppConfig, load_config
 from .errors import ProviderError, StudioError, ValidationFailed
 from .jobs.worker import Worker
@@ -105,7 +105,7 @@ def create_app(config: AppConfig | None = None, services: Services | None = None
         return JSONResponse({"error": {"message": "Something went wrong on the server. Details are in logs/studio.log.",
                                        "kind": "internal", "detail": repr(exc)[:500]}}, status_code=500)
 
-    for module in (system, projects, jobs, integrations):
+    for module in (system, projects, jobs, integrations, styles):
         app.include_router(module.router, prefix="/api")
 
     dist = config.frontend_dist

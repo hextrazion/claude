@@ -31,6 +31,7 @@ class GenerationRequest:
     num_frames: int | None = None
     fps: int | None = None
     image_path: Path | None = None
+    ref_images: list[Path] = field(default_factory=list)  # style references for reference-to-video models
     extra: dict = field(default_factory=dict)
 
 

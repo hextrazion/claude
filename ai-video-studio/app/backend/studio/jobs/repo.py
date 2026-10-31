@@ -18,6 +18,7 @@ LANES = {
     "scene_image": "gpu",
     "scene_clip": "gpu",
     "assemble": "cpu",
+    "style_analysis": "api",
 }
 
 KIND_LABELS = {
@@ -30,6 +31,7 @@ KIND_LABELS = {
     "scene_image": "Scene still",
     "scene_clip": "Scene clip",
     "assemble": "Assemble video",
+    "style_analysis": "Analyse style",
 }
 
 ACTIVE = ("pending", "running", "paused")

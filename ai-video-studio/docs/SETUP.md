@@ -76,6 +76,17 @@ Settings → **Where your videos are saved** → **Choose folder…** → pick a
 - If the external drive is unplugged later, the studio says so and holds GPU/assembly jobs until it is back; nothing is lost.
 - The small database, logs and the voice model stay in `%LOCALAPPDATA%\AI Video Studio`. ComfyUI's own model files are managed by ComfyUI, not by the studio.
 
+## 6c. Teaching it your style (Style library)
+
+**Styles** (sidebar) → **New style** → drop in 3–10 images or short clips (5–30 s) of videos in the look you want → optionally describe it in your own words → **Analyse references** → **Use for all new videos** (or pick the style per project under Project settings → Style).
+
+What happens:
+- Colours are measured from the references and turned into words ("sand, navy, crimson"); clips are checked for how often they cut, and scenes are planned to roughly match that pace.
+- An image-reading model on Groq (Llama 4 Scout when your account has it) writes a detailed style description of the look, never of the people or story. It is added to every scene's prompt, together with an "avoid" list. You can edit both.
+- Starred images (up to 4) are given straight to MiniMax H3 when its **Ref2VA** reference model is installed in ComfyUI (`minimax_h3_ref2va_…`, plus the optional 4-step turbo LoRA). Auto-detect picks it up; clips then follow your references much more closely than text alone.
+
+This steers the model; it does not retrain it. Real fine-tuning (a LoRA) of H3 needs far more VRAM than a 12 GB card.
+
 ## 7. Your first video
 
 1. **Settings → Automation mode:** keep **Supervised**. Video defaults: 35 s, 1080×1920, 30 fps.

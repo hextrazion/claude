@@ -215,6 +215,14 @@ class ComfyUIAdapter:
                 raise ValidationFailed("This workflow needs a source image, but the scene has none.")
             values["image"] = await self._upload_image(req.image_path)
         graph = apply_bindings(wf, values)
+        ref_node = wf.get("ref_images_node")
+        if ref_node:
+            if not req.ref_images:
+                raise ValidationFailed("This workflow needs style reference images, but none were given.")
+            for i, path in enumerate(req.ref_images[:9]):  # the H3 node accepts up to 9 images
+                loader = f"ref_load_{i}"
+                graph[loader] = {"class_type": "LoadImage", "inputs": {"image": await self._upload_image(path)}}
+                graph[str(ref_node)]["inputs"][f"ref_images.ref_image_{i}"] = [loader, 0]
         resp = await self._post("/prompt", json={"prompt": graph, "client_id": self.client_id})
         if resp.status_code == 400:
             # ComfyUI explains graph validation problems in the body.

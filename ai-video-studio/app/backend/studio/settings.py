@@ -57,6 +57,7 @@ class TextSettings(_Section):
     provider: Literal["groq"] = "groq"
     model_quality: str = "llama-3.3-70b-versatile"
     model_fast: str = "llama-3.1-8b-instant"
+    model_vision: str = "meta-llama/llama-4-scout-17b-16e-instruct"
     temperature: float = Field(0.8, ge=0, le=2)
     research_enabled: bool = True
     research_provider: Literal["none", "wikipedia", "tavily"] = "wikipedia"
@@ -68,6 +69,9 @@ class GenerationSettings(_Section):
     video_workflow: str = "minimax_h3_t2v_turbo"
     i2v_workflow: str = "minimax_h3_i2v"
     image_workflow: str = ""
+    ref_workflow: str = "minimax_h3_r2v_turbo"
+    style_id: int = Field(0, ge=0, description="Style from the Style library (0 = none)")
+    use_style_references: bool = True
     use_image_stage: bool = False
     style_preset: str = Field(
         "polished stylised 3D animation, soft global illumination, clean shapes, vibrant but natural colours, "

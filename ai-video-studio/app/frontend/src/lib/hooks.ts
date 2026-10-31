@@ -50,6 +50,9 @@ export function useLiveEvents() {
         case "integration":
           touch("integrations", "dashboard");
           break;
+        case "style":
+          touch("style", "styles");
+          break;
         case "settings":
           touch("settings", "queue");
           break;

@@ -290,12 +290,17 @@ function ComfySection() {
         </Field>
         <Field label="Text-to-video workflow">
           <select className="select" value={g.video_workflow} onChange={(e) => save.mutate({ generation: { video_workflow: e.target.value } })}>
-            {videoWfs.filter((w) => w.mode !== "i2v").map((w) => <option key={w.name} value={w.name}>{w.label}</option>)}
+            {videoWfs.filter((w) => w.mode === "t2v").map((w) => <option key={w.name} value={w.name}>{w.label}</option>)}
           </select>
         </Field>
         <Field label="Image-to-video workflow">
           <select className="select" value={g.i2v_workflow} onChange={(e) => save.mutate({ generation: { i2v_workflow: e.target.value } })}>
             {videoWfs.filter((w) => w.mode === "i2v").map((w) => <option key={w.name} value={w.name}>{w.label}</option>)}
+          </select>
+        </Field>
+        <Field label="Style-reference workflow" hint="Used when a style has starred images and this model is installed.">
+          <select className="select" value={g.ref_workflow} onChange={(e) => save.mutate({ generation: { ref_workflow: e.target.value } })}>
+            {videoWfs.filter((w) => w.mode === "r2v").map((w) => <option key={w.name} value={w.name}>{w.label}</option>)}
           </select>
         </Field>
         <Field label="Still image workflow (optional)">

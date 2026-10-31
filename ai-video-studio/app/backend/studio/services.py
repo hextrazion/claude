@@ -62,8 +62,10 @@ class Services:
         self.jobs = JobRepo(self.db)
         self.draft = DraftAdapter(self.ffmpeg)
         from .storage import StorageMover
+        from .styles import StyleStore
 
         self.storage = StorageMover(self)
+        self.styles = StyleStore(self.db, config.data_dir / "styles")
         self._comfy: ComfyUIAdapter | None = None
         self.worker = None  # set by the app (jobs.worker.Worker)
         self.orchestrator = None  # set by the app (pipeline.orchestrator.Orchestrator)

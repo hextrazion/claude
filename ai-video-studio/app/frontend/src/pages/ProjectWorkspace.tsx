@@ -539,10 +539,12 @@ function ResearchTab({ p }: { p: Project }) {
 // ---------------------------------------------------------------- project settings
 function ProjectSettings({ p }: { p: Project }) {
   const e = p.effective;
+  const { data: styles } = useQuery({ queryKey: ["styles"], queryFn: () => api.get<{ id: number; name: string; status: string }[]>("/styles") });
   const { data: voices } = useQuery({ queryKey: ["kokoro-voices"], queryFn: () => api.get<{ voices: { id: string; label: string }[] }>("/integrations/kokoro/voices") });
   const [o, setO] = useState({
     duration_s: e.video.duration_s, voice_id: e.narration.voice_id, voice_name: e.narration.voice_name, speed: e.narration.speed,
     narrator: e.narration.provider as string, kokoro_voice: e.narration.kokoro_voice as string,
+    style_id: Number(e.generation.style_id ?? 0),
     captions: e.captions.enabled, provider: e.generation.video_provider, transition: e.video.transition, music: e.music.enabled,
   });
   const save = useAction(() => api.patch(`/projects/${p.id}`, {
@@ -550,7 +552,7 @@ function ProjectSettings({ p }: { p: Project }) {
       video: { duration_s: o.duration_s, transition: o.transition },
       narration: { provider: o.narrator, kokoro_voice: o.kokoro_voice, voice_id: o.voice_id, voice_name: o.voice_name, speed: o.speed },
       captions: { enabled: o.captions },
-      generation: { video_provider: o.provider },
+      generation: { video_provider: o.provider, style_id: o.style_id },
       music: { enabled: o.music },
     },
   }), { invalidate: [["project", p.id]], success: "Project settings saved" });
@@ -561,6 +563,12 @@ function ProjectSettings({ p }: { p: Project }) {
         <Field label="Video provider">
           <select className="select" value={o.provider} onChange={(ev) => setO({ ...o, provider: ev.target.value })}>
             <option value="comfyui">ComfyUI (AI video)</option><option value="draft">Draft cards (no AI)</option>
+          </select>
+        </Field>
+        <Field label="Style" hint={<Link to="/styles">Manage styles</Link>}>
+          <select className="select" value={o.style_id} onChange={(ev) => setO({ ...o, style_id: Number(ev.target.value) })}>
+            <option value={0}>No style (global style text)</option>
+            {(styles ?? []).filter((x) => x.status === "ready" || x.id === o.style_id).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
           </select>
         </Field>
         <Field label="Transitions">

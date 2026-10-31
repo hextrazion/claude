@@ -1,6 +1,6 @@
 import { NavLink, Navigate, Route, Routes } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Clapperboard, Film, Gauge, Lightbulb, ListOrdered, Pause, Play, Plug, Settings as SettingsIcon, WifiOff } from "lucide-react";
+import { Clapperboard, Film, Gauge, Lightbulb, ListOrdered, Palette, Pause, Play, Plug, Settings as SettingsIcon, WifiOff } from "lucide-react";
 import { api } from "./lib/api";
 import { useAction, useLiveEvents } from "./lib/hooks";
 import type { QueueState, SystemInfo } from "./lib/types";
@@ -10,6 +10,7 @@ import Ideas from "./pages/Ideas";
 import Production from "./pages/Production";
 import ProjectWorkspace from "./pages/ProjectWorkspace";
 import Queue from "./pages/Queue";
+import Styles, { StyleDetail } from "./pages/Styles";
 import Library from "./pages/Library";
 import Integrations from "./pages/Integrations";
 import SettingsPage from "./pages/Settings";
@@ -22,6 +23,7 @@ export default function App() {
     { to: "/", label: "Dashboard", icon: Gauge, end: true },
     { to: "/ideas", label: "Idea Studio", icon: Lightbulb, count: counts?.ideas_awaiting },
     { to: "/production", label: "Production", icon: Clapperboard, count: counts?.waiting_approval, alert: !!counts?.waiting_approval },
+    { to: "/styles", label: "Styles", icon: Palette },
     { to: "/queue", label: "Queue", icon: ListOrdered, count: counts?.failed_jobs, alert: !!counts?.failed_jobs },
     { to: "/library", label: "Library", icon: Film, count: counts?.awaiting_review },
     { to: "/integrations", label: "Integrations", icon: Plug },
@@ -49,6 +51,8 @@ export default function App() {
           <Route path="/ideas" element={<Ideas />} />
           <Route path="/production" element={<Production />} />
           <Route path="/production/:id" element={<ProjectWorkspace />} />
+          <Route path="/styles" element={<Styles />} />
+          <Route path="/styles/:id" element={<StyleDetail />} />
           <Route path="/queue" element={<Queue />} />
           <Route path="/library" element={<Library />} />
           <Route path="/integrations" element={<Integrations />} />

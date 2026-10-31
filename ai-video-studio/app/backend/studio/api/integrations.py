@@ -316,7 +316,7 @@ async def autodetect_workflows(s: Services, *, force: bool) -> dict:
         return {"changed": False, "reason": "Current workflow is ready.", "video_workflow": g.video_workflow}
     wfs = sorted((w for w in s.workflows.list() if w.get("kind") == "video" and not w.get("error")),
                  key=lambda w: (w.get("priority", 100), w["name"]))
-    ready: dict[str, list[str]] = {"t2v": [], "i2v": []}
+    ready: dict[str, list[str]] = {"t2v": [], "i2v": [], "r2v": []}
     for w in wfs:
         res = await adapter.check_workflow(w["name"])
         if res.status == "ok":
@@ -326,6 +326,8 @@ async def autodetect_workflows(s: Services, *, force: bool) -> dict:
         patch["video_workflow"] = ready["t2v"][0]
     if ready["i2v"] and ready["i2v"][0] != g.i2v_workflow:
         patch["i2v_workflow"] = ready["i2v"][0]
+    if ready["r2v"] and ready["r2v"][0] != g.ref_workflow:
+        patch["ref_workflow"] = ready["r2v"][0]
     if patch:
         s.settings.update({"generation": patch})
         names = {w["name"]: w["label"] for w in wfs}

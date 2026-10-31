@@ -310,6 +310,7 @@ async def run_scene_plan(ctx: JobContext) -> dict:
     adapter = s.video_adapter(g.video_provider)
     caps = adapter.capabilities(g.video_workflow)
     use_images = g.use_image_stage and bool(g.image_workflow) and g.video_provider != "draft"
+    style_text, style_guide = _active_style(s, g)
     feedback = None
     scenes: list[dict] = []
     for attempt in range(2):
@@ -318,8 +319,10 @@ async def run_scene_plan(ctx: JobContext) -> dict:
             prompts.scene_plan_messages(
                 script, duration_s=round(script.get("est_duration_s") or eff.video.duration_s),
                 max_clip_s=caps.max_clip_s,
-                model_notes=model_notes_for(g.video_workflow, g.video_provider, _workflow_or_none(s, g)),
-                style=g.style_preset, aspect=eff.video.aspect_ratio, use_images=use_images, feedback=feedback,
+                model_notes=" ".join(x for x in (model_notes_for(g.video_workflow, g.video_provider,
+                                                                  _workflow_or_none(s, g)), style_guide) if x),
+                style=style_text or g.style_preset, aspect=eff.video.aspect_ratio, use_images=use_images,
+                feedback=feedback,
             ),
             model=eff.text.model_quality, operation="scene_plan", temperature=0.6, max_tokens=7000,
             project_id=project["id"],
@@ -368,6 +371,31 @@ async def run_scene_plan(ctx: JobContext) -> dict:
     return {"scenes": len(cleaned), "repaired": repaired}
 
 
+def _active_style(s, g) -> tuple[str, str]:
+    """(style prompt, planner guidance) from the selected Style library entry, if it is ready."""
+    from ..styles import planner_style
+
+    style = s.styles.get(g.style_id)
+    if not style or style["status"] != "ready":
+        return "", ""
+    return planner_style(style)
+
+
+async def _reference_setup(s, g, provider: str) -> tuple[str | None, list[Path]]:
+    """Reference-to-video workflow and key images when the style has images and the model is installed."""
+    style = s.styles.get(g.style_id)
+    if provider == "draft" or not g.use_style_references or not style or style["status"] != "ready":
+        return None, []
+    images = s.styles.key_images(style)
+    if not images or not g.ref_workflow:
+        return None, []
+    try:
+        ready = (await s.comfyui().check_workflow(g.ref_workflow)).status == "ok"
+    except Exception:
+        ready = False
+    return (g.ref_workflow, images) if ready else (None, [])
+
+
 def _workflow_or_none(s, g) -> dict | None:
     if g.video_provider == "draft":
         return None
@@ -413,12 +441,21 @@ async def _generate(ctx: JobContext, kind: str) -> dict:
     s.bus.publish("scene", id=scene["id"], project_id=project["id"])
 
     image_path = None
+    ref_images: list[Path] = []
     if kind == "video":
         use_i2v = bool(scene.get("image_path")) and g.use_image_stage and provider != "draft"
         workflow = g.i2v_workflow if use_i2v else g.video_workflow
+        style_text, _ = _active_style(s, g)
+        prompt = prompts.compose_video_prompt(scene, _style_bible(project), style_text or g.style_preset)
         if use_i2v:
             image_path = s.projects.abs(project, scene["image_path"])
-        prompt = prompts.compose_video_prompt(scene, _style_bible(project), g.style_preset)
+        else:
+            ref_wf, ref_images = await _reference_setup(s, g, provider)
+            if ref_wf:
+                workflow = ref_wf
+                tags = " ".join(f"<Picture {i + 1}>" for i in range(len(ref_images)))
+                prompt = (f"Visual style reference: {tags}. Match their art style, colour palette, lighting and "
+                          f"rendering, not their subjects or layout. {prompt}")
     else:
         workflow = g.image_workflow
         if not workflow and provider != "draft":
@@ -429,12 +466,15 @@ async def _generate(ctx: JobContext, kind: str) -> dict:
     seconds = _scene_target_seconds(project, scene, scenes, eff.video.transition_s)
     frames = caps.frames_for(seconds) if kind == "video" else 1
     seed = int(ctx.payload.get("seed") or _seed(eff, scene))
-    negative = ", ".join(x for x in (scene.get("negative_prompt"), g.negative_prompt) if x)
+    style = s.styles.get(g.style_id)
+    style_avoid = ((style or {}).get("profile") or {}).get("avoid", "") if (style or {}).get("status") == "ready" else ""
+    negative = ", ".join(x for x in (scene.get("negative_prompt"), style_avoid, g.negative_prompt) if x)
     name = f"{'clip' if kind == 'video' else 'image'}_{stamp()}"
     req = GenerationRequest(
         kind=kind, workflow=workflow, prompt=prompt, negative_prompt=negative,
         width=caps.width, height=caps.height, seed=seed, out_dir=s.projects.scene_dir(project, scene),
         filename_prefix=name, num_frames=frames, fps=caps.fps, image_path=image_path,
+        ref_images=ref_images if kind == "video" and not image_path else [],
         extra={"label": scene.get("visual_objective") or scene.get("narration", "")},
     )
     external = ctx.payload.get("resume_external_id")
@@ -456,6 +496,7 @@ async def _generate(ctx: JobContext, kind: str) -> dict:
         "provider": adapter.name, "provider_label": adapter.label, "is_ai": adapter.is_ai, "workflow": workflow,
         "prompt": prompt, "negative_prompt": negative, "seed": seed, "width": caps.width, "height": caps.height,
         "frames": frames, "fps": caps.fps, "requested_seconds": round(seconds, 2),
+        "style_id": g.style_id or None, "style_references": len(req.ref_images),
         "duration": info.duration if info else None, "source_image": scene.get("image_path") if image_path else None,
         "started_at": started, "finished_at": utcnow(), "external_id": external, **result.meta,
     }
@@ -654,6 +695,36 @@ async def run_assemble(ctx: JobContext) -> dict:
     return {"path": export["path"], "qc_ok": report["technical_ok"]}
 
 
+async def run_style_analysis(ctx: JobContext) -> dict:
+    from ..errors import StudioError
+    from ..styles import analyze_style
+
+    s = ctx.s
+    sid = int(ctx.payload["style_id"])
+    s.styles.update(sid, status="analyzing", error=None)
+    s.bus.publish("style", id=sid)
+    try:
+        profile = await analyze_style(s, sid, ctx.progress)
+    except StudioError as exc:
+        s.styles.update(sid, status="failed", error=exc.message)
+        s.bus.publish("style", id=sid)
+        raise
+    except Exception as exc:
+        s.styles.update(sid, status="failed", error=str(exc)[:300])
+        s.bus.publish("style", id=sid)
+        raise
+    style = s.styles.require(sid)
+    fields = {"profile": profile, "status": "ready", "error": None}
+    if profile.get("name") and style["name"].startswith("New style"):
+        fields["name"] = profile["name"]
+    s.styles.update(sid, **fields)
+    s.bus.publish("style", id=sid)
+    s.activity.add(f"Style ready: {fields.get('name', style['name'])}"
+                   + ("" if profile.get("vision_model") else " (from your description; no image-reading model available)"),
+                   category="style")
+    return {"style_id": sid, "vision": bool(profile.get("vision_model"))}
+
+
 HANDLERS = {
     "ideas": run_ideas,
     "research": run_research,
@@ -664,4 +735,5 @@ HANDLERS = {
     "scene_image": run_scene_image,
     "narration": run_narration,
     "assemble": run_assemble,
+    "style_analysis": run_style_analysis,
 }

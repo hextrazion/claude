@@ -33,6 +33,7 @@ No GPU model yet? Set **Video provider → Draft cards** to run the whole pipeli
 | **Dashboard** | Real counts, things waiting for you, service health, GPU/VRAM/temperature, disk, API usage, recent errors |
 | **Idea Studio** | Generate batches of specific concepts, duplicate warnings, favourite/edit/reject, approve into production |
 | **Production** | Per-project workspace: script editor, scene-by-scene prompts with per-scene generate/regenerate, narration, research & claim status, final review with QC results |
+| **Styles** | Reference images/clips → measured colours and pacing + an AI-written style applied to every scene; starred images feed H3's reference mode |
 | **Queue** | Persistent job queue in three lanes (GPU / API / FFmpeg), pause/resume, cancel, retry, reorder, limits, processing hours |
 | **Library** | All projects and finished videos: preview, rename, archive, export, safe delete |
 | **Integrations** | Keys (masked, stored in Windows Credential Manager), connection tests, Groq model list, free voice picker with preview, ComfyUI model auto-detect and workflows |

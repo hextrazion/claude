@@ -19,10 +19,10 @@ from .conftest import HEADERS, make_services
 
 
 def test_migrations_are_idempotent(services):
-    assert services.db.schema_version() == "0001"
+    assert services.db.schema_version() == "0002"
     assert services.db.migrate() == []
     tables = {r["name"] for r in services.db.query("SELECT name FROM sqlite_master WHERE type='table'")}
-    assert {"projects", "scenes", "jobs", "ideas", "settings", "api_usage", "activity"} <= tables
+    assert {"projects", "scenes", "jobs", "ideas", "settings", "api_usage", "activity", "styles"} <= tables
 
 
 def test_settings_persist_across_restart(home, router):
