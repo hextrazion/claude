@@ -506,6 +506,7 @@ function StorageSection({ i }: { i: Integration }) {
       <dt>Library folder</dt><dd className="mono tiny">{i.config?.export_dir}</dd>
       <dt>Projects use</dt><dd>{gb(data?.projects_bytes)}</dd>
       <dt>Library uses</dt><dd>{gb(data?.library_bytes)}</dd>
+      <dt>Change drive</dt><dd><a href="/settings">Settings → Where your videos are saved</a></dd>
     </dl>
   );
 }

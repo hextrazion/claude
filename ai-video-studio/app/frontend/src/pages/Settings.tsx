@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Upload } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { FolderOpen, Upload } from "lucide-react";
 import { api } from "../lib/api";
 import { useAction, useSaveSettings, useSettings } from "../lib/hooks";
 import type { Settings } from "../lib/types";
-import { Card, Field, ListInput, NumberInput, PageHeader, Progress, Toggle } from "../components/ui";
+import { Card, Field, ListInput, Note, NumberInput, PageHeader, Progress, Spinner, Toggle } from "../components/ui";
 
 type Opt = { value: string; label: string };
 type Def =
@@ -103,9 +103,7 @@ const SECTIONS: { id: string; title: string; sub?: string; fields: Def[] }[] = [
     { k: "window_applies_to_api", label: "Processing hours also apply to API jobs", type: "bool" },
     { k: "min_free_disk_gb", label: "Stop generating below free disk (GB)", type: "number", min: 0 },
   ] },
-  { id: "storage", title: "Storage", fields: [
-    { k: "projects_dir", label: "Projects folder", type: "text", hint: "Empty = data/projects. New projects only; existing ones stay where they are." },
-    { k: "export_dir", label: "Library (export) folder", type: "text", hint: "Empty = data/library" },
+  { id: "storage", title: "Disk space", sub: "Choose the drive itself at the top of this page.", fields: [
     { k: "low_disk_warning_gb", label: "Warn below free space (GB)", type: "number", min: 0 },
     { k: "keep_work_files_days", label: "Keep intermediate files (days)", type: "number", min: 0 },
   ] },
@@ -129,6 +127,7 @@ export default function SettingsPage() {
       <PageHeader title="Settings" sub="Saved to the local database and kept across restarts." />
       <div className="stack">
         <General s={s} />
+        <StorageLocation />
         <div className="grid cols-2">
           {SECTIONS.map((sec) => <Section key={sec.id} id={sec.id} title={sec.title} sub={sec.sub} fields={sec.fields} value={s[sec.id]} />)}
           <MusicSection s={s} />
@@ -254,6 +253,86 @@ function WindowSection({ s }: { s: Settings }) {
       </div>
       <div className="row" style={{ marginTop: 14 }}>
         <button className="btn primary" disabled={!dirty || save.isPending} onClick={() => save.mutate({ queue: { processing_window: w } })}>Save</button>
+      </div>
+    </Card>
+  );
+}
+
+type StorageInfo = {
+  location: string;
+  projects_dir: string;
+  available: boolean;
+  export_dir: string;
+  default_location: string;
+  disk: { free_gb: number; total_gb: number } | null;
+  projects: number;
+  projects_elsewhere: number;
+  move: { status: string; done: number; total: number; current: string; errors: string[] };
+};
+
+function StorageLocation() {
+  const qc = useQueryClient();
+  const { data: info } = useQuery({
+    queryKey: ["storage-location"],
+    queryFn: () => api.get<StorageInfo>("/storage/location"),
+    refetchInterval: (q) => (q.state.data?.move.status === "moving" ? 1000 : false),
+  });
+  const [path, setPath] = useState("");
+  const [move, setMove] = useState(true);
+  useEffect(() => {
+    if (info && !path) setPath(info.location || "");
+  }, [info, path]);
+  const pick = useAction(() => api.post<{ path: string | null }>("/storage/choose-folder"));
+  const apply = useAction(() => api.post<StorageInfo>("/storage/location", { path, move_existing: move }), {
+    invalidate: [["storage-location"], ["settings"], ["system"], ["integrations"]],
+    success: move ? "Storage folder set — moving your projects" : "Storage folder set",
+  });
+  const moveNow = useAction(() => api.post<StorageInfo>("/storage/move"), { invalidate: [["storage-location"]] });
+  useEffect(() => {
+    if (info?.move.status && info.move.status !== "moving") qc.invalidateQueries({ queryKey: ["projects"] });
+  }, [info?.move.status, qc]);
+  if (!info) return null;
+  const m = info.move;
+  const moving = m.status === "moving";
+  return (
+    <Card title="Where your videos are saved" sub="Projects and finished videos can live on any drive, such as an external SSD.">
+      <div className="stack">
+        <div className="row wrap">
+          <span className="small muted">Current folder:</span>
+          <span className="mono small">{info.projects_dir}</span>
+          {info.available
+            ? info.disk && <span className="small muted">· {info.disk.free_gb} GB free of {info.disk.total_gb} GB</span>
+            : <span className="small" style={{ color: "var(--err)" }}>· not available — plug in the drive or choose another folder</span>}
+        </div>
+        <div className="row">
+          <input className="input mono" placeholder="E:\AI Video Studio" value={path} onChange={(e) => setPath(e.target.value)} />
+          <button className="btn" disabled={pick.isPending} onClick={() => pick.mutate(undefined, { onSuccess: (r) => r.path && setPath(r.path) })}>
+            {pick.isPending ? <Spinner size={14} /> : <FolderOpen size={14} />} Choose folder…
+          </button>
+        </div>
+        {info.projects > 0 && (
+          <Toggle checked={move} onChange={setMove} label={`Also move my ${info.projects} existing project${info.projects === 1 ? "" : "s"} there`} />
+        )}
+        <div className="row wrap">
+          <button className="btn primary" disabled={!path.trim() || moving || apply.isPending} onClick={() => apply.mutate()}>Use this folder</button>
+          <span className="tiny faint">The studio creates <b>Projects</b> and <b>Library</b> folders inside it. Its small database and the voice model stay on C:.</span>
+        </div>
+        {moving && (
+          <div className="stack tight">
+            <div className="small">Moving {m.current}… ({m.done}/{m.total}) — new generations wait until this finishes.</div>
+            <Progress value={m.total ? m.done / m.total : null} />
+          </div>
+        )}
+        {m.status === "done" && <Note tone="ok">All projects moved. Each one was copied and checked before the old copy was removed.</Note>}
+        {m.status === "done_with_errors" && (
+          <Note tone="warn" title="Some projects could not be moved; they are still in their old place and work normally.">
+            <ul style={{ margin: 0, paddingLeft: 18 }}>{m.errors.map((e, i) => <li key={i}>{e}</li>)}</ul>
+          </Note>
+        )}
+        {m.status === "error" && <Note tone="err">{m.errors.join(" ")}</Note>}
+        {!moving && info.projects_elsewhere > 0 && info.location && m.status !== "idle" && (
+          <button className="btn sm" onClick={() => moveNow.mutate()}>Try moving the remaining {info.projects_elsewhere} project(s) again</button>
+        )}
       </div>
     </Card>
   );

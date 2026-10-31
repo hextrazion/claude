@@ -86,8 +86,13 @@ class Worker:
         if q.processing_window.enabled and (lane != "api" or q.window_applies_to_api):
             if not in_window(q.processing_window.start, q.processing_window.end):
                 return False, f"Outside processing hours ({q.processing_window.start}–{q.processing_window.end})"
+        if lane in ("gpu", "cpu") and self.s.storage.busy:
+            return False, "Moving projects to the new storage folder"
         if lane in ("gpu", "cpu"):
-            disk = disk_stats(self.s.projects.projects_root)
+            root = self.s.projects.projects_root_or_none()
+            if root is None:
+                return False, "Storage folder not available (is the external drive plugged in?)"
+            disk = disk_stats(root)
             if disk and q.min_free_disk_gb and disk["free_gb"] < q.min_free_disk_gb:
                 return False, f"Low disk space ({disk['free_gb']} GB free, minimum {q.min_free_disk_gb} GB)"
         if lane == "gpu":

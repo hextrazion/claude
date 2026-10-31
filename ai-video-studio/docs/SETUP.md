@@ -66,6 +66,16 @@ Full details and alternatives: [VIDEO_MODELS.md](VIDEO_MODELS.md). Short version
 3. In the studio: Integrations → ComfyUI → **Auto-detect my model**. It checks which models your ComfyUI has (MiniMax H3, Wan 2.2…), finds your files even if you downloaded a different variant (INT8, FP8, GGUF), and selects the best workflow. The studio also does this automatically when it starts.
 4. If it says something is missing, press **Check** on the MiniMax H3 workflow: it lists exactly which file or node it could not find.
 
+## 6b. Storing videos on another drive (e.g. an external SSD)
+
+Settings → **Where your videos are saved** → **Choose folder…** → pick a folder on the drive → keep *Also move my existing projects there* ticked → **Use this folder**.
+
+- The studio creates `Projects` and `Library` inside that folder; all new projects go there.
+- Existing projects are copied, checked file by file, switched over, and only then deleted from the old drive. If anything fails (or the drive is unplugged mid-way) that project simply stays where it was.
+- Generation pauses while projects are moving and resumes automatically.
+- If the external drive is unplugged later, the studio says so and holds GPU/assembly jobs until it is back; nothing is lost.
+- The small database, logs and the voice model stay in `%LOCALAPPDATA%\AI Video Studio`. ComfyUI's own model files are managed by ComfyUI, not by the studio.
+
 ## 7. Your first video
 
 1. **Settings → Automation mode:** keep **Supervised**. Video defaults: 35 s, 1080×1920, 30 fps.

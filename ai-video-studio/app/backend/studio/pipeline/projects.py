@@ -68,19 +68,37 @@ class ProjectStore:
         self.settings = settings
 
     # -- directories ------------------------------------------------------------
-    @property
-    def projects_root(self) -> Path:
-        custom = self.settings.get().storage.projects_dir.strip()
-        root = Path(custom).expanduser() if custom else self.config.default_projects_dir
-        root.mkdir(parents=True, exist_ok=True)
+    def _root(self, custom: str, default: Path, what: str) -> Path:
+        root = Path(custom).expanduser() if custom else default
+        try:
+            root.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            raise ValidationFailed(
+                f"The {what} folder {root} is not available. If it is on an external drive, plug it in; "
+                "otherwise choose another folder in Settings → Storage.",
+                detail=str(exc),
+            ) from exc
         return root.resolve()
 
     @property
+    def projects_root(self) -> Path:
+        return self._root(self.settings.get().storage.projects_dir.strip(), self.config.default_projects_dir, "projects")
+
+    @property
     def export_root(self) -> Path:
-        custom = self.settings.get().storage.export_dir.strip()
-        root = Path(custom).expanduser() if custom else self.config.library_dir
-        root.mkdir(parents=True, exist_ok=True)
-        return root.resolve()
+        return self._root(self.settings.get().storage.export_dir.strip(), self.config.library_dir, "library")
+
+    def projects_root_or_none(self) -> Path | None:
+        try:
+            return self.projects_root
+        except ValidationFailed:
+            return None
+
+    def export_root_or_none(self) -> Path | None:
+        try:
+            return self.export_root
+        except ValidationFailed:
+            return None
 
     def folder(self, project: dict) -> Path:
         return Path(project["folder"])
@@ -255,11 +273,11 @@ class ProjectStore:
     def delete(self, project: dict, delete_files: bool) -> None:
         folder = self.folder(project)
         if delete_files and folder.exists():
-            # Only ever remove a folder that is inside the projects root and is marked as ours.
-            root = self.projects_root
-            resolved = ensure_within(root, folder)
+            # Only ever remove this project's own folder: named NNNN-slug and marked with its project.json.
+            resolved = folder.resolve()
             marker = resolved / PROJECT_MARKER
-            if resolved == root or not marker.is_file():
+            if (resolved == Path(resolved.anchor) or not resolved.name.startswith(f"{project['id']:04d}-")
+                    or not marker.is_file()):
                 raise ValidationFailed("Refusing to delete: folder is not a recognised project folder.", detail=str(folder))
             try:
                 data = json.loads(marker.read_text(encoding="utf-8"))

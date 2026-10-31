@@ -208,6 +208,7 @@ class AutomationSettings(_Section):
 
 
 class StorageSettings(_Section):
+    location: str = Field("", description="Folder chosen in Settings → Storage (Projects/ and Library/ inside)")
     projects_dir: str = Field("", description="Empty = data/projects")
     export_dir: str = Field("", description="Empty = data/library")
     low_disk_warning_gb: float = Field(30.0, ge=0)

@@ -54,6 +54,13 @@ Every failed job shows a plain-language message; click it on the Queue page or a
 | "Scene narration changed after the audio was generated" | Regenerate narration (Narration tab), then assemble. |
 | Quality check warnings | Warnings never block you: they flag black sections, clipping, short clips or draft footage. Failures (wrong size, no audio, unreadable file) mean the export should not be used. |
 
+## Storage
+
+| Symptom | Fix |
+|---|---|
+| "The projects folder … is not available" | The external drive is unplugged or has a new drive letter. Plug it in, or choose the folder again in Settings → Where your videos are saved. |
+| Some projects could not be moved | They stay in their old place and keep working. Close anything using their files and press *Try moving the remaining projects again*. |
+
 ## Queue
 
 | Symptom | Fix |

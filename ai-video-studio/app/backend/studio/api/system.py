@@ -7,6 +7,7 @@ import json
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 from pydantic import ValidationError
 
 from .. import __version__
@@ -26,11 +27,39 @@ def health(s: Services = Depends(services)):
 
 @router.get("/system")
 def system(s: Services = Depends(services)):
-    snap = system_snapshot(s.projects.projects_root)
+    snap = system_snapshot(s.projects.projects_root_or_none() or s.config.data_dir)
     st = s.settings.get().storage
     disk = snap.get("disk")
     snap["low_disk"] = bool(disk and st.low_disk_warning_gb and disk["free_gb"] < st.low_disk_warning_gb)
     return snap
+
+
+class LocationIn(BaseModel):
+    path: str = Field(..., min_length=2, max_length=500)
+    move_existing: bool = True
+
+
+@router.get("/storage/location")
+def storage_location(s: Services = Depends(services)):
+    return s.storage.summary()
+
+
+@router.post("/storage/choose-folder")
+async def storage_choose_folder(s: Services = Depends(services)):
+    from ..storage import choose_folder
+
+    return {"path": await choose_folder(s.settings.get().storage.location or None)}
+
+
+@router.post("/storage/location")
+async def storage_set_location(body: LocationIn, s: Services = Depends(services)):
+    return s.storage.set_location(body.path, body.move_existing)
+
+
+@router.post("/storage/move")
+async def storage_move(s: Services = Depends(services)):
+    s.storage.start_move()
+    return s.storage.summary()
 
 
 @router.get("/storage")

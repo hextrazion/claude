@@ -83,7 +83,9 @@ def _describe(s: Services, name: str) -> dict:
     elif name == "ffmpeg":
         out["config"] = {"path": s.ffmpeg.paths.ffmpeg if s.ffmpeg.paths else None}
     elif name == "storage":
-        out["config"] = {"projects_dir": str(s.projects.projects_root), "export_dir": str(s.projects.export_root)}
+        st_ = s.settings.get().storage
+        out["config"] = {"projects_dir": str(s.projects.projects_root_or_none() or st_.projects_dir),
+                         "export_dir": str(s.projects.export_root_or_none() or st_.export_dir)}
     return out
 
 
@@ -137,10 +139,12 @@ async def run_test(s: Services, name: str) -> dict:
         s.draft.ffmpeg = s.ffmpeg
         result = s.ffmpeg.health()
     else:
-        disk = disk_stats(s.projects.projects_root)
+        root = s.projects.projects_root_or_none()
+        disk = disk_stats(root) if root else None
         st = s.settings.get().storage
         if not disk:
-            result = HealthResult("error", "Project folder is not accessible.")
+            result = HealthResult("error", "The storage folder is not available. If it is on an external drive, plug it in, "
+                                  "or choose another folder in Settings → Storage.")
         elif disk["free_gb"] < st.low_disk_warning_gb:
             result = HealthResult("warning", f"Low disk space: {disk['free_gb']} GB free.", info=disk)
         else:
