@@ -3,8 +3,8 @@
 A local, self-hosted production studio for short-form animated explainer videos. One app takes a video from **idea → research → script → scene plan → AI footage → narration → captions → finished vertical MP4**, with a review step wherever you want one.
 
 - **Text:** [Groq](https://console.groq.com) (ideas, scripts, scene plans, claim checks)
-- **Video:** an open-source model running on your own GPU through [ComfyUI](https://github.com/comfyanonymous/ComfyUI) (default: Wan 2.2 TI2V‑5B, chosen for 12 GB cards)
-- **Voice:** [Fish Audio](https://fish.audio) text-to-speech
+- **Video:** an open model running on your own GPU through [ComfyUI](https://github.com/comfyanonymous/ComfyUI): **MiniMax H3** built in (also Wan 2.2 5B); the app detects which one you have and finds its files
+- **Voice:** free [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M) narration that runs on your PC (no account, no key); [Fish Audio](https://fish.audio) optional
 - **Assembly:** FFmpeg (timeline, transitions, word-highlighted captions, music ducking, loudness, quality checks)
 - **Research (optional):** Wikipedia (no key) or Tavily web search
 
@@ -16,7 +16,7 @@ Everything is controlled from a dark-themed web UI served by a local Python back
 2. Double-click it. If Windows says it protected your PC (the installer isn't code-signed), click **More info → Run anyway**.
 3. Click **Install**. No admin rights, Python, Node or FFmpeg needed: everything is included.
 4. AI Video Studio opens in its own window and adds a Start-menu and desktop icon. A small tray icon near the clock keeps it running while videos render; right-click it → **Quit** to stop.
-5. Open **Integrations**, paste your Groq and Fish Audio keys, pick a voice, then set up ComfyUI ([docs/VIDEO_MODELS.md](docs/VIDEO_MODELS.md)) and follow [Your first video](docs/SETUP.md#7-your-first-video).
+5. Open **Integrations**: paste your free Groq key, pick and preview a narration voice (it downloads once, ~140 MB), start ComfyUI and press **Auto-detect my model**. Then follow [Your first video](docs/SETUP.md#7-your-first-video).
 
 Your projects live in `%LOCALAPPDATA%\AI Video Studio` and are kept if you uninstall or update. Each push to the app rebuilds the installer at the same link.
 
@@ -35,7 +35,7 @@ No GPU model yet? Set **Video provider → Draft cards** to run the whole pipeli
 | **Production** | Per-project workspace: script editor, scene-by-scene prompts with per-scene generate/regenerate, narration, research & claim status, final review with QC results |
 | **Queue** | Persistent job queue in three lanes (GPU / API / FFmpeg), pause/resume, cancel, retry, reorder, limits, processing hours |
 | **Library** | All projects and finished videos: preview, rename, archive, export, safe delete |
-| **Integrations** | Keys (masked, stored in Windows Credential Manager), connection tests, Groq model list, Fish voice browser, ComfyUI workflows (import/check) |
+| **Integrations** | Keys (masked, stored in Windows Credential Manager), connection tests, Groq model list, free voice picker with preview, ComfyUI model auto-detect and workflows |
 | **Settings** | Everything else, persisted in SQLite |
 
 Automation modes: **Manual** (you start every stage), **Supervised** (default: writes ideas/scripts, stops before footage), **Automated** (works through its own idea pool inside your daily limits, gates and processing hours). Nothing is ever published to social platforms.
@@ -65,7 +65,7 @@ ai-video-studio/
 
 ## Documentation
 
-- [Setup & first video](docs/SETUP.md): installing, Groq, Fish Audio, ComfyUI, first video
+- [Setup & first video](docs/SETUP.md): installing, Groq, narration voice, ComfyUI, first video
 - [Video models on a 12 GB GPU](docs/VIDEO_MODELS.md): why Wan 2.2 5B is the default, LTX-2.x options, how to benchmark
 - [Architecture](docs/ARCHITECTURE.md): components, data model, job lifecycle, security
 - [Homelab roadmap](docs/HOMELAB.md)

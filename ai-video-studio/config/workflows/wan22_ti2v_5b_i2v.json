@@ -244,8 +244,8 @@
           0
         ],
         "filename_prefix": "ai_video_studio/clip",
-        "format": "mp4",
-        "codec": "h264"
+        "format": "auto",
+        "format.codec": "auto"
       },
       "_meta": {
         "title": "Save Video"
@@ -260,5 +260,7 @@
         "title": "Start Image"
       }
     }
-  }
+  },
+  "family": "wan22_5b",
+  "priority": 11
 }

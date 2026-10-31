@@ -130,9 +130,20 @@ def create_app(config: AppConfig | None = None, services: Services | None = None
 
 
 async def _startup_checks(svc: Services) -> None:
-    from .api.integrations import INTEGRATIONS, run_test
+    from .api.integrations import INTEGRATIONS, autodetect_workflows, run_test
     from .integrations.base import HealthResult
 
+    # Fetch the free narration voice in the background so it is ready before the first video.
+    if svc.settings.get().narration.provider == "kokoro" and not svc.kokoro.installed():
+        try:
+            svc.kokoro.start_download()
+        except Exception:
+            log.warning("could not start the voice model download", exc_info=True)
+    try:
+        # Switch to whichever video model the user's ComfyUI actually has (e.g. MiniMax H3).
+        await autodetect_workflows(svc, force=False)
+    except Exception:
+        log.warning("video workflow auto-detection failed", exc_info=True)
     for name in INTEGRATIONS:
         try:
             await run_test(svc, name)

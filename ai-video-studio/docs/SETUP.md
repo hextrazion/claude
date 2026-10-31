@@ -7,7 +7,7 @@ Target machine: Windows 10/11, NVIDIA RTX 4070 Ti (12 GB), Ryzen 7 5800X, 32 GB 
 | Software | Version | Why |
 |---|---|---|
 | Python | 3.11, 3.12 or 3.13 | Backend. Install from python.org and tick **Add python.exe to PATH**. |
-| Node.js | 22 LTS (≥ 22.12) | Builds the web UI on first launch (not needed afterwards). |
+| Node.js | 22 LTS (≥ 22.12) | Only when running from source (the installer needs nothing). |
 | FFmpeg | 6.x or 7.x **full** build | Assembly, captions, audio, quality checks. |
 | NVIDIA driver | Recent Game Ready/Studio driver | ComfyUI and `nvidia-smi` GPU monitoring. |
 | ComfyUI | Current release (desktop app or portable) | Local video generation. |
@@ -47,27 +47,24 @@ The studio looks there first, then `FFMPEG_PATH`, then your PATH. On the Integra
 
 Notes: Groq's API has no web access, so research is a separate optional stage. Free-tier limits are per model and change over time; the app records rate-limit headers, waits and retries on HTTP 429, and stops immediately on invalid keys. Set daily caps under Settings → Daily limits. If a model is retired, scripts fail with “model not available” and you choose another one; nothing is lost.
 
-## 5. Fish Audio (narration)
+## 5. Narration voice (free)
 
-1. Create an API key at <https://fish.audio/app/api-keys/> and make sure the account has API credit (API calls draw on API credit, which may be separate from a website subscription).
-2. Integrations → Fish Audio → paste → **Save**. The test shows your API credit balance.
-3. **Choose** a voice: search public voices, switch to *My voices* for voices you cloned on fish.audio, or paste a voice ID.
-4. *TTS model* is sent as Fish's `model` header. `s2-pro` is the default; `s1` also works on most accounts. If your plan rejects a model you will see the error on the narration job.
+Narration uses **Kokoro**, an open-source (Apache 2.0) voice model that runs on your CPU: no account, no key, no cost, and it never competes with ComfyUI for the GPU.
 
-Each narration is one request for the whole script (better prosody than per-scene clips). Characters and estimated cost are recorded; Settings → Pricing holds the per-million-character rate used for estimates.
+1. Integrations → **Narration voice** → *Download free voice* (one time, ~140 MB). The app also starts this download by itself on first launch.
+2. Pick a voice (★ marks the clearest ones, e.g. *Heart*, *Bella*, *Michael*, *Emma*, *George*) and press **Preview voice**.
+3. Optional: change the speed. Each project can override the voice under Project settings.
 
-## 6. ComfyUI and the video model
+**Fish Audio (optional, paid).** Fish Audio's API is billed from API credit, which its free plan does not include, so it is off by default. If you buy credit: Integrations → Fish Audio → paste key → *Use Fish Audio*.
 
-Full details and alternatives: [VIDEO_MODELS.md](VIDEO_MODELS.md). Short version for the default model:
+## 6. ComfyUI and the video model (MiniMax H3)
 
-1. Install ComfyUI and start it (default address `http://127.0.0.1:8188`).
-2. Download into ComfyUI's `models` folder:
-   - `diffusion_models/wan2.2_ti2v_5B_fp16.safetensors`
-   - `text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors`
-   - `vae/wan2.2_vae.safetensors`
-   (ComfyUI's built-in “Wan 2.2 5B video generation” template links to all three.)
-3. Integrations → ComfyUI: video provider **ComfyUI**, workflow **Wan 2.2 TI2V 5B — text to video**, press **Check**. It confirms every node type and model file exists in *your* ComfyUI.
-4. If Check reports a node mismatch (ComfyUI renames nodes occasionally): open the built-in template in ComfyUI, **Workflow → Export (API)**, then **Import from ComfyUI** in the studio and select the imported workflow.
+Full details and alternatives: [VIDEO_MODELS.md](VIDEO_MODELS.md). Short version:
+
+1. In ComfyUI, make sure the MiniMax H3 example (Workflow → Browse Templates → Video → MiniMax H3) runs once by itself. That confirms your ComfyUI is new enough and the model files are in place.
+2. Start ComfyUI and leave it running (default address `http://127.0.0.1:8188`).
+3. In the studio: Integrations → ComfyUI → **Auto-detect my model**. It checks which models your ComfyUI has (MiniMax H3, Wan 2.2…), finds your files even if you downloaded a different variant (INT8, FP8, GGUF), and selects the best workflow. The studio also does this automatically when it starts.
+4. If it says something is missing, press **Check** on the MiniMax H3 workflow: it lists exactly which file or node it could not find.
 
 ## 7. Your first video
 
@@ -88,4 +85,5 @@ Everything for the project is in its folder: `idea.json`, `research/`, `script/`
 - **Better caption timing:** `.venv\Scripts\python.exe -m pip install -r requirements-optional.txt` installs faster-whisper; caption timing then comes from speech recognition instead of estimation.
 - **Background music:** Settings → Background music → *Add track* (only tracks you have rights to), enable, and set volume/ducking.
 - **Still images first:** pick the SDXL (or your own) image workflow on Integrations, enable *Generate stills first* in Settings → Video generation. Scenes the planner marks as needing a still are generated as an image and animated with the image-to-video workflow. You can also upload your own source image per scene.
+- **Background voice download:** the voice model comes from the kokoro-onnx project's GitHub releases; ONNX Runtime's telemetry is switched off so narration stays fully local.
 - **Development:** `scripts\dev.bat` runs the backend and the Vite dev server with live reload; `scripts\test.bat` runs both test suites.

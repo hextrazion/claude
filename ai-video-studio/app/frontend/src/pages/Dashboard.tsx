@@ -19,7 +19,7 @@ type Dash = {
 };
 
 const SERVICE_LABELS: Record<string, string> = {
-  groq: "Groq", fish_audio: "Fish Audio", comfyui: "Video engine", research: "Research", ffmpeg: "FFmpeg", storage: "Storage",
+  groq: "Groq", kokoro: "Narration voice", comfyui: "Video engine", research: "Research", ffmpeg: "FFmpeg", storage: "Storage",
 };
 
 export default function Dashboard() {

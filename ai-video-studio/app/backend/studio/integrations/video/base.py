@@ -48,23 +48,24 @@ class Capabilities:
     height: int
     fps: int
     max_frames: int
-    frame_multiple: int = 1  # frames must be multiple*n + 1 when > 1
+    frame_multiple: int = 1  # frame counts must be frame_multiple*n + frame_offset when > 1
     is_ai: bool = True
+    frame_offset: int = 1
 
     @property
     def max_clip_s(self) -> float:
         return self.max_frames / self.fps if self.fps else 0
 
     def frames_for(self, seconds: float) -> int:
-        """Frames for a clip of ``seconds``, rounded *up* to the model's m*n+1 rule
+        """Frames for a clip of ``seconds``, rounded *up* to the model's m*n+offset rule
         (a little extra footage is trimmed; too little would be held) and capped
         at the largest valid count within ``max_frames``."""
         frames = max(1, round(seconds * self.fps))
-        m = self.frame_multiple
+        m, r = self.frame_multiple, self.frame_offset
         if m > 1:
-            frames = -(-(frames - 1) // m) * m + 1
-            cap = ((self.max_frames - 1) // m) * m + 1
-            return max(1, min(frames, cap))
+            frames = max(r, frames + (r - frames) % m)
+            cap = self.max_frames - (self.max_frames - r) % m
+            return max(r, min(frames, cap))
         return min(frames, self.max_frames)
 
     def to_dict(self) -> dict:

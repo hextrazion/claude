@@ -518,13 +518,32 @@ async def run_narration(ctx: JobContext) -> dict:
     else:
         raise ValidationFailed("There is no script to narrate yet.")
     text = re.sub(r"\s+", " ", text).strip()
-    s.usage.check_limit("tts", len(text))
+    local = n.provider == "kokoro"
+    if not local:
+        s.usage.check_limit("tts", len(text))  # daily cap protects paid credit only
     s.projects.update(project["id"], narration_status="running")
-    out = s.projects.folder(project) / "narration" / f"narration_{stamp()}.{n.format}"
-    await ctx.progress(0.1, "Generating narration with Fish Audio")
+    ext = "wav" if local else n.format
+    out = s.projects.folder(project) / "narration" / f"narration_{stamp()}.{ext}"
     try:
-        tts = await s.fish.synthesize(text, out, voice_id=n.voice_id, model=n.model, fmt=n.format, speed=n.speed,
-                                      volume=n.volume, normalize=n.normalize, project_id=project["id"])
+        if local:
+            from ..integrations.kokoro_tts import describe_voice
+
+            if not s.kokoro.installed():
+                await ctx.progress(0.02, "Downloading the free voice model (one time, ~140 MB)")
+
+                async def dl_progress(frac):
+                    await ctx.progress(0.02 + 0.3 * frac, f"Downloading the free voice model… {int(frac * 100)}%")
+            else:
+                dl_progress = None
+            await ctx.progress(0.35, "Generating narration on this PC (free voice)")
+            tts = await s.kokoro.synthesize(text, out, voice=n.kokoro_voice, speed=n.speed, project_id=project["id"],
+                                            on_progress=dl_progress)
+            voice_id, voice_name, model = n.kokoro_voice, describe_voice(n.kokoro_voice)["label"], tts["model"]
+        else:
+            await ctx.progress(0.1, "Generating narration with Fish Audio")
+            tts = await s.fish.synthesize(text, out, voice_id=n.voice_id, model=n.model, fmt=n.format, speed=n.speed,
+                                          volume=n.volume, normalize=n.normalize, project_id=project["id"])
+            voice_id, voice_name, model = n.voice_id, n.voice_name, n.model
     except BaseException:
         s.projects.update(project["id"], narration_status="failed")
         raise
@@ -532,8 +551,9 @@ async def run_narration(ctx: JobContext) -> dict:
     info = media_info(await s.ffmpeg.probe(out))
     words, method = await compute_word_timings(s, out, text, info.duration, n.alignment)
     narration = {
-        "path": s.projects.rel(project, out), "duration": round(info.duration, 3), "voice_id": n.voice_id,
-        "voice_name": n.voice_name, "model": n.model, "speed": n.speed, "characters": tts["characters"],
+        "path": s.projects.rel(project, out), "duration": round(info.duration, 3), "voice_id": voice_id,
+        "voice_name": voice_name, "provider": n.provider, "model": model, "speed": n.speed,
+        "characters": tts["characters"],
         "cost_usd": tts.get("cost_usd"), "text": text, "words": [w.to_dict() for w in words],
         "alignment_method": method, "generated_at": utcnow(),
     }

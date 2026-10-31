@@ -12,6 +12,7 @@ from .events import ActivityLog, EventBus
 from .integrations.base import HealthResult
 from .integrations.fish_audio import FishAudioClient
 from .integrations.groq import GroqClient
+from .integrations.kokoro_tts import KokoroTTS
 from .integrations.research import TavilyResearch, WikipediaResearch
 from .integrations.video.comfyui import ComfyUIAdapter
 from .integrations.video.draft import DraftAdapter
@@ -52,6 +53,7 @@ class Services:
         self.transport = transport
         self.groq = GroqClient(self.secrets, self.usage, transport)
         self.fish = FishAudioClient(self.secrets, self.usage, transport)
+        self.kokoro = KokoroTTS(config.data_dir / "models" / "kokoro", self.usage, transport)
         self.wikipedia = WikipediaResearch(self.usage, transport)
         self.tavily = TavilyResearch(self.secrets, self.usage, transport)
         self.ffmpeg = ffmpeg or FFmpeg()

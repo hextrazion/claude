@@ -1,6 +1,6 @@
-import { useState, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { BookOpen, Check, KeyRound, RefreshCw, RotateCcw, Search, SlidersHorizontal, Trash2, Upload } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { BookOpen, Check, KeyRound, Play, RefreshCw, RotateCcw, Search, SlidersHorizontal, Trash2, Upload } from "lucide-react";
 import { api } from "../lib/api";
 import { useAction, useSaveSettings, useSettings } from "../lib/hooks";
 import type { Health, Integration, Workflow } from "../lib/types";
@@ -19,8 +19,9 @@ export default function Integrations() {
       {isLoading ? <Progress /> : (
         <div className="grid cols-2">
           {by.groq && <IntegrationCard i={by.groq}><GroqModels /></IntegrationCard>}
-          {by.fish_audio && <IntegrationCard i={by.fish_audio}><FishVoices /></IntegrationCard>}
+          {by.kokoro && <IntegrationCard i={by.kokoro}><FreeVoice /></IntegrationCard>}
           {by.comfyui && <div style={{ gridColumn: "1 / -1" }}><IntegrationCard i={by.comfyui}><ComfySection /></IntegrationCard></div>}
+          {by.fish_audio && <IntegrationCard i={by.fish_audio}><FishVoices /></IntegrationCard>}
           {by.research && <IntegrationCard i={by.research}><ResearchSection /></IntegrationCard>}
           {by.ffmpeg && <IntegrationCard i={by.ffmpeg}><FfmpegHelp /></IntegrationCard>}
           {by.storage && <IntegrationCard i={by.storage}><StorageSection i={by.storage} /></IntegrationCard>}
@@ -116,6 +117,74 @@ function GroqModels() {
   );
 }
 
+type LocalVoice = { id: string; name: string; accent: string; gender: string; label: string; recommended: boolean };
+type VoiceStatus = { installed: boolean; download_mb: number; download: { status: string; received: number; total: number; error: string | null } };
+
+function FreeVoice() {
+  const { data: s } = useSettings();
+  const save = useSaveSettings();
+  const qc = useQueryClient();
+  const { data: st } = useQuery({
+    queryKey: ["kokoro-status"],
+    queryFn: () => api.get<VoiceStatus>("/integrations/kokoro/status"),
+    refetchInterval: (q) => (q.state.data?.download.status === "downloading" ? 1000 : false),
+  });
+  const { data: voices } = useQuery({ queryKey: ["kokoro-voices", st?.installed], queryFn: () => api.get<{ voices: LocalVoice[] }>("/integrations/kokoro/voices") });
+  const download = useAction(() => api.post<VoiceStatus>("/integrations/kokoro/download"), { invalidate: [["kokoro-status"]] });
+  const [preview, setPreview] = useState<string | null>(null);
+  const previewMut = useAction((voice: string) => api.post<{ url: string }>("/integrations/kokoro/preview", { voice, speed: s?.narration.speed ?? 1 }));
+  useEffect(() => {
+    if (st?.installed) qc.invalidateQueries({ queryKey: ["integrations"] });
+  }, [st?.installed, qc]);
+  if (!s) return null;
+  const n = s.narration;
+  const active = n.provider === "kokoro";
+  const dl = st?.download;
+  const frac = dl && dl.total ? Math.min(1, dl.received / dl.total) : null;
+  return (
+    <div className="stack">
+      {!active && (
+        <Note tone="warn" title="Narration currently uses Fish Audio (paid).">
+          <button className="btn sm primary" style={{ marginTop: 6 }} onClick={() => save.mutate({ narration: { provider: "kokoro" } })}>Use the free voice instead</button>
+        </Note>
+      )}
+      {st && !st.installed && (
+        dl?.status === "downloading" ? (
+          <div className="stack tight">
+            <div className="small">Downloading the voice model… {frac != null ? `${Math.round(frac * 100)}%` : ""}</div>
+            <Progress value={frac} />
+          </div>
+        ) : (
+          <div className="stack tight">
+            {dl?.status === "error" && <Note tone="err">{dl.error}</Note>}
+            <button className="btn primary" onClick={() => download.mutate()}>Download free voice ({st.download_mb} MB, one time)</button>
+            <div className="tiny faint">Or just start a video: it downloads automatically the first time narration is needed.</div>
+          </div>
+        )
+      )}
+      <div className="grid cols-2">
+        <Field label="Voice">
+          <select className="select" value={n.kokoro_voice} onChange={(e) => { setPreview(null); save.mutate({ narration: { kokoro_voice: e.target.value } }); }}>
+            {(voices?.voices ?? []).map((v) => <option key={v.id} value={v.id}>{v.label}{v.recommended ? " ★" : ""}</option>)}
+          </select>
+        </Field>
+        <Field label="Speed">
+          <select className="select" value={String(n.speed)} onChange={(e) => { setPreview(null); save.mutate({ narration: { speed: Number(e.target.value) } }); }}>
+            {[0.9, 0.95, 1, 1.05, 1.1, 1.15, 1.2].map((x) => <option key={x} value={String(x)}>{x === 1 ? "Normal" : `${x}×`}</option>)}
+          </select>
+        </Field>
+      </div>
+      <div className="row wrap">
+        <button className="btn sm" disabled={!st?.installed || previewMut.isPending} onClick={() => previewMut.mutate(n.kokoro_voice, { onSuccess: (r) => setPreview(r.url) })}>
+          {previewMut.isPending ? <Spinner size={13} /> : <Play size={13} />} Preview voice
+        </button>
+        {preview && <audio key={preview} src={preview} controls autoPlay style={{ height: 32 }} />}
+      </div>
+      <div className="tiny faint">★ = clearest voices. Free and private: generated on your CPU, so it never slows video generation on the GPU.</div>
+    </div>
+  );
+}
+
 type Voice = { id: string; title: string; description: string; languages: string[]; tags: string[]; samples: string[] };
 
 function FishVoices() {
@@ -125,6 +194,10 @@ function FishVoices() {
   if (!s) return null;
   return (
     <div className="stack">
+      {s.narration.provider !== "fish_audio" ? (
+        <div className="small muted">Not in use. Fish Audio's API needs paid API credit; the free voice above is used instead.
+          {" "}<button className="details-toggle" onClick={() => save.mutate({ narration: { provider: "fish_audio" } })}>Use Fish Audio</button></div>
+      ) : <Note tone="info">Narration uses Fish Audio (paid API credit).</Note>}
       <div className="grid cols-2">
         <Field label="Narration voice">
           <div className="row">
@@ -192,10 +265,13 @@ function ComfySection() {
   const { data: wf } = useQuery({ queryKey: ["workflows"], queryFn: () => api.get<{ workflows: Workflow[] }>("/workflows") });
   const [url, setUrl] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
+  const [detected, setDetected] = useState<{ changed: boolean; reason: string | null; video_workflow: string } | null>(null);
+  const detect = useAction(() => api.post<{ changed: boolean; reason: string | null; video_workflow: string }>("/integrations/comfyui/autodetect"),
+    { invalidate: [["settings"], ["integrations"], ["workflows"]] });
   if (!s) return null;
   const g = s.generation;
   const workflows = wf?.workflows ?? [];
-  const videoWfs = workflows.filter((w) => w.kind === "video");
+  const videoWfs = workflows.filter((w) => w.kind === "video").sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100));
   const imageWfs = workflows.filter((w) => w.kind === "image");
   return (
     <div className="stack">
@@ -229,6 +305,15 @@ function ComfySection() {
           </select>
         </Field>
       </div>
+      <div className="row wrap">
+        <button className="btn primary" disabled={detect.isPending} onClick={() => detect.mutate(undefined, { onSuccess: setDetected })}>
+          {detect.isPending ? <Spinner size={14} /> : <Search size={14} />} Auto-detect my model
+        </button>
+        <span className="small muted">Checks which models (MiniMax H3, Wan…) your ComfyUI has, finds their files, and selects the best one.</span>
+      </div>
+      {detected && (detected.reason
+        ? <Note tone="warn">{detected.reason}</Note>
+        : <Note tone="ok">Using {workflows.find((w) => w.name === detected.video_workflow)?.label ?? detected.video_workflow}.</Note>)}
       <div className="row between">
         <div className="section-title">Workflows</div>
         <button className="btn sm" onClick={() => setImporting(true)}><Upload size={13} /> Import from ComfyUI</button>
@@ -241,9 +326,18 @@ function ComfySection() {
   );
 }
 
-function frameRule(m?: number) {
-  return m && m > 1 ? `${m}n+1 frames` : "any frame count";
+function frameRule(m?: number, offset = 1) {
+  return m && m > 1 ? `${m}n+${offset} frames` : "any frame count";
 }
+
+const FRAME_RULES: { label: string; m: number; offset: number }[] = [
+  { label: "Any frame count", m: 1, offset: 1 },
+  { label: "4n+1 (Wan)", m: 4, offset: 1 },
+  { label: "8n+1 (LTX)", m: 8, offset: 1 },
+  { label: "17n+5 (MiniMax H3)", m: 17, offset: 5 },
+  { label: "2n+1", m: 2, offset: 1 },
+  { label: "16n+1", m: 16, offset: 1 },
+];
 
 function WorkflowRow({ w, active }: { w: Workflow; active: boolean }) {
   const [result, setResult] = useState<Health | null>(null);
@@ -265,7 +359,7 @@ function WorkflowRow({ w, active }: { w: Workflow; active: boolean }) {
           {d.width && (
             <span className="tiny faint">
               {d.width}×{d.height} · {d.fps} fps · up to {d.max_frames} frames
-              {w.kind === "video" && <> · {bySeconds ? "length set in seconds" : frameRule(d.frame_multiple)}</>}
+              {w.kind === "video" && <> · {bySeconds ? "length set in seconds" : frameRule(d.frame_multiple, d.frame_offset ?? 1)}</>}
             </span>
           )}
         </div>
@@ -294,10 +388,12 @@ function FrameSettings({ w, onClose }: { w: Workflow; onClose: () => void }) {
   const d = w.defaults ?? {};
   const [v, setV] = useState({
     width: d.width ?? 704, height: d.height ?? 1280, fps: d.fps ?? 24, max_frames: d.max_frames ?? 121, frame_multiple: d.frame_multiple ?? 1,
+    frame_offset: d.frame_offset ?? 1,
   });
   const save = useAction(() => api.patch(`/workflows/${w.name}`, { defaults: v }), { invalidate: [["workflows"]], success: "Frame settings saved" });
   const set = (k: keyof typeof v) => (n: number) => setV({ ...v, [k]: Math.max(1, Math.round(n)) });
-  const validMax = v.frame_multiple <= 1 || (v.max_frames - 1) % v.frame_multiple === 0;
+  const validMax = v.frame_multiple <= 1 || (v.max_frames - v.frame_offset) % v.frame_multiple === 0;
+  const capped = v.max_frames - ((((v.max_frames - v.frame_offset) % v.frame_multiple) + v.frame_multiple) % v.frame_multiple);
   return (
     <Modal title={`Frame settings · ${w.label}`} onClose={onClose} footer={<>
       <button className="btn" onClick={onClose}>Cancel</button>
@@ -313,17 +409,17 @@ function FrameSettings({ w, onClose }: { w: Workflow; onClose: () => void }) {
         <Field label="Height" hint="Even number"><NumberInput value={v.height} min={64} max={4096} step={2} onChange={set("height")} /></Field>
         <Field label="Frames per second"><NumberInput value={v.fps} min={1} max={60} onChange={set("fps")} /></Field>
         <Field label="Max frames per clip"><NumberInput value={v.max_frames} min={1} max={2000} onChange={set("max_frames")} /></Field>
-        <Field label="Frame-count rule" hint="Wan: 4n+1 · LTX: 8n+1. Use “any” if the model accepts any count.">
-          <select className="select" value={v.frame_multiple} onChange={(e) => setV({ ...v, frame_multiple: Number(e.target.value) })}>
-            <option value={1}>Any frame count</option>
-            <option value={2}>2n+1</option>
-            <option value={4}>4n+1</option>
-            <option value={8}>8n+1</option>
-            <option value={16}>16n+1</option>
+        <Field label="Frame-count rule" hint="Use the rule your model needs; “any” if it accepts any count.">
+          <select className="select" value={`${v.frame_multiple}:${v.frame_offset}`}
+            onChange={(e) => { const [m, o] = e.target.value.split(":").map(Number); setV({ ...v, frame_multiple: m, frame_offset: o }); }}>
+            {FRAME_RULES.map((r) => <option key={r.label} value={`${r.m}:${r.offset}`}>{r.label}</option>)}
+            {!FRAME_RULES.some((r) => r.m === v.frame_multiple && r.offset === v.frame_offset) && (
+              <option value={`${v.frame_multiple}:${v.frame_offset}`}>{frameRule(v.frame_multiple, v.frame_offset)}</option>
+            )}
           </select>
         </Field>
       </div>
-      {!validMax && <Note tone="warn">{v.max_frames} doesn't fit {frameRule(v.frame_multiple)}; clips will be capped at {Math.floor((v.max_frames - 1) / v.frame_multiple) * v.frame_multiple + 1} frames.</Note>}
+      {!validMax && <Note tone="warn">{v.max_frames} doesn't fit {frameRule(v.frame_multiple, v.frame_offset)}; clips will be capped at {capped} frames.</Note>}
     </Modal>
   );
 }

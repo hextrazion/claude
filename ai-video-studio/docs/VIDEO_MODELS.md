@@ -21,19 +21,25 @@ Status: **researched, not yet benchmarked on your PC.** The development environm
 
 **LTX-2.3 GGUF** is the realistic LTX option today on 12 GB: community workflows labelled “12 GB VRAM” use Q4_K_M dev GGUF plus a distilled LoRA. Treat it as an experiment against Wan, not a guaranteed upgrade.
 
-## MiniMax H3 (open weights, Aug 2026)
+## MiniMax H3 (built in)
 
-Usable through ComfyUI's native H3 support. Use the **FL2VA** checkpoint (text-to-video / first-last frame); Ref2VA isn't needed.
+The studio ships three H3 workflows rebuilt from ComfyUI's official *MiniMax H3* template (FL2VA checkpoint, `res_multistep` sampler, `simple` scheduler, frame counts on the model's 17n+5 grid at 24 fps):
 
-- **Licence:** MiniMax H3 Community License. Users in the US, UK, EU and South Korea must apply to MiniMax before use. Check this before publishing anything made with it.
-- **12 GB:** community reports say it runs with the pruned INT8 file (~21 GB on disk, offloaded) or GGUF Q3/Q4 (needs the ComfyUI-GGUF nodes), 32 GB system RAM, at about 0.4 MP (≈480×832), roughly 6 min per clip. One RTX 5090 test measured ~32 GB peak VRAM, so 12 GB is unconfirmed. Skip NVFP4 files (no FP4 hardware on the 4070 Ti).
-- **Output:** open weights top out at 768p; the studio scales to 1080×1920. H3's own generated audio is discarded (the Fish Audio narration is used).
+| Workflow | Steps | Use |
+|---|---|---|
+| MiniMax H3 — text to video (fast, 8-step turbo) | 8 | Default when the turbo LoRA (`minimax_h3_fl2v_turbo_8step…`) is installed: ~2.5× faster |
+| MiniMax H3 — text to video (best quality) | 20 | Used when the turbo LoRA is not installed |
+| MiniMax H3 — image to video | 20 | Scenes with a source image (first frame) |
 
-Setup: run the ComfyUI H3 template once by hand → **Export (API)** → Integrations → **Import from ComfyUI** → select it as the text-to-video workflow → **Check** → generate one scene and compare with Wan. The importer handles models that take clip length in seconds instead of frames, keeps integer inputs as integers, and the scene planner gets H3-specific prompting advice automatically (it recognises H3 from the workflow's node types, whatever you name it).
+- **Your files are found automatically.** Each workflow describes the files it needs (video model, text encoder, video VAE, optional turbo LoRA) and matches them against what your ComfyUI lists, so INT8, FP8, BF16 or other variants work without editing anything. A `.gguf` model is used through the ComfyUI-GGUF loader nodes if they are installed.
+- **Default size:** 480×864 (9:16, ~0.4 MP), 24 fps, up to 124 frames (~5 s) per clip, which suits a 12 GB card. Raise it under **Edit frames** if you have headroom (H3 was trained on ~5–15 s clips).
+- **Audio:** H3 can generate sound; the studio skips decoding it (saves time and VRAM) and uses your narration instead.
+- **Licence:** MiniMax H3 Community License. Users in the US, UK, EU and South Korea must apply to MiniMax before use.
+- **12 GB reality check:** community reports say H3 runs on 12 GB with INT8/FP8 or GGUF Q3/Q4 files and 32 GB of system RAM, at several minutes per clip. If a clip fails with "GPU ran out of memory", lower the size or frames under Edit frames, or use a smaller quant.
 
 ## Frame settings for any workflow
 
-Each video workflow has **Edit frames** on the Integrations page: width, height, fps, max frames per clip and the frame-count rule (any, 2n+1, 4n+1, 8n+1, 16n+1). The importer guesses the rule (LTX → 8n+1, Wan → 4n+1, otherwise the strictest rule the exported frame count already satisfies). If ComfyUI rejects a frame count, change the rule there. Requested frame counts are rounded **up** to the rule (capped at the maximum), so clips are never shorter than needed because of rounding. Editing a bundled workflow saves a customised copy; the reset button restores the original.
+Each video workflow has **Edit frames** on the Integrations page: width, height, fps, max frames per clip and the frame-count rule (any, 4n+1 Wan, 8n+1 LTX, 17n+5 MiniMax H3, …). The importer guesses the rule (H3 → 17n+5, LTX → 8n+1, Wan → 4n+1, otherwise the strictest rule the exported frame count already satisfies). If ComfyUI rejects a frame count, change the rule there. Requested frame counts are rounded **up** to the rule (capped at the maximum), so clips are never shorter than needed because of rounding. Editing a bundled workflow saves a customised copy; the reset button restores the original.
 
 ## Installing the default (Wan 2.2 TI2V‑5B)
 

@@ -22,7 +22,10 @@ router = APIRouter()
 INTEGRATIONS = {
     "groq": {"label": "Groq", "kind": "api", "purpose": "Ideas, research planning, scripts, scene plans",
              "docs": groq.DOCS_URL, "keys_url": groq.KEYS_URL, "secret": "groq"},
-    "fish_audio": {"label": "Fish Audio", "kind": "api", "purpose": "Narration (text-to-speech)",
+    "kokoro": {"label": "Narration voice (free, on this PC)", "kind": "local",
+               "purpose": "Kokoro text-to-speech: no account or key, runs on your CPU",
+               "docs": "https://huggingface.co/hexgrad/Kokoro-82M", "secret": None},
+    "fish_audio": {"label": "Fish Audio (optional, paid)", "kind": "api", "purpose": "Cloud narration voices; needs API credit",
                    "docs": fish_audio.DOCS_URL, "keys_url": fish_audio.KEYS_URL, "secret": "fish_audio"},
     "comfyui": {"label": "ComfyUI (local video engine)", "kind": "local", "purpose": "Video and image generation on your GPU",
                 "docs": "https://docs.comfy.org", "secret": None},
@@ -65,6 +68,9 @@ def _describe(s: Services, name: str) -> dict:
     if name == "groq":
         out["config"] = {"model_quality": st.text.model_quality, "model_fast": st.text.model_fast}
         out["rate_limits"] = s.usage.rate_limits.get("groq")
+    elif name == "kokoro":
+        out["config"] = {"provider": st.narration.provider, "voice": st.narration.kokoro_voice,
+                         "speed": st.narration.speed, **s.kokoro.status()}
     elif name == "fish_audio":
         out["config"] = {"voice_id": st.narration.voice_id, "voice_name": st.narration.voice_name, "model": st.narration.model,
                          "known_models": fish_audio.KNOWN_MODELS}
@@ -98,8 +104,12 @@ async def run_test(s: Services, name: str) -> dict:
             if missing:
                 result = HealthResult("warning", f"Connected, but configured model(s) not available: {', '.join(missing)}. "
                                       "Pick available models below.", info=result.info)
+    elif name == "kokoro":
+        result = await s.kokoro.test()
     elif name == "fish_audio":
         result = await s.fish.test()
+        if s.settings.get().narration.provider != "fish_audio" and result.status == "not_configured":
+            result = HealthResult("not_configured", "Optional. Narration uses the free local voice.")
         if result.status == "ok" and not s.settings.get().narration.voice_id:
             result = HealthResult("warning", result.message + " — choose a narration voice.", info=result.info)
     elif name == "comfyui":
@@ -180,6 +190,53 @@ async def groq_models(s: Services = Depends(services)):
     return await s.groq.list_models()
 
 
+class PreviewIn(BaseModel):
+    voice: str = Field(..., pattern=r"^[a-z]{2}_[a-z0-9]{1,24}$")
+    speed: float = Field(1.0, ge=0.5, le=2.0)
+
+
+@router.get("/integrations/kokoro/status")
+def kokoro_status(s: Services = Depends(services)):
+    return s.kokoro.status()
+
+
+@router.post("/integrations/kokoro/download")
+def kokoro_download(s: Services = Depends(services)):
+    return s.kokoro.start_download()
+
+
+@router.get("/integrations/kokoro/voices")
+def kokoro_voices(s: Services = Depends(services)):
+    return {"installed": s.kokoro.installed(), "voices": s.kokoro.voices()}
+
+
+PREVIEW_TEXT = ("Why is the sky blue, but sunsets are orange? Sunlight looks white, "
+                "but it is really a mix of every colour.")
+
+
+@router.post("/integrations/kokoro/preview")
+async def kokoro_preview(body: PreviewIn, s: Services = Depends(services)):
+    if not s.kokoro.installed():
+        raise ValidationFailed("Download the voice model first.")
+    name = f"voice_preview_{body.voice}_{int(round(body.speed * 100))}.wav"
+    out = s.config.cache_dir / name
+    if not out.is_file():
+        await s.kokoro.synthesize(PREVIEW_TEXT, out, voice=body.voice, speed=body.speed)
+    return {"url": f"/api/voice-preview/{name}"}
+
+
+@router.get("/voice-preview/{name}")
+def voice_preview_file(name: str, s: Services = Depends(services)):
+    from fastapi.responses import FileResponse
+
+    from ..safety import safe_join
+
+    path = safe_join(s.config.cache_dir, name)
+    if not name.startswith("voice_preview_") or path.suffix != ".wav" or not path.is_file():
+        raise ValidationFailed("Preview not found.")
+    return FileResponse(path, media_type="audio/wav")
+
+
 @router.get("/integrations/fish_audio/voices")
 async def fish_voices(mine: bool = False, q: str = "", page: int = 1, s: Services = Depends(services)):
     return await s.fish.list_voices(mine=mine, query=q, page=page)
@@ -208,7 +265,7 @@ def patch_workflow(name: str, body: WorkflowPatch, s: Services = Depends(service
     if body.label is not None:
         wf["label"] = body.label
     if body.defaults is not None:
-        allowed = {"width", "height", "fps", "max_frames", "frame_multiple"}
+        allowed = {"width", "height", "fps", "max_frames", "frame_multiple", "frame_offset"}
         for k, v in body.defaults.items():
             if k not in allowed or not isinstance(v, int) or isinstance(v, bool) or v <= 0 or v > 8192:
                 raise ValidationFailed(f"Invalid default '{k}'.")
@@ -234,6 +291,46 @@ def delete_workflow(name: str, s: Services = Depends(services)):
     if not s.workflows.delete_user(name):
         raise ValidationFailed("Only imported or customised workflows can be removed.")
     return {"ok": True}
+
+
+@router.post("/integrations/comfyui/autodetect")
+async def comfy_autodetect(s: Services = Depends(services)):
+    return await autodetect_workflows(s, force=True)
+
+
+async def autodetect_workflows(s: Services, *, force: bool) -> dict:
+    """Pick the best workflows whose nodes and model files exist in the user's ComfyUI.
+
+    Runs at start-up (only when the current choice is not ready) and from the
+    "Auto-detect" button. Never changes anything when ComfyUI is unreachable."""
+    adapter = s.comfyui()
+    g = s.settings.get().generation
+    current = await adapter.check_workflow(g.video_workflow)
+    if current.status == "unavailable":
+        return {"changed": False, "reason": "ComfyUI is not reachable.", "video_workflow": g.video_workflow}
+    if current.status == "ok" and not force:
+        return {"changed": False, "reason": "Current workflow is ready.", "video_workflow": g.video_workflow}
+    wfs = sorted((w for w in s.workflows.list() if w.get("kind") == "video" and not w.get("error")),
+                 key=lambda w: (w.get("priority", 100), w["name"]))
+    ready: dict[str, list[str]] = {"t2v": [], "i2v": []}
+    for w in wfs:
+        res = await adapter.check_workflow(w["name"])
+        if res.status == "ok":
+            ready.setdefault(w.get("mode", "t2v"), []).append(w["name"])
+    patch: dict = {}
+    if ready["t2v"] and ready["t2v"][0] != g.video_workflow:
+        patch["video_workflow"] = ready["t2v"][0]
+    if ready["i2v"] and ready["i2v"][0] != g.i2v_workflow:
+        patch["i2v_workflow"] = ready["i2v"][0]
+    if patch:
+        s.settings.update({"generation": patch})
+        names = {w["name"]: w["label"] for w in wfs}
+        s.activity.add("Video model auto-detected: " + ", ".join(names.get(v, v) for v in patch.values()),
+                       category="integrations")
+    return {
+        "changed": bool(patch), "ready": ready, "video_workflow": patch.get("video_workflow", g.video_workflow),
+        "reason": None if ready["t2v"] else "No complete video workflow found in your ComfyUI. Press Check on a workflow to see what is missing.",
+    }
 
 
 @router.post("/workflows/{name}/check")

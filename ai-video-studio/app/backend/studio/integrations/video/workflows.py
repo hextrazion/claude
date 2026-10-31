@@ -58,6 +58,9 @@ class WorkflowLibrary:
                 "defaults": wf.get("defaults", {}),
                 "requirements": wf.get("requirements", {}),
                 "bindings": wf.get("bindings", {}),
+                "family": wf.get("family", ""),
+                "priority": wf.get("priority", 100),
+                "model_slots": [{"label": m.get("label", ""), "input": m.get("input")} for m in wf.get("model_slots") or []],
                 "user": path.parent == self.user_dir,
                 "overrides_bundled": path.parent == self.user_dir and (self.bundled_dir / f"{name}.json").is_file(),
             })
@@ -187,27 +190,34 @@ def detect_bindings(graph: dict) -> tuple[dict, list[str]]:
     return b, warnings
 
 
-def infer_frame_multiple(graph: dict, frames: int | None) -> int:
-    """Frame-count rule (frames = m*n + 1) for a graph.
+def infer_frame_rule(graph: dict, frames: int | None) -> tuple[int, int]:
+    """Frame-count rule (frames = m*n + offset) for a graph.
 
-    Known families first (LTX needs 8n+1, Wan 4n+1); otherwise the largest
-    rule the exported frame count already satisfies, which keeps every
-    snapped count in the same family as one the workflow is known to accept."""
+    Known families first (MiniMax H3 needs 17n+5, LTX 8n+1, Wan 4n+1);
+    otherwise the largest m*n+1 rule the exported frame count already
+    satisfies, which keeps every snapped count in the same family as one the
+    workflow is known to accept."""
     types = " ".join(str(n.get("class_type", "")).lower() for n in graph.values())
+    if "minimaxh3" in types:
+        return 17, 5
     if "ltx" in types:
-        return 8
+        return 8, 1
     if "wan" in types:
-        return 4
+        return 4, 1
     if frames and frames > 1:
         for m in (8, 4, 2):
             if (frames - 1) % m == 0:
-                return m
-    return 1
+                return m, 1
+    return 1, 1
+
+
+def infer_frame_multiple(graph: dict, frames: int | None) -> int:
+    return infer_frame_rule(graph, frames)[0]
 
 
 def build_imported(name: str, label: str, kind: str, mode: str, graph: dict, defaults: dict | None = None) -> dict:
     bindings, warnings = detect_bindings(graph)
-    d = {"width": 704, "height": 1280, "fps": 24, "max_frames": 121, "frame_multiple": 1}
+    d = {"width": 704, "height": 1280, "fps": 24, "max_frames": 121, "frame_multiple": 1, "frame_offset": 1}
 
     def first(key):
         t = bindings[key][0]
@@ -220,9 +230,10 @@ def build_imported(name: str, label: str, kind: str, mode: str, graph: dict, def
         d["max_frames"] = int(first("frames"))
     elif bindings.get("seconds"):
         d["max_frames"] = int(round(float(first("seconds")) * d["fps"])) + 1
-    d["frame_multiple"] = infer_frame_multiple(graph, d["max_frames"] if bindings.get("frames") else None)
+    # A frame-count rule only matters when the app sets the frame count itself.
+    d["frame_multiple"], d["frame_offset"] = infer_frame_rule(graph, d["max_frames"]) if bindings.get("frames") else (1, 1)
     if bindings.get("frames"):
-        rule = f"{d['frame_multiple']}n+1" if d["frame_multiple"] > 1 else "any number"
+        rule = f"{d['frame_multiple']}n+{d['frame_offset']}" if d["frame_multiple"] > 1 else "any number"
         warnings.append(
             f"Frame counts will be snapped to {rule} frames (max {d['max_frames']}). If ComfyUI rejects a frame "
             "count, change the rule with Edit frames."

@@ -14,7 +14,7 @@ Environment: Linux container, Python 3.13, Node 22, FFmpeg 6.1, **no GPU, no Win
 
 | Suite | Result |
 |---|---|
-| Backend (`pytest`, 57 tests) | **57 passed** |
+| Backend (`pytest`, 72 tests) | **72 passed** (one runs the real Kokoro voice model) |
 | Frontend (`vitest`, 9 tests) | **9 passed** |
 | TypeScript typecheck + production build | Passed |
 | App start-up (fresh venv from `requirements.txt`, `python -m studio`) | Starts, serves UI and API; start-up health checks report each service honestly (not configured / unreachable / OK) |
@@ -29,12 +29,15 @@ What the backend tests cover:
 - **Media (real FFmpeg):** silence-snapped alignment, transcript alignment, scene spans, narration repair, caption chunking/SRT/ASS, segment planning; **assembly of clips with different sizes, frame rates and lengths into a 9:16 MP4 with burned captions and fades**; music looping and ducking; QC detects wrong size, missing audio, missing captions, empty files.
 - **End-to-end (HTTP API, worker running, mocked Groq/Fish, draft-card footage, real FFmpeg):** idea generation → approve → script (supervised gate) → claim check (never "verified" without sources) → edit + approve → scene plan with narration repair → no footage before plan approval → clips + narration → automatic assembly → QC → files on disk → review → single-scene regeneration leaves other clips untouched and invalidates the export. A second test confirms a Fish Audio credit failure is not retried and preserves the approved script and all clips.
 
+Added since the first release: MiniMax H3 workflows (model-file matching for INT8/FP8/GGUF variants, the 17n+5 frame grid, turbo LoRA wiring, auto-detection order H3 turbo → H3 → Wan, settings untouched when ComfyUI is off), migration of old settings to the free voice, the Kokoro voice (WAV output, voice list, preview endpoint, truncated-download handling, a full idea→MP4 run with it), and a check that the packaged app makes no telemetry calls.
+
 ## Not tested (needs your PC or accounts)
 
 | Item | Why not | How to verify |
 |---|---|---|
 | Real Groq calls | No key/network in the build environment | Integrations → Groq → Save key → Test; generate one idea batch |
-| Real Fish Audio narration | No key/credit | Choose a voice, generate narration for a project |
+| Real Fish Audio narration (optional) | No key/credit | Only if you switch to Fish Audio |
+| MiniMax H3 generating on your RTX 4070 Ti | No GPU here | Auto-detect, then generate one scene |
 | ComfyUI + Wan 2.2 5B on the RTX 4070 Ti (speed, VRAM, quality) | No GPU | Follow the benchmark in VIDEO_MODELS.md |
 | Bundled Wan workflow node names vs your ComfyUI version | No ComfyUI | Integrations → workflow **Check**; re-import from ComfyUI if it reports mismatches |
 | Windows-specific behaviour (start.bat, Credential Manager, `os.startfile`, fonts, gyan.dev FFmpeg) | Linux container | Run `scripts\start.bat`; on the Integrations page the key source should read "OS credential store" |

@@ -45,3 +45,12 @@ export function bytes(n?: number | null): string {
 export function titleCase(s: string): string {
   return s.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 }
+
+/** "bf_emma" -> "Emma (British female)" for the free Kokoro voices. */
+export function voiceLabel(id?: string | null): string {
+  if (!id) return "—";
+  const [prefix, name = ""] = id.split("_");
+  const accent = { a: "American", b: "British" }[prefix?.[0] ?? ""] ?? "";
+  const gender = { f: "female", m: "male" }[prefix?.[1] ?? ""] ?? "";
+  return `${name.charAt(0).toUpperCase()}${name.slice(1)}${accent || gender ? ` (${[accent, gender].filter(Boolean).join(" ")})` : ""}`;
+}

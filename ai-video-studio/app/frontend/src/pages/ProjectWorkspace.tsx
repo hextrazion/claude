@@ -10,7 +10,7 @@ import { useAction } from "../lib/hooks";
 import type { Claim, Project, Scene, Segment } from "../lib/types";
 import { Badge, Card, ConfirmDialog, Details, Empty, ErrorNote, Field, Note, NumberInput, Progress, Spinner, StatusBadge, Toggle } from "../components/ui";
 import { JobTable } from "../components/JobTable";
-import { dateTime, duration, timeAgo, titleCase } from "../lib/format";
+import { dateTime, duration, timeAgo, titleCase, voiceLabel } from "../lib/format";
 
 const STAGES = [
   ["research", "Research"], ["script", "Script"], ["scene_plan", "Scenes"], ["production", "Footage"],
@@ -378,14 +378,17 @@ function NarrationTab({ p }: { p: Project }) {
           ) : job ? <Empty icon={<Spinner size={22} />} title="Generating narration…" /> : <Empty icon={<Mic size={26} />} title="No narration yet" />}
           <div className="row">
             <button className="btn primary" disabled={!!job || !p.script} onClick={() => gen.mutate()}><Mic size={14} /> {n ? "Regenerate narration" : "Generate narration"}</button>
-            {!voice.voice_id && <span className="small" style={{ color: "var(--warn)" }}>No voice selected — choose one in Integrations → Fish Audio or Project settings.</span>}
+            {voice.provider === "fish_audio" && !voice.voice_id && <span className="small" style={{ color: "var(--warn)" }}>No Fish Audio voice selected — choose one in Integrations or Project settings.</span>}
           </div>
         </div>
       </Card>
       <Card title="Voice for this project">
         <dl className="kv">
-          <dt>Voice</dt><dd>{voice.voice_name || voice.voice_id || "Not set"}</dd>
-          <dt>Model</dt><dd>{voice.model}</dd>
+          {voice.provider === "kokoro" ? (
+            <><dt>Voice</dt><dd>{voiceLabel(voice.kokoro_voice)}</dd><dt>Engine</dt><dd>Free local voice (Kokoro)</dd></>
+          ) : (
+            <><dt>Voice</dt><dd>{voice.voice_name || voice.voice_id || "Not set"}</dd><dt>Engine</dt><dd>Fish Audio ({voice.model})</dd></>
+          )}
           <dt>Speed</dt><dd>{voice.speed}×</dd>
         </dl>
         <div className="tiny faint" style={{ marginTop: 10 }}>Change it under Project settings. Narration always uses the scenes' narration text, in order.</div>
@@ -536,14 +539,16 @@ function ResearchTab({ p }: { p: Project }) {
 // ---------------------------------------------------------------- project settings
 function ProjectSettings({ p }: { p: Project }) {
   const e = p.effective;
+  const { data: voices } = useQuery({ queryKey: ["kokoro-voices"], queryFn: () => api.get<{ voices: { id: string; label: string }[] }>("/integrations/kokoro/voices") });
   const [o, setO] = useState({
     duration_s: e.video.duration_s, voice_id: e.narration.voice_id, voice_name: e.narration.voice_name, speed: e.narration.speed,
+    narrator: e.narration.provider as string, kokoro_voice: e.narration.kokoro_voice as string,
     captions: e.captions.enabled, provider: e.generation.video_provider, transition: e.video.transition, music: e.music.enabled,
   });
   const save = useAction(() => api.patch(`/projects/${p.id}`, {
     overrides: {
       video: { duration_s: o.duration_s, transition: o.transition },
-      narration: { voice_id: o.voice_id, voice_name: o.voice_name, speed: o.speed },
+      narration: { provider: o.narrator, kokoro_voice: o.kokoro_voice, voice_id: o.voice_id, voice_name: o.voice_name, speed: o.speed },
       captions: { enabled: o.captions },
       generation: { video_provider: o.provider },
       music: { enabled: o.music },
@@ -563,8 +568,23 @@ function ProjectSettings({ p }: { p: Project }) {
             <option value="cut">Cut</option><option value="fade">Fade</option><option value="dissolve">Dissolve</option><option value="slideup">Slide up</option>
           </select>
         </Field>
-        <Field label="Voice ID (Fish Audio)"><input className="input mono" value={o.voice_id} onChange={(ev) => setO({ ...o, voice_id: ev.target.value })} /></Field>
-        <Field label="Voice name"><input className="input" value={o.voice_name} onChange={(ev) => setO({ ...o, voice_name: ev.target.value })} /></Field>
+        <Field label="Narration">
+          <select className="select" value={o.narrator} onChange={(ev) => setO({ ...o, narrator: ev.target.value })}>
+            <option value="kokoro">Free voice on this PC</option><option value="fish_audio">Fish Audio (paid)</option>
+          </select>
+        </Field>
+        {o.narrator === "kokoro" ? (
+          <Field label="Voice">
+            <select className="select" value={o.kokoro_voice} onChange={(ev) => setO({ ...o, kokoro_voice: ev.target.value })}>
+              {(voices?.voices ?? [{ id: o.kokoro_voice, label: voiceLabel(o.kokoro_voice) }]).map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+            </select>
+          </Field>
+        ) : (
+          <>
+            <Field label="Voice ID (Fish Audio)"><input className="input mono" value={o.voice_id} onChange={(ev) => setO({ ...o, voice_id: ev.target.value })} /></Field>
+            <Field label="Voice name"><input className="input" value={o.voice_name} onChange={(ev) => setO({ ...o, voice_name: ev.target.value })} /></Field>
+          </>
+        )}
         <Field label="Speech speed"><NumberInput value={o.speed} step={0.05} min={0.5} max={2} onChange={(v) => setO({ ...o, speed: v })} /></Field>
         <Field label="Captions"><Toggle checked={o.captions} onChange={(v) => setO({ ...o, captions: v })} label={o.captions ? "On" : "Off"} /></Field>
         <Field label="Background music"><Toggle checked={o.music} onChange={(v) => setO({ ...o, music: v })} label={o.music ? "On" : "Off"} /></Field>

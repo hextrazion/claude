@@ -65,8 +65,8 @@ class TextSettings(_Section):
 class GenerationSettings(_Section):
     video_provider: Literal["comfyui", "draft"] = "comfyui"
     comfyui_url: str = "http://127.0.0.1:8188"
-    video_workflow: str = "wan22_ti2v_5b_t2v"
-    i2v_workflow: str = "wan22_ti2v_5b_i2v"
+    video_workflow: str = "minimax_h3_t2v_turbo"
+    i2v_workflow: str = "minimax_h3_i2v"
     image_workflow: str = ""
     use_image_stage: bool = False
     style_preset: str = Field(
@@ -93,7 +93,9 @@ class GenerationSettings(_Section):
 
 
 class NarrationSettings(_Section):
-    provider: Literal["fish_audio"] = "fish_audio"
+    # kokoro: free, runs on this PC. fish_audio: paid cloud API (optional).
+    provider: Literal["kokoro", "fish_audio"] = "kokoro"
+    kokoro_voice: str = Field("af_heart", pattern=r"^[a-z]{2}_[a-z0-9]{1,24}$")
     voice_id: str = ""
     voice_name: str = ""
     model: str = "s2-pro"
@@ -227,7 +229,11 @@ class PricingSettings(_Section):
     fish_usd_per_m_chars: float = Field(15.0, ge=0)
 
 
+SETTINGS_VERSION = 2
+
+
 class Settings(_Section):
+    settings_version: int = SETTINGS_VERSION
     general: GeneralSettings = GeneralSettings()
     video: VideoSettings = VideoSettings()
     text: TextSettings = TextSettings()
@@ -264,11 +270,14 @@ class SettingsService:
         if self._cache is None:
             row = self.db.query_one("SELECT value FROM settings WHERE key = ?", (self.KEY,))
             stored = loads(row["value"], {}) if row else {}
+            migrated = _migrate(stored) if row else False
             # Unknown/old keys are dropped; invalid stored values fall back to defaults per section.
             try:
                 self._cache = Settings.model_validate(stored)
             except Exception:
                 self._cache = _salvage(stored)
+            if migrated:
+                self._save(self._cache)
         return self._cache
 
     def update(self, patch: dict) -> Settings:
@@ -300,6 +309,24 @@ class SettingsService:
             "ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at",
             (key, dumps(value), utcnow()),
         )
+
+
+def _migrate(stored: dict) -> bool:
+    """Upgrade settings saved by older versions in place. Returns True if changed."""
+    version = stored.get("settings_version", 1)
+    if version >= SETTINGS_VERSION:
+        return False
+    if version < 2:
+        # v2: narration defaults to the free local Kokoro voice; video defaults to MiniMax H3
+        # (the app switches to whatever is actually installed in ComfyUI on start-up).
+        stored.setdefault("narration", {})["provider"] = "kokoro"
+        gen = stored.setdefault("generation", {})
+        if gen.get("video_workflow", "wan22_ti2v_5b_t2v") == "wan22_ti2v_5b_t2v":
+            gen["video_workflow"] = "minimax_h3_t2v_turbo"
+        if gen.get("i2v_workflow", "wan22_ti2v_5b_i2v") == "wan22_ti2v_5b_i2v":
+            gen["i2v_workflow"] = "minimax_h3_i2v"
+    stored["settings_version"] = SETTINGS_VERSION
+    return True
 
 
 def _salvage(stored: dict) -> Settings:

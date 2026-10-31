@@ -58,6 +58,8 @@ class UsageTracker:
             if not rates or input_tokens is None:
                 return None
             return round((input_tokens * rates[0] + (output_tokens or 0) * rates[1]) / 1_000_000, 6)
+        if provider == "kokoro":
+            return 0.0  # runs locally
         if provider == "fish_audio" and characters:
             return round(characters * pricing.fish_usd_per_m_chars / 1_000_000, 6)
         return None

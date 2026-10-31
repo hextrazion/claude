@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import time
 import uuid
 from pathlib import Path
 
@@ -18,6 +19,7 @@ import httpx
 from ...errors import Cancelled, ProviderError, ValidationFailed
 from ..base import HealthResult, network_error, raise_for_status
 from .base import Capabilities, CancelledFn, GenerationRequest, GenerationResult, ProgressFn
+from .models import _choices, resolve_models
 from .workflows import WorkflowLibrary, apply_bindings
 
 log = logging.getLogger(__name__)
@@ -25,6 +27,8 @@ log = logging.getLogger(__name__)
 VIDEO_EXT = {".mp4", ".webm", ".mov", ".mkv", ".gif", ".webp"}
 IMAGE_EXT = {".png", ".jpg", ".jpeg", ".webp"}
 DOCS_URL = "https://docs.comfy.org"
+
+MODEL_EXT = (".safetensors", ".gguf", ".ckpt", ".pt", ".pth", ".bin", ".sft")
 
 _OOM_MARKERS = ("outofmemory", "out of memory", "allocation on device", "cuda error: out of memory")
 
@@ -45,6 +49,7 @@ class ComfyUIAdapter:
         self.transport = transport
         self.client_id = uuid.uuid4().hex
         self._progress: dict[str, tuple[float, str]] = {}
+        self._object_info: tuple[float, dict] | None = None
 
     def _client(self, timeout: float = 30) -> httpx.AsyncClient:
         return httpx.AsyncClient(base_url=self.base_url, timeout=timeout, transport=self.transport)
@@ -96,43 +101,68 @@ class ComfyUIAdapter:
         gpu = info["devices"][0]["name"] if info["devices"] else "no GPU reported"
         return HealthResult("ok", f"Connected to ComfyUI ({gpu}).", info=info)
 
+    async def object_info(self, max_age: float = 60) -> dict:
+        """ComfyUI's node catalogue (includes the installed model file lists). Cached briefly."""
+        now = time.monotonic()
+        if self._object_info and now - self._object_info[0] < max_age:
+            return self._object_info[1]
+        info = (await self._get("/object_info")).json()
+        self._object_info = (now, info)
+        return info
+
+    async def prepared(self, name: str) -> tuple[dict, list[dict]]:
+        """The workflow with model files matched to what is installed, plus the match report."""
+        wf = self.workflows.get(name)
+        if not wf.get("model_slots"):
+            return wf, []
+        return resolve_models(wf, await self.object_info())
+
     async def check_workflow(self, name: str) -> HealthResult:
-        """Verify every node type exists and every model file the graph names is installed."""
+        """Verify every node type exists and every model file the graph needs is installed."""
         try:
-            wf = self.workflows.get(name)
+            self.workflows.get(name)
         except ValidationFailed as exc:
             return HealthResult("error", exc.message)
         try:
-            object_info = (await self._get("/object_info")).json()
+            wf, report = await self.prepared(name)
+            object_info = await self.object_info()
         except ProviderError as exc:
             return HealthResult("unavailable", "ComfyUI is not reachable.", detail=exc.detail)
         missing_nodes, missing_files = [], []
         bound = {(str(t["node"]), t["input"]) for ts in (wf.get("bindings") or {}).values() for t in ts}
+        slotted = {(str(sl["node"]), sl["input"]) for sl in wf.get("model_slots") or []}
         for nid, node in wf["workflow"].items():
             ct = node.get("class_type")
-            spec = object_info.get(ct)
-            if spec is None:
+            if ct not in object_info:
                 missing_nodes.append(ct)
                 continue
-            inputs_spec = {**(spec.get("input", {}).get("required") or {}), **(spec.get("input", {}).get("optional") or {})}
             for inp, value in (node.get("inputs") or {}).items():
-                if (nid, inp) in bound or not isinstance(value, str):
+                if (nid, inp) in bound or (nid, inp) in slotted or not isinstance(value, str):
                     continue
-                s = inputs_spec.get(inp)
-                choices = s[0] if isinstance(s, list) and s and isinstance(s[0], list) else None
-                if choices is not None and value not in choices and value.endswith((".safetensors", ".gguf", ".ckpt", ".pt", ".pth", ".bin")):
+                choices = _choices(object_info, ct, inp)
+                if choices is not None and value not in choices and value.endswith(MODEL_EXT):
                     missing_files.append(f"{value} (for {ct}.{inp})")
+        for r in report:
+            if r["chosen"] is None:
+                hint = ""
+                if not r["gguf_loader_available"]:
+                    hint = " If you downloaded a .gguf version, install the ComfyUI-GGUF custom nodes (ComfyUI Manager → search 'GGUF') and restart ComfyUI."
+                missing_files.append(f"{r['label']}: no matching file found (expected something like {r['expected']}).{hint}")
+        using = {r["label"]: r["chosen"] for r in report if r["chosen"]}
+        info = {"missing_nodes": missing_nodes, "missing_files": missing_files, "using": using}
         if missing_nodes or missing_files:
             parts = []
             if missing_nodes:
                 parts.append("Missing node types: " + ", ".join(sorted(set(missing_nodes))) +
-                             ". Update ComfyUI or install the custom nodes this workflow needs.")
+                             ". Update ComfyUI (Manager → Update ComfyUI) or install the custom nodes this workflow needs.")
             if missing_files:
-                parts.append("Missing model files: " + "; ".join(missing_files) +
-                             ". Download them into ComfyUI's models folders (see docs/VIDEO_MODELS.md).")
-            return HealthResult("error", "Workflow is not ready.", detail="\n".join(parts),
-                                info={"missing_nodes": missing_nodes, "missing_files": missing_files})
-        return HealthResult("ok", f"Workflow '{wf.get('label', name)}' is ready: all nodes and model files found.")
+                parts.append("Missing model files:\n- " + "\n- ".join(missing_files) +
+                             "\nDownload them into ComfyUI's models folders (see the workflow's required files).")
+            return HealthResult("error", "Not ready in your ComfyUI yet.", detail="\n".join(parts), info=info)
+        msg = f"Ready: '{wf.get('label', name)}' found everything it needs."
+        if using:
+            msg += " Using " + "; ".join(f"{k}: {v}" for k, v in using.items()) + "."
+        return HealthResult("ok", msg, info=info)
 
     def capabilities(self, workflow: str) -> Capabilities:
         wf = self.workflows.get(workflow)
@@ -145,6 +175,7 @@ class ComfyUIAdapter:
             fps=int(d.get("fps", 24)),
             max_frames=int(d.get("max_frames", 121)),
             frame_multiple=int(d.get("frame_multiple", 1)),
+            frame_offset=int(d.get("frame_offset", 1)),
         )
 
     # -- jobs -----------------------------------------------------------------
@@ -161,7 +192,13 @@ class ComfyUIAdapter:
         return f"{sub}/{data['name']}" if sub else data["name"]
 
     async def submit(self, req: GenerationRequest) -> str:
-        wf = self.workflows.get(req.workflow)
+        wf, report = await self.prepared(req.workflow)
+        missing = [r["label"] for r in report if r["chosen"] is None]
+        if missing:
+            raise ProviderError(
+                f"ComfyUI has no file for: {', '.join(missing)}. Press Check on the Integrations page for details.",
+                kind="not_configured", provider="comfyui",
+            )
         values = {
             "prompt": req.prompt,
             "negative_prompt": req.negative_prompt,

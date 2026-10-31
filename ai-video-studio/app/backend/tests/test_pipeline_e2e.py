@@ -20,7 +20,7 @@ FAST_SETTINGS = {
     "video": {"duration_s": 8, "min_duration_s": 3, "max_duration_s": 30, "width": 360, "height": 640, "fps": 24,
               "transition": "fade", "transition_s": 0.25},
     "generation": {"video_provider": "draft"},
-    "narration": {"voice_id": "voice-123", "voice_name": "Test voice", "alignment": "heuristic"},
+    "narration": {"provider": "fish_audio", "voice_id": "voice-123", "voice_name": "Test voice", "alignment": "heuristic"},
     "captions": {"font": "DejaVu Sans"},
     "gates": {"script": True, "scene_plan": True, "assembly": False},
     "queue": {"min_free_disk_gb": 0},

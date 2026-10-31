@@ -30,6 +30,11 @@ args = [
     "--collect-submodules", "studio",
     "--collect-submodules", "uvicorn",
     "--hidden-import", "keyring.backends.Windows",
+    # Local narration voice: bundled espeak-ng phonemizer data and Kokoro config.
+    "--collect-all", "kokoro_onnx",
+    "--collect-all", "espeakng_loader",
+    "--collect-all", "phonemizer",
+    "--collect-all", "onnxruntime",
     "--add-data", f"{ROOT / 'app' / 'frontend' / 'dist'}{SEP}app/frontend/dist",
     "--add-data", f"{ROOT / 'config' / 'workflows'}{SEP}config/workflows",
     "--add-data", f"{ROOT / 'app' / 'backend' / 'studio' / 'db' / 'migrations'}{SEP}studio/db/migrations",

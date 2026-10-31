@@ -195,6 +195,9 @@ export type Workflow = {
   bindings: Record<string, { node: string; input: string }[]>;
   user: boolean;
   overrides_bundled?: boolean;
+  family?: string;
+  priority?: number;
+  model_slots?: { label: string; input: string }[];
   error?: string;
 };
 
